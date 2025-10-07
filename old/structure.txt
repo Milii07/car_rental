@@ -1,0 +1,98 @@
+Folder PATH listing
+Volume serial number is 9A62-5E99
+C:.
+|   structure.txt
+|   
++---controllers
+|       forgot_process.php
+|       login_progress.php
+|       logout.php
+|       register_progress.php
+|       
++---db
+|       db.php
+|       
++---uploads
+|   |   1757407494_76c048dd372d13c8ffb558e6c3e02dc8.jpg
+|   |   1757407593_518-5189872_mercedes-amg-gt-r-png-transparent-png.png
+|   |   1757407741_Used-2021-Rolls-Royce-Ghost-1721333489.jpg
+|   |   1757407864_Mercedes-CLS-400d-4Matic-AMG-sylwetka.jpg
+|   |   1757407934_ABT-RSQ8-LE_SatelliteSilver_PreislisteWebseite.png
+|   |   1757408012_8a1b3f7b-02f0-4aef-9a70-be3f25780ba5.webp
+|   |   1757408168_1_zqunB7dJ_9nfILbdiACziQ.png
+|   |   1757408237_2025-Porsche-Taycan-2-770x545.png
+|   |   img_68bff90d8a8265.79406008.png
+|   |   img_68bffa399f6df5.41029863.png
+|   |   img_68bffc935aa0a2.39476917.jfif
+|   |   img_68bffd05231a74.48116083.png
+|   |   img_68bffd5f6573a1.72448913.png
+|   |   img_68c00316e06590.36821173.png
+|   |   img_68c0039225c3f0.45421728.jpg
+|   |   img_68c004ec833bb0.35956093.jpg
+|   |   img_68c0066fb80679.15430076.jpg
+|   |   img_68c007015a8051.75045389.jpg
+|   |   img_68c0086fdd4a24.72231113.jpg
+|   |   img_68c12b7f684529.36586111.png
+|   |   img_68c12b8a73e530.50392177.png
+|   |   img_68c12bbd5980c8.93004667.jpg
+|   |   img_68c12bc24c0fe5.67644972.jpg
+|   |   img_68c12bc52e17a6.52976207.jpg
+|   |   img_68c12c2e1fb4c4.28041665.jpg
+|   |   img_68c12c34ab7519.07736606.jpg
+|   |   img_68c12c37e725e5.11873630.jpg
+|   |   img_68c153823171d7.24742279.png
+|   |   img_68c15654195324.76920012.png
+|   |   img_68c156d6e4f915.49944101.png
+|   |   img_68c15741af1e45.69768798.png
+|   |   img_68c1580e604567.31168790.png
+|   |   img_68c1591b3f4f22.48651664.png
+|   |   img_68c159ac83e329.30034098.jpg
+|   |   img_68c15a87879a86.95377500.jpg
+|   |   img_68c15b47c29ad3.30126234.png
+|   |   img_68c15c19909692.81557030.jpg
+|   |   img_68c15c9f4b0ca2.44570369.png
+|   |   img_68c15d07b64d93.76636684.png
+|   |   img_68c15dad4899d4.27400841.png
+|   |   img_68c15df5b14658.89413321.jpg
+|   |   img_68c1693d87d280.82906886.png
+|   |   img_68c169de784229.43820113.jpg
+|   |   img_68c16a4b3c5324.93458327.jpg
+|   |   img_68c16ac6edcb14.07888242.jpg
+|   |   img_68c16b8ee26bb5.43614428.jpg
+|   |   img_68c191a094c9e3.58054292.jpg
+|   |   img_68c192711968a5.73555579.png
+|   |   img_68c192beb46f02.93932826.png
+|   |   img_68c2b4577a83e5.89299564.jpg
+|   |   img_68c3f5a56446c4.55641688.jpg
+|   |   img_68c3f74b044ec0.71346484.jpg
+|   |   img_68c3f997c580f6.07382224.jpg
+|   |   img_68c3f9ccac9056.16584277.jpg
+|   |   img_68c7baf0184ce1.24792448.jpg
+|   |   upload_post.php
+|   |   
+|   \---cars
+|           car_68c93a4342dff.jpg
+|           
+\---views
+    |   header.php
+    |   
+    +---auth
+    |       forgot.php
+    |       login.php
+    |       o.php
+    |       register.php
+    |       reset_password.php
+    |       
+    +---general
+    |   +---brands
+    |   |       list.php
+    |   |       
+    |   +---cars
+    |   |       create.php
+    |   |       
+    |   \---categories
+    |           list.php
+    |           
+    \---layout
+            layout.php
+            
