@@ -1,9 +1,10 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
+if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/db/db.php';
+
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
 
 if (isset($_POST['create'])) {
     $name = trim($_POST['name']);
@@ -32,7 +33,7 @@ if (isset($_POST['update'])) {
     } else {
         $_SESSION['error'] = "Emri i kategorisë nuk mund të jetë bosh!";
     }
-    header("Location: /new_project/views/general/categories/list.php");
+    header("Location: /new_project_bk/views/general/categories/list.php");
     exit;
 }
 
@@ -43,7 +44,7 @@ if (isset($_GET['delete'])) {
     $stmt->execute();
     $stmt->close();
     $_SESSION['message'] = "Kategoria u fshi me sukses!";
-    header("Location: /new_project/views/general/categories/list.php");
+    header("Location: /new_project_bk/views/general/categories/list.php");
     exit;
 }
 

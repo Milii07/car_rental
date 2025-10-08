@@ -1,13 +1,15 @@
 <?php
 
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 }
 
 
 
 
-define('BASE_PATH', $_SERVER['DOCUMENT_ROOT'] . '/new_project');
+define('BASE_PATH', $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk');
 
 define('DB_PATH', BASE_PATH . '/db');
 define('HELPER_PATH', BASE_PATH . '/helper');

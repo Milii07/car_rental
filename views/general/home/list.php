@@ -1,56 +1,32 @@
 <?php
-session_start();
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/db/db.php';
-
-// FUNKSIONET
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/reservations.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/client_helper.php';
 function getCarFiles()
 {
-    $carDir = $_SERVER['DOCUMENT_ROOT'] . '/new_project/uploads/cars';
+    $carDir = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/uploads/cars';
     $carFiles = glob($carDir . "/*.{jpg,png,jpeg,webp}", GLOB_BRACE);
     return array_filter($carFiles, fn($file) => basename($file)[0] != '.');
 }
 
-function syncCarsToDB($mysqli)
-{
-    $uploadsDir = $_SERVER['DOCUMENT_ROOT'] . '/new_project/uploads/cars/';
-    $files = glob($uploadsDir . '*.{jpg,jpeg,png,gif}', GLOB_BRACE);
-    foreach ($files as $file) {
-        $fileName = basename($file);
-        $carName = pathinfo($file, PATHINFO_FILENAME);
-        $images = '/uploads/cars/' . $fileName;
+$carFiles = getCarFiles();
 
-        // Kontrollo nëse makina ekziston
-        $stmt = $mysqli->prepare("SELECT id FROM cars WHERE images=?");
-        $stmt->bind_param("s", $images);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $stmt->close();
-        if ($result->num_rows > 0) continue;
+$query = "SELECT id, full_name FROM clients ORDER BY full_name ASC";
+$result = $mysqli->query($query);
 
-        $price_per_day = rand(50, 300);
-        $transmission = 'Automatic';
-        $year = date('Y');
-        $brand_id = 1;
-        $category_id = 1;
-        $vin = strtoupper(string: substr(md5($carName . uniqid('', true)), 0, 10));
-
-        $stmtInsert = $mysqli->prepare("
-            INSERT INTO cars (model, vin, brand_id, category_id, images, price_per_day, transmission, year)
-            VALUES (?,?,?,?,?,?,?,?)");
-        $stmtInsert->bind_param("ssiidssi", $carName, $vin, $brand_id, $category_id, $images, $price_per_day, $transmission, $year);
-        $stmtInsert->execute();
-        $stmtInsert->close();
+$clients = [];
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $clients[] = $row;
     }
 }
 
-syncCarsToDB($mysqli);
 
-// Merr makinat dhe klientët
-$cars = $mysqli->query("SELECT * FROM cars")->fetch_all(MYSQLI_ASSOC);
-$clients = $mysqli->query("SELECT * FROM clients ORDER BY full_name ASC")->fetch_all(MYSQLI_ASSOC);
-$carFiles = getCarFiles();
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
 ?>
 
 
@@ -302,7 +278,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
     }
 
     .car-price-clean {
-        color: #2e8b57;
+        color: #0d8d62ff;
         font-weight: 700;
         font-size: 1.6rem;
         letter-spacing: 0.5px;
@@ -328,7 +304,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
     }
 
     .btn-rezervo:hover {
-        background: #152c8c;
+        background: #032c69ff;
         transform: translateY(-2px);
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
     }
@@ -371,6 +347,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
                 elseif ($category === 'used') $usedCars++;
 
                 $carData = [
+                    'id' => $fileName,
                     'name' => str_replace('_', ' ', $carName),
                     'image' => $relativePath,
                     'badge' => ucfirst($category),
@@ -381,21 +358,23 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
                     'price' => rand(50, 300),
                     'category' => $category
                 ];
+
                 $allCars[] = $carData;
             }
             $totalCars = count($allCars);
             ?>
+
             <div class="dashboard-cards" style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:30px;">
-                <div class="card total-card" style="flex:1; min-width:150px; padding:20px; border-radius:12px; background:#1E40AF; color:#fff; text-align:center;">
-                    <h5>Total Makina</h5>
+                <div class="card total-card" style="flex:1; min-width:150px; padding:20px; border-radius:12px; background:#1E40AF; color:#fff !important; text-align:center;">
+                    <h5 class="text-white">Total Makina</h5>
                     <span class="counter" data-target="<?= $totalCars ?>">0</span>
                 </div>
-                <div class="card total-card" style="flex:1; min-width:150px; padding:20px; border-radius:12px; background:#10B981; color:#fff; text-align:center;">
-                    <h5>Të Reja</h5>
+                <div class="card total-card" style="flex:1; min-width:150px; padding:20px; border-radius:12px; background:#10B981; color:#fff !important; text-align:center;">
+                    <h5 class="text-white">Të Reja</h5>
                     <span class="counter" data-target="<?= $newCars ?>">0</span>
                 </div>
-                <div class="card total-card" style="flex:1; min-width:150px; padding:20px; border-radius:12px; background:#F59E0B; color:#fff; text-align:center;">
-                    <h5>Të Përdorura</h5>
+                <div class="card total-card" style="flex:1; min-width:150px; padding:20px; border-radius:12px; background:#F59E0B; color:#fff !important; text-align:center;">
+                    <h5 class="text-white">Të Përdorura</h5>
                     <span class="counter" data-target="<?= $usedCars ?>">0</span>
                 </div>
             </div>
@@ -405,11 +384,16 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
 
             <!-- === GRID MAKINASH === -->
             <div class="car-grid">
+
                 <?php foreach ($allCars as $carData):
                     $modalId = "carModal" . md5($carData['image']);
                 ?>
                     <div class="car-card">
-                        <img src="<?= htmlspecialchars($carData['image']) ?>" alt="<?= htmlspecialchars($carData['name']) ?>" class="car-image" data-bs-toggle="modal" data-bs-target="#<?= $modalId ?>">
+                        <img src="<?= htmlspecialchars($carData['image']) ?>"
+                            alt="<?= htmlspecialchars($carData['name']) ?>"
+                            class="car-image"
+                            data-bs-toggle="modal"
+                            data-bs-target="#<?= $modalId ?>">
                         <div class="car-rating">⭐ <?= $carData['rating'] ?></div>
                         <div class="car-content">
                             <h3 class="car-name"><?= htmlspecialchars($carData['name']) ?></h3>
@@ -420,26 +404,33 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
                             </div>
                             <div class="car-footer">
                                 <div class="car-price-clean">
-                                    💰 <span class="price-value"><?= $carData['price'] ?>€</span><span class="price-label"> /ditë</span>
+                                    💰 <span class="price-value"><?= $carData['price'] ?>€</span>
+                                    <span class="price-label"> /ditë</span>
                                 </div>
                                 <a href="#"
                                     class="btn btn-primary btn-rezervo"
                                     data-bs-toggle="modal"
-                                    data-bs-target="#addReservationModal">
+                                    data-bs-target="#addReservationModal"
+                                    data-car-id="<?= htmlspecialchars($carData['id'] ?? '') ?>"
+                                    data-car-name="<?= htmlspecialchars($carData['name']) ?>">
                                     Rezervo
                                 </a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- === MODAL Makinës === -->
+                    <!-- MODAL DETAJET E MAKINËS -->
                     <div class="modal fade" id="<?= $modalId ?>" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered modal-lg">
                             <div class="modal-content">
                                 <div class="modal-body text-center p-4">
-                                    <img src="<?= htmlspecialchars($carData['image']) ?>" class="img-fluid rounded mb-3" style="max-height:400px; object-fit:cover;">
+                                    <img src="<?= htmlspecialchars($carData['image']) ?>"
+                                        class="img-fluid rounded mb-3"
+                                        style="max-height:400px; object-fit:cover;">
                                     <h5 class="fw-semibold"><?= htmlspecialchars($carData['name']) ?></h5>
-                                    <p class="text-muted mb-1"><?= ucfirst($carData['category']) ?> | <?= htmlspecialchars($carData['type']) ?> | <?= htmlspecialchars($carData['transmission']) ?></p>
+                                    <p class="text-muted mb-1">
+                                        <?= ucfirst($carData['category']) ?> | <?= htmlspecialchars($carData['type']) ?> | <?= htmlspecialchars($carData['transmission']) ?>
+                                    </p>
                                     <p class="fs-5 fw-bold text-success">💰 <?= $carData['price'] ?> €/ditë</p>
                                     <p class="text-muted small">⭐ <?= $carData['rating'] ?> | 💺 <?= $carData['seats'] ?> vende</p>
                                     <hr class="my-3">
@@ -451,56 +442,33 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
                             </div>
                         </div>
                     </div>
-
                 <?php endforeach; ?>
             </div>
 
-            <!-- === MODAL ADD RESERVATION (vetëm një herë jashtë foreach) === -->
+            <!-- MODAL ADD RESERVATION  -->
             <div class="modal fade" id="addReservationModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content p-4">
                         <div class="modal-header">
-                            <h5 class="modal-title">Shto Rezervim</h5>
+                            <h5 class="modal-title">Rezervo Makinen</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-                        <form method="POST" action="/new_project/helper/reservations.php" id="reservationForm">
+                        <form method="POST" action="/new_project_bk/helper/reservations.php" id="reservationForm">
                             <div class="modal-body">
+                                <input type="hidden" name="car_id" value="<?= $carData['id'] ?>">
+                                <div class="mb-3">
+                                    <label class="form-label">Makina</label>
+                                    <input type="text" name="car_name" class="form-control" value="" readonly>
+                                </div>
                                 <div class="mb-3">
                                     <label class="form-label">Klienti</label>
-                                    <div class="input-group">
-                                        <select name="client_id" id="clientSelect" class="form-select" required>
-                                            <option value="">Zgjidh klientin</option>
-                                            <?php foreach ($clients as $cl): ?>
-                                                <option value="<?= $cl['id'] ?>"><?= htmlspecialchars($cl['full_name']) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <button type="button" class="btn btn-outline-primary"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#addClientModal">
-                                            + Shto Klient
-                                        </button>
-                                    </div>
+                                    <select name="client_id" class="form-select" required>
+                                        <option value="">Zgjidh klientin</option>
+                                        <?php foreach ($clients as $cl): ?>
+                                            <option value="<?= $cl['id'] ?>"><?= htmlspecialchars($cl['full_name']) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
-                                <?php
-                                $selectedCar = null;
-                                if (isset($_GET['car_id'])) {
-                                    $carId = (int)$_GET['car_id'];
-                                    foreach ($cars as $c) {
-                                        if ($c['id'] === $carId) {
-                                            $selectedCar = $c;
-                                            break;
-                                        }
-                                    }
-                                }
-                                ?>
-
-                                <?php if ($selectedCar): ?>
-                                    <div class="mb-3">
-                                        <label class="form-label">Makina</label>
-                                        <input type="text" class="form-control" value="<?= htmlspecialchars($selectedCar['model'] . ' - ' . $selectedCar['vin'] . ' | $' . $selectedCar['price_per_day'] . '/day') ?>" disabled>
-                                        <input type="hidden" name="car_id" value="<?= $selectedCar['id'] ?>">
-                                    </div>
-                                <?php endif; ?>
                                 <div class="row">
                                     <div class="col mb-3">
                                         <label class="form-label">Data Fillimit</label>
@@ -517,12 +485,13 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="submit" name="create" class="btn btn-success w-30">Krijo Rezervim</button>
+                                <button type="submit" name="create" class="btn btn-success">Krijo Rezervim</button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
+
 
             <!-- === MODAL ADD CLIENT (vetëm një herë jashtë foreach) === -->
             <div class="modal fade" id="addClientModal" tabindex="-1">
@@ -547,15 +516,34 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
                                     </select>
                                 </div>
                                 <?php
+
+                                $clientFields = [
+                                    'full_name' => 'text',
+                                    'company_name' => 'text',
+                                    'nipt' => 'text',
+                                    'email' => 'email',
+                                    'phone' => 'tel',
+                                    'birthday' => 'date',
+                                    'country' => 'text',
+                                    'city' => 'text',
+                                    'zip' => 'text',
+                                    'reference' => 'text',
+                                    'address' => 'text',
+                                    'payment_terms' => 'text',
+                                    'remarks' => 'text'
+                                ];
+
                                 $clientFields = ['full_name', 'company_name', 'nipt', 'email', 'phone', 'birthday', 'country', 'city', 'zip', 'reference', 'address', 'payment_terms', 'remarks'];
                                 foreach ($clientFields as $field) {
                                     $label = ucwords(str_replace('_', ' ', $field));
                                     echo '<div class="col-md-3 mb-3">
-                                <label class="form-label">' . $label . '</label>
-                                <input type="text" class="form-control" name="' . $field . '">
-                              </div>';
+        <label class="form-label">' . $label . '</label>
+        <input type="text" class="form-control" name="' . $field . '" required>
+    </div>';
                                 }
                                 ?>
+
+
                             </div>
                             <div class="modal-footer">
                                 <button type="submit" name="save_client" class="btn btn-success">Save Client</button>
@@ -565,6 +553,10 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
                     </div>
                 </div>
             </div>
+            <div class="modal fade" id="addReservationModal" tabindex="-1" aria-hidden="true">
+                ...
+            </div>
+
 
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -652,7 +644,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
                                 cancelButtonText: "Anulo",
                                 preConfirm: (newName) => {
                                     if (!newName) Swal.showValidationMessage("Emri nuk mund të jetë bosh");
-                                    return fetch("/new_project/helper/renameCar.php", {
+                                    return fetch("/new_project_bk/helper/renameCar.php", {
                                             method: "POST",
                                             headers: {
                                                 "Content-Type": "application/x-www-form-urlencoded"
@@ -672,6 +664,41 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
                 });
 
                 console.log(<?= json_encode($allCars, JSON_PRETTY_PRINT) ?>);
+
+                var reservationModal = document.getElementById('addReservationModal');
+                reservationModal.addEventListener('show.bs.modal', function(event) {
+                    var button = event.relatedTarget; // buttoni që e hap modalin
+                    var carId = button.getAttribute('data-car-id');
+                    var carName = button.getAttribute('data-car-name');
+
+                    var modalForm = reservationModal.querySelector('#reservationForm');
+                    modalForm.querySelector('input[name="car_id"]').value = carId;
+                    modalForm.querySelector('input[name="car_name"]').value = carName;
+                });
+
+                document.querySelectorAll('.btn-rezervo').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const carId = btn.getAttribute('data-car-id');
+                        const carName = btn.getAttribute('data-car-name');
+                        document.getElementById('reservationCarId').value = carId;
+                        document.getElementById('reservationCarName').value = carName;
+                    });
+                });
+                document.getElementById('addClientForm').addEventListener('submit', function(e) {
+                    const inputs = this.querySelectorAll('input[required]:not([readonly]), select[required]');
+                    let valid = true;
+                    inputs.forEach(input => {
+                        if (!input.value.trim()) valid = false;
+                    });
+                    if (!valid) {
+                        e.preventDefault();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Të gjitha fushat janë të detyrueshme!',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
             </script>
 
-            <?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/footer.php'; ?>
+            <?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/footer.php'; ?>

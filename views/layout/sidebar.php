@@ -1,5 +1,5 @@
 <?php
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/db/db.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
 ?>
 
 <!DOCTYPE html>
@@ -182,7 +182,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/db/db.php';
 
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <img src="/new_project/uploads/cars/LOGO.jpg" alt="Logo">
+      <img src="/new_project_bk/uploads/cars/LOGO.jpg" alt="Logo">
       <div class="title-slogan">
         <span class="title">A.F.B</span>
         <span class="slogan">Rent Cars with Style!</span>
@@ -191,31 +191,31 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/db/db.php';
 
     <ul class="nav flex-column mb-auto mt-3">
       <li class="nav-item">
-        <a href="/new_project/views/general/brands/list.php" class="nav-link fw-semibold" data-tooltip="Brand-et">
+        <a href="/new_project_bk/views/general/brands/list.php" class="nav-link fw-semibold" data-tooltip="Brand-et">
           <i class="bi bi-tags-fill me-2 fs-5"></i>
           <span class="nav-link-text">Brand-et</span>
         </a>
       </li>
       <li class="nav-item">
-        <a href="/new_project/views/general/categories/list.php" class="nav-link fw-semibold" data-tooltip="Kategoritë">
+        <a href="/new_project_bk/views/general/categories/list.php" class="nav-link fw-semibold" data-tooltip="Kategoritë">
           <i class="bi bi-grid-fill me-2 fs-5"></i>
           <span class="nav-link-text">Kategoritë</span>
         </a>
       </li>
       <li class="nav-item">
-        <a href="/new_project/views/general/cars/list.php" class="nav-link fw-semibold" data-tooltip="Makina">
+        <a href="/new_project_bk/views/general/cars/list.php" class="nav-link fw-semibold" data-tooltip="Makina">
           <i class="bi bi-car-front-fill me-2 fs-5"></i>
           <span class="nav-link-text">Makina</span>
         </a>
       </li>
       <li class="nav-item">
-        <a href="/new_project/views/general/reservations/list.php" class="nav-link fw-semibold" data-tooltip="Rezervime">
+        <a href="/new_project_bk/views/general/reservations/list.php" class="nav-link fw-semibold" data-tooltip="Rezervime">
           <i class="bi bi-calendar-check-fill me-2 fs-5"></i>
           <span class="nav-link-text">Rezervime</span>
         </a>
       </li>
       <li class="nav-item">
-        <a href="/new_project/views/general/client_management/list.php" class="nav-link fw-semibold" data-tooltip="Klientët">
+        <a href="/new_project_bk/views/general/client_management/list.php" class="nav-link fw-semibold" data-tooltip="Klientët">
           <i class="bi bi-people-fill me-2 fs-5"></i>
           <span class="nav-link-text">Klientët</span>
         </a>

@@ -42,15 +42,15 @@
 </div>
 
 
-<script src="/new_project/public/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="/new_project/public/assets/libs/simplebar/simplebar.min.js"></script>
-<script src="/new_project/public/assets/libs/node-waves/waves.min.js"></script>
-<script src="/new_project/public/assets/libs/feather-icons/feather.min.js"></script>
-<script src="/new_project/public/assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
-<script src="/new_project/public/assets/js/plugins.js"></script>
+<script src="/new_project_bk/public/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/new_project_bk/public/assets/libs/simplebar/simplebar.min.js"></script>
+<script src="/new_project_bk/public/assets/libs/node-waves/waves.min.js"></script>
+<script src="/new_project_bk/public/assets/libs/feather-icons/feather.min.js"></script>
+<script src="/new_project_bk/public/assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
+<script src="/new_project_bk/public/assets/js/plugins.js"></script>
 
 
-<script src="/new_project/public/assets/js/app.js"></script>
+<script src="/new_project_bk/public/assets/js/app.js"></script>
 
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>

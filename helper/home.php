@@ -3,14 +3,14 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/db/db.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
 
 /**
  * Merr të gjitha skedarët e makinave nga dosja uploads/cars
  */
 function getCarFiles()
 {
-    $carDir = $_SERVER['DOCUMENT_ROOT'] . '/new_project/uploads/cars';
+    $carDir = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/uploads/cars';
     $carFiles = glob($carDir . "/*.{jpg,png,jpeg,webp}", GLOB_BRACE);
 
     $carFiles = array_filter($carFiles, function ($file) {
@@ -20,43 +20,45 @@ function getCarFiles()
     return array_unique($carFiles);
 }
 
-/**
- * Sinkronizon makinat nga dosja uploads/cars në DB
- */
-function syncCarsToDB($mysqli)
+
+function syncCarsToDB($mysqli, $files = [])
 {
-    $uploadsDir = $_SERVER['DOCUMENT_ROOT'] . '/new_project/uploads/cars/';
-    $files = glob($uploadsDir . '*.{jpg,jpeg,png,gif}', GLOB_BRACE);
+    $uploadsDir = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/uploads/cars/';
+
+    if (empty($files)) {
+        $files = glob($uploadsDir . '*.{jpg,jpeg,png,gif,webp}', GLOB_BRACE);
+    }
 
     foreach ($files as $file) {
         $fileName = basename($file);
         $carName = pathinfo($file, PATHINFO_FILENAME);
         $images = '/uploads/cars/' . $fileName;
 
-        // Kontrollo nëse makina ekziston
-        $stmt = $mysqli->prepare("SELECT id FROM cars WHERE images = ?");
-        $stmt->bind_param("s", $images);
+        $hash = md5_file($file);
+
+        $stmt = $mysqli->prepare("SELECT id FROM cars WHERE file_hash = ?");
+        $stmt->bind_param("s", $hash);
         $stmt->execute();
         $result = $stmt->get_result();
         $stmt->close();
 
         if ($result->num_rows > 0) continue;
 
-        // Fut makina në DB
         $price = rand(50, 300);
         $transmission = 'Automatic';
         $year = date('Y');
 
-        $stmtInsert = $mysqli->prepare("INSERT INTO cars (model, images, price_per_day, transmission, year) VALUES (?, ?, ?, ?, ?)");
-        $stmtInsert->bind_param("ssdsi", $carName, $images, $price, $transmission, $year);
+        $stmtInsert = $mysqli->prepare("
+            INSERT INTO cars (model, images, price_per_day, transmission, year, file_hash)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
+        $stmtInsert->bind_param("ssdiss", $carName, $images, $price, $transmission, $year, $hash);
         $stmtInsert->execute();
         $stmtInsert->close();
     }
 }
 
-/**
- * Merr statusin e një makine sipas rezervimeve
- */
+
 function getCarStatus($car_id, $mysqli)
 {
     $today = new DateTime();
@@ -101,9 +103,7 @@ function getCarStatus($car_id, $mysqli)
     ];
 }
 
-/**
- * Merr të gjitha makinat nga DB
- */
+
 function getAllCars($mysqli)
 {
     return $mysqli->query("
@@ -117,9 +117,7 @@ function getAllCars($mysqli)
     ")->fetch_all(MYSQLI_ASSOC);
 }
 
-/**
- * Merr makinat e lira (të cilat nuk janë të rezervuara)
- */
+
 function getAvailableCars($mysqli)
 {
     $cars = getAllCars($mysqli);

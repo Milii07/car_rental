@@ -1,7 +1,9 @@
 <?php
-session_start();
-include '../../db/db.php';         
-include '../layout/layout.php'; 
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
+include '../../db/db.php';
+include '../layout/layout.php';
 
 $message = $_SESSION['message'] ?? '';
 $error = $_SESSION['error'] ?? '';
@@ -10,6 +12,7 @@ unset($_SESSION['message'], $_SESSION['error']);
 
 <!DOCTYPE html>
 <html lang="sq">
+
 <head>
   <meta charset="UTF-8" />
   <title>Keni harruar fjalëkalimin</title>
@@ -42,4 +45,5 @@ unset($_SESSION['message'], $_SESSION['error']);
     </div>
   </div>
 </body>
+
 </html>

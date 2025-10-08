@@ -1,11 +1,14 @@
 <?php
-session_start();
-include '../../db/db.php';         
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
+include '../../db/db.php';
 include '../layout/layout.php';
 ?>
 
 <!DOCTYPE html>
 <html lang="sq">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -62,45 +65,47 @@ include '../layout/layout.php';
 </head>
 
 <body>
-<?php showFutureBlockBackground(); ?>
+  <?php showFutureBlockBackground(); ?>
 
-<?php if (isset($_SESSION['error'])): ?>
-  <div class="alert alert-danger w-50 mx-auto mt-3"><?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
-<?php endif; ?>
+  <?php if (isset($_SESSION['error'])): ?>
+    <div class="alert alert-danger w-50 mx-auto mt-3"><?= htmlspecialchars($_SESSION['error']);
+                                                      unset($_SESSION['error']); ?></div>
+  <?php endif; ?>
 
-<div class="login-card mx-auto mt-5">
-  <h3>Kyçu në llogari</h3>
+  <div class="login-card mx-auto mt-5">
+    <h3>Kyçu në llogari</h3>
 
-  <form action="../../controllers/login_progress.php" method="POST">
-    <div class="input-group mb-4 position-relative">
-      <span class="input-group-text position-absolute top-50 translate-middle-y" style="left: 15px; background: transparent; border: none; color: #2575fc;">
-        <i class="bi bi-person-circle fs-4"></i>
-      </span>
-      <input type="email" class="form-control rounded-input ps-6" name="email" placeholder="Email" required autofocus />
-    </div>
+    <form action="../../controllers/login_progress.php" method="POST">
+      <div class="input-group mb-4 position-relative">
+        <span class="input-group-text position-absolute top-50 translate-middle-y" style="left: 15px; background: transparent; border: none; color: #2575fc;">
+          <i class="bi bi-person-circle fs-4"></i>
+        </span>
+        <input type="email" class="form-control rounded-input ps-6" name="email" placeholder="Email" required autofocus />
+      </div>
 
-    <div class="input-group mb-3 position-relative">
-      <span class="input-group-text position-absolute top-50 translate-middle-y" style="left: 15px; background: transparent; border: none; color: #2575fc;">
-        <i class="bi bi-lock-fill fs-4"></i>
-      </span>
-      <input type="password" class="form-control rounded-input ps-6" name="password" placeholder="Fjalëkalimi" required />
-    </div>
+      <div class="input-group mb-3 position-relative">
+        <span class="input-group-text position-absolute top-50 translate-middle-y" style="left: 15px; background: transparent; border: none; color: #2575fc;">
+          <i class="bi bi-lock-fill fs-4"></i>
+        </span>
+        <input type="password" class="form-control rounded-input ps-6" name="password" placeholder="Fjalëkalimi" required />
+      </div>
 
-    <div class="form-check mb-3 text-start">
-      <input class="form-check-input" type="checkbox" name="remember" id="remember" />
-      <label class="form-check-label" for="remember"> Më mbaj mend </label>
-    </div>
+      <div class="form-check mb-3 text-start">
+        <input class="form-check-input" type="checkbox" name="remember" id="remember" />
+        <label class="form-check-label" for="remember"> Më mbaj mend </label>
+      </div>
 
-    <div class="mb-3 text-end">
-      <a href="forgot.php" class="text-decoration-none small">Ke harruar fjalëkalimin?</a>
-    </div>
+      <div class="mb-3 text-end">
+        <a href="forgot.php" class="text-decoration-none small">Ke harruar fjalëkalimin?</a>
+      </div>
 
-    <button type="submit" class="btn btn-primary w-100 mb-3">Kyçu</button>
-  </form>
+      <button type="submit" class="btn btn-primary w-100 mb-3">Kyçu</button>
+    </form>
 
-  <p class="mt-3">Nuk ke llogari? <a href="register.php">Regjistrohu</a></p>
-</div>
+    <p class="mt-3">Nuk ke llogari? <a href="register.php">Regjistrohu</a></p>
+  </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

@@ -1,10 +1,12 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/db/db.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/helper/reservations.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/helper/client_helper.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/reservations.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/client_helper.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
 
 $clients_result = $mysqli->query("SELECT id, full_name FROM clients ORDER BY full_name ASC");
 $clients = $clients_result->fetch_all(MYSQLI_ASSOC);
@@ -137,7 +139,7 @@ function getCarStatus($car_id, $mysqli)
                                     <td>$<?= number_format($r['total_price'], 2) ?></td>
                                     <td><?= $carStatus['status'] ?><?php if ($carStatus['client_name']) echo ' (' . htmlspecialchars($carStatus['client_name']) . ')'; ?></td>
                                     <td>
-                                        <a href="/new_project/helper/reservations.php?delete=<?= $r['id'] ?>" class="btn btn-sm btn-danger delete-btn">
+                                        <a href="/new_project_bk/helper/reservations.php?delete=<?= $r['id'] ?>" class="btn btn-sm btn-danger delete-btn">
                                             <i class="ri-delete-bin-6-line"></i>
                                         </a>
                                     </td>
@@ -155,7 +157,7 @@ function getCarStatus($car_id, $mysqli)
                             <h5 class="modal-title">Shto Rezervim</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-                        <form method="POST" action="/new_project/helper/reservations.php" id="reservationForm">
+                        <form method="POST" action="/new_project_bk/helper/reservations.php" id="reservationForm">
                             <div class="modal-body">
                                 <div class="mb-3">
                                     <label class="form-label">Klienti</label>
@@ -293,7 +295,7 @@ function getCarStatus($car_id, $mysqli)
         var submitBtn = this.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
 
-        fetch('/new_project/helper/save_client_ajax.php', {
+        fetch('/new_project_bk/helper/save_client_ajax.php', {
                 method: 'POST',
                 body: formData
             })
@@ -331,4 +333,4 @@ function getCarStatus($car_id, $mysqli)
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/footer.php'; ?>
+<?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/footer.php'; ?>

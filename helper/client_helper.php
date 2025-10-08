@@ -1,8 +1,8 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
+if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/db/db.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
 
 
 if (isset($_POST['save_client'])) {
@@ -26,7 +26,7 @@ if (isset($_POST['save_client'])) {
     if (isset($_FILES['photos']) && $_FILES['photos']['name'][0] != '') {
         foreach ($_FILES['photos']['tmp_name'] as $key => $tmp_name) {
             $filename = basename($_FILES['photos']['name'][$key]);
-            $target = $_SERVER['DOCUMENT_ROOT'] . '/new_project/client_management/uploads/' . $filename;
+            $target = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/client_management/uploads/' . $filename;
             if (move_uploaded_file($tmp_name, $target)) {
                 $uploaded[] = $filename;
             }
@@ -40,10 +40,10 @@ if (isset($_POST['save_client'])) {
     $stmt->close();
 
     if (isset($_POST['from']) && $_POST['from'] === 'order_status') {
-        header("Location: /new_project/views/general/order_status/list.php");
+        header("Location: /new_project_bk/views/general/order_status/list.php");
         exit;
     } else {
-        header("Location: /new_project/views/general/client_management/list.php");
+        header("Location: /new_project_bk/views/general/client_management/list.php");
         exit;
     }
 }
@@ -63,7 +63,7 @@ if (isset($_GET['delete'])) {
         $row = $mysqli->query("SELECT photos FROM clients WHERE id=$id")->fetch_assoc();
         if (!empty($row['photos'])) {
             foreach (explode(',', $row['photos']) as $img) {
-                $file = $_SERVER['DOCUMENT_ROOT'] . '/new_project/client_management/uploads/' . $img;
+                $file = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/client_management/uploads/' . $img;
                 if (file_exists($file)) unlink($file);
             }
         }
@@ -75,7 +75,7 @@ if (isset($_GET['delete'])) {
         $_SESSION['message'] = "Client u fshi me sukses!";
     }
 
-    header("Location: /new_project/views/general/client_management/list.php");
+    header("Location: /new_project_bk/views/general/client_management/list.php");
     exit;
 }
 
@@ -101,7 +101,7 @@ if (isset($_POST['update_client'])) {
     if (isset($_FILES['photos']) && $_FILES['photos']['name'][0] != '') {
         foreach ($_FILES['photos']['tmp_name'] as $key => $tmp_name) {
             $filename = basename($_FILES['photos']['name'][$key]);
-            $target = $_SERVER['DOCUMENT_ROOT'] . '/new_project/client_management/uploads/' . $filename;
+            $target = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/client_management/uploads/' . $filename;
             if (move_uploaded_file($tmp_name, $target)) {
                 $uploaded[] = $filename;
             }
@@ -118,7 +118,7 @@ if (isset($_POST['update_client'])) {
     $stmt->close();
 
     $_SESSION['message'] = "Client u përditësua me sukses!";
-    header("Location: /new_project/views/general/client_management/list.php");
+    header("Location: /new_project_bk/views/general/client_management/list.php");
     exit;
 }
 

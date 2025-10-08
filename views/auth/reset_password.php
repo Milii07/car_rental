@@ -1,8 +1,10 @@
 <?php
-session_start();
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/db/db.php';
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/layout.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/layout.php';
 
 
 $token = $_GET['token'] ?? '';
@@ -11,54 +13,56 @@ $success = '';
 $user_id = null;
 
 if ($token) {
-    $stmt = $mysqli->prepare("SELECT user_id, expires_at FROM password_resets WHERE token = ? LIMIT 1");
-    $stmt->bind_param("s", $token);
-    $stmt->execute();
-    $row = $stmt->get_result()->fetch_assoc();
+  $stmt = $mysqli->prepare("SELECT user_id, expires_at FROM password_resets WHERE token = ? LIMIT 1");
+  $stmt->bind_param("s", $token);
+  $stmt->execute();
+  $row = $stmt->get_result()->fetch_assoc();
 
-    if ($row && strtotime($row['expires_at']) > time()) {
-        $user_id = $row['user_id'];
-    } else {
-        $error = "Linku nuk është valid ose ka skaduar.";
-    }
+  if ($row && strtotime($row['expires_at']) > time()) {
+    $user_id = $row['user_id'];
+  } else {
+    $error = "Linku nuk është valid ose ka skaduar.";
+  }
 } else {
-    $error = "Token mungon.";
+  $error = "Token mungon.";
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user_id) {
-    $password = $_POST['password'] ?? '';
-    $confirm = $_POST['confirm_password'] ?? '';
+  $password = $_POST['password'] ?? '';
+  $confirm = $_POST['confirm_password'] ?? '';
 
-    if (!$password || !$confirm) {
-        $error = "Plotëso të gjitha fushat.";
-    } elseif ($password !== $confirm) {
-        $error = "Fjalëkalimet nuk përputhen.";
-    } elseif (strlen($password) < 6) {
-        $error = "Fjalëkalimi duhet të jetë të paktën 6 karaktere.";
-    } else {
-        $hashed = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $mysqli->prepare("UPDATE users SET password = ? WHERE id = ?");
-        $stmt->bind_param("si", $hashed, $user_id);
-        $stmt->execute();
+  if (!$password || !$confirm) {
+    $error = "Plotëso të gjitha fushat.";
+  } elseif ($password !== $confirm) {
+    $error = "Fjalëkalimet nuk përputhen.";
+  } elseif (strlen($password) < 6) {
+    $error = "Fjalëkalimi duhet të jetë të paktën 6 karaktere.";
+  } else {
+    $hashed = password_hash($password, PASSWORD_DEFAULT);
+    $stmt = $mysqli->prepare("UPDATE users SET password = ? WHERE id = ?");
+    $stmt->bind_param("si", $hashed, $user_id);
+    $stmt->execute();
 
-        $stmt = $mysqli->prepare("DELETE FROM password_resets WHERE token = ?");
-        $stmt->bind_param("s", $token);
-        $stmt->execute();
+    $stmt = $mysqli->prepare("DELETE FROM password_resets WHERE token = ?");
+    $stmt->bind_param("s", $token);
+    $stmt->execute();
 
-        $success = "Fjalëkalimi  !";
-        $user_id = null;
-    }
+    $success = "Fjalëkalimi  !";
+    $user_id = null;
+  }
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="sq">
+
 <head>
   <meta charset="UTF-8">
   <title>Rivendos Fjalëkalimin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
   <?php showFutureBlockBackground(); ?>
   <div class="container vh-100 d-flex justify-content-center align-items-center">
@@ -88,4 +92,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user_id) {
     </div>
   </div>
 </body>
+
 </html>

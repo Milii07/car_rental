@@ -2,7 +2,6 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 $mysqli = new mysqli('localhost', 'root', '', 'auto_future_block');
 if ($mysqli->connect_error) {
     die("Connection failed: " . $mysqli->connect_error);
@@ -10,7 +9,7 @@ if ($mysqli->connect_error) {
 
 $tables = ['brands', 'cars', 'categories', 'clients', 'menu_items', 'password_resets', 'reservations', 'users'];
 
-$projectDir = $_SERVER['DOCUMENT_ROOT'] . '/new_project';
+$projectDir = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk';
 
 
 function getTextColumns($table, $mysqli)
@@ -53,7 +52,7 @@ function searchDatabase($query, $tables, $mysqli)
                     'type' => 'db',
                     'table' => $table,
                     'columns' => $row,
-                    'url' => "/new_project/views/general/$table/list.php"
+                    'url' => "/new_project_bk/views/general/$table/list.php"
                 ];
             }
         }

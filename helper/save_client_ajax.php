@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/db/db.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
 header('Content-Type: application/json');
 
 if (isset($_POST['full_name']) && !empty(trim($_POST['full_name']))) {

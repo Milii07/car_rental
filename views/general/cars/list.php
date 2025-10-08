@@ -1,23 +1,28 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/index.php';
+include __DIR__ . '/../../../db/db.php';
+require $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/home.php';
 
+include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
 
-
-
-
-$brands = $mysqli->query("SELECT * FROM brands ORDER BY name ASC")->fetch_all(MYSQLI_ASSOC);
-$categories = $mysqli->query("SELECT * FROM categories ORDER BY name ASC")->fetch_all(MYSQLI_ASSOC);
-
-$result = $mysqli->query("SELECT * FROM cars ORDER BY id DESC");
-
+// Fushat e makinës
 $carFields = ['vin', 'model', 'year', 'body_type', 'color', 'fuel_type', 'transmission', 'odometer', 'license_plate', 'seating_capacity'];
 $ownerFields = ['owner_name', 'dob', 'address', 'phone', 'email', 'license_number', 'tax_id'];
 $insuranceFields = ['insurance_provider', 'policy_number', 'coverage_type'];
 $financialFields = ['registration_fee', 'road_tax', 'sales_tax', 'payment_method', 'price_per_day'];
 $dealerFields = ['dealer_info', 'special_plate'];
 
+// Merr brands dhe categories
+$brands = $mysqli->query("SELECT * FROM brands ORDER BY name ASC")->fetch_all(MYSQLI_ASSOC);
+$categories = $mysqli->query("SELECT * FROM categories ORDER BY name ASC")->fetch_all(MYSQLI_ASSOC);
 
+// Merr makinat
+$result = $mysqli->query("SELECT * FROM cars ORDER BY id DESC");
+
+// Funksion për form fields
 function renderFields($fields, $data = [])
 {
     foreach ($fields as $field) {
@@ -27,7 +32,7 @@ function renderFields($fields, $data = [])
         $step = $type === 'number' ? 'step="0.01" min="0"' : '';
         echo '<div class="col-md-3 mb-3">
                 <label class="form-label">' . $label . '</label>
-                <input type="' . $type . '" class="form-control" name="' . $field . '" value="' . htmlspecialchars($value) . '" ' . $step . '>
+                <input type="' . $type . '" class="form-control" name="' . $field . '" value="' . htmlspecialchars($value) . '" ' . $step . ' required>
               </div>';
     }
 }
@@ -100,14 +105,14 @@ function renderFields($fields, $data = [])
                                             <td>
                                                 <?php if (!empty($row['images'])) :
                                                     foreach (explode(',', $row['images']) as $img) :
-                                                        echo "<img src='/new_project/uploads/cars/" . htmlspecialchars($img) . "' width='50' class='me-1 mb-1'>";
+                                                        echo "<img src='/new_project_bk/uploads/cars/" . htmlspecialchars($img) . "' width='50' class='me-1 mb-1'>";
                                                     endforeach;
                                                 endif; ?>
                                             </td>
                                             <td class="d-flex">
                                                 <button class="btn btn-info btn-sm me-1" data-bs-toggle="modal" data-bs-target="#viewCarModal<?= $row['id'] ?>"><i class="ri-eye-fill"></i></button>
                                                 <button class="btn btn-warning btn-sm me-1" data-bs-toggle="modal" data-bs-target="#editCarModal<?= $row['id'] ?>"><i class="ri-edit-2-fill"></i></button>
-                                                <a href="/new_project/helper/cars.php?delete=<?= $row['id'] ?>" class="btn btn-danger btn-sm delete-btn"><i class="ri-delete-bin-6-line"></i></a>
+                                                <a href="/new_project_bk/helper/cars.php?delete=<?= $row['id'] ?>" class="btn btn-danger btn-sm delete-btn"><i class="ri-delete-bin-6-line"></i></a>
                                             </td>
                                         </tr>
                                         <div class="modal fade" id="viewCarModal<?= $row['id'] ?>" tabindex="-1">
@@ -116,7 +121,7 @@ function renderFields($fields, $data = [])
 
                                                     <!-- HEADER -->
                                                     <div class="modal-header  text-white rounded-top-4">
-                                                        <h5 class="modal-title d-flex align-items-center">
+                                                        <h5 class="modal-title d-flex text-primary align-items-center">
                                                             <i class="ri-car-line me-2 fs-5"></i> Detajet e Makinës – ID <?= $row['id'] ?>
                                                         </h5>
                                                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -130,7 +135,7 @@ function renderFields($fields, $data = [])
                                                             <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
                                                                 <?php foreach (explode(',', $row['images']) as $img) : ?>
                                                                     <div class="border rounded-3 overflow-hidden">
-                                                                        <img src="/new_project/uploads/cars/<?= htmlspecialchars($img) ?>"
+                                                                        <img src="/new_project_bk/uploads/cars/<?= htmlspecialchars($img) ?>"
                                                                             class="img-fluid"
                                                                             style="width:390px; height:260px; object-fit:cover;"
                                                                             alt="Foto makine">
@@ -191,7 +196,7 @@ function renderFields($fields, $data = [])
                                                         <h5 class="modal-title">Edit Car - ID <?= $row['id'] ?></h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                     </div>
-                                                    <form method="POST" action="/new_project/helper/cars.php" enctype="multipart/form-data">
+                                                    <form method="POST" action="/new_project_bk/helper/cars.php" enctype="multipart/form-data">
                                                         <input type="hidden" name="id" value="<?= $row['id'] ?>">
                                                         <div class="modal-body row">
                                                             <?php renderFields(array_merge($carFields, $ownerFields, $insuranceFields, $financialFields, $dealerFields), $row); ?>
@@ -219,7 +224,7 @@ function renderFields($fields, $data = [])
                                                                 <?php if (!empty($row['images'])) : ?>
                                                                     <div class="mt-2">
                                                                         <?php foreach (explode(',', $row['images']) as $img) : ?>
-                                                                            <img src="/new_project/uploads/cars/Makina\Camera Roll/<?= htmlspecialchars($img) ?>" width="50" class="me-1 mb-1">
+                                                                            <img src="/new_project_bk/uploads/cars/Makina\Camera Roll/<?= htmlspecialchars($img) ?>" width="50" class="me-1 mb-1">
                                                                         <?php endforeach; ?>
                                                                     </div>
                                                                 <?php endif; ?>
@@ -253,7 +258,7 @@ function renderFields($fields, $data = [])
                 <h5 class="modal-title">Shto Makine</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="POST" action="/new_project/helper/cars.php" enctype="multipart/form-data">
+            <form method="POST" action="/new_project_bk/helper/cars.php" enctype="multipart/form-data">
                 <div class="modal-body row">
                     <?php renderFields(array_merge($carFields, $ownerFields, $insuranceFields, $financialFields, $dealerFields)); ?>
                     <div class="col-md-3 mb-3">
@@ -286,7 +291,7 @@ function renderFields($fields, $data = [])
         </div>
     </div>
 </div>
-
+<!-- JS -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.querySelectorAll('.delete-btn').forEach(button => {
@@ -310,6 +315,6 @@ function renderFields($fields, $data = [])
         });
     });
 </script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/footer.php'; ?>
+
+<?php include __DIR__ . '/../../../views/layout/footer.php'; ?>

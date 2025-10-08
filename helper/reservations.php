@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/db/db.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
 
 // Funksioni për statusin e makinës
 if (!function_exists('getCarStatus')) {
@@ -121,13 +121,13 @@ if (isset($_POST['create'])) {
 
     if (!$car_id || !$client_id || !$start_date) {
         $_SESSION['error'] = "Të gjitha fushat janë të detyrueshme!";
-        header("Location: /new_project/views/general/reservations/list.php");
+        header("Location: /new_project_bk/views/general/reservations/list.php");
         exit;
     }
 
     if ($start_date > $end_date) {
         $_SESSION['error'] = "Data e fillimit nuk mund të jetë pas datës së mbarimit!";
-        header("Location: /new_project/views/general/reservations/list.php");
+        header("Location: /new_project_bk/views/general/reservations/list.php");
         exit;
     }
 
@@ -155,7 +155,7 @@ if (isset($_POST['create'])) {
 
     if ($res_check) {
         $_SESSION['error'] = "Makina është rezervuar nga: " . htmlspecialchars($res_check['full_name']);
-        header("Location: /new_project/views/general/reservations/list.php");
+        header("Location: /new_project_bk/views/general/reservations/list.php");
         exit;
     }
 
@@ -174,18 +174,19 @@ if (isset($_POST['create'])) {
     $days = max(1, (abs(strtotime($end_date) - strtotime($start_date)) / 86400) + 1);
     $total_price = $price_per_day * $days;
 
+    var_dump($car_id);
     // Fut rezervimin
     $stmt = $mysqli->prepare("
         INSERT INTO reservations 
         (client_id, client_name, car_id, brand_id, category_id, start_date, time, end_date, total_price, status)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
     ");
-    $stmt->bind_param("iiiiissss", $client_id, $client_name, $car_id, $brand_id, $category_id, $start_date, $time, $end_date, $total_price);
+    $stmt->bind_param("isiiisssd", $client_id, $client_name, $car_id, $brand_id, $category_id, $start_date, $time, $end_date, $total_price);
     $stmt->execute();
     $stmt->close();
 
     $_SESSION['message'] = "Rezervimi u krijua me sukses!";
-    header("Location: /new_project/views/general/reservations/list.php");
+    header("Location: /new_project_bk/views/general/reservations/list.php");
     exit;
 }
 
@@ -198,6 +199,6 @@ if (isset($_GET['delete'])) {
     $stmt->close();
 
     $_SESSION['message'] = "Rezervimi u fshi me sukses!";
-    header("Location: /new_project/views/general/reservations/list.php");
+    header("Location: /new_project_bk/views/general/reservations/list.php");
     exit;
 }

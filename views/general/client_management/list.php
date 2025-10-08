@@ -1,8 +1,10 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/helper/client_helper.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/client_helper.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
 
 
 $result = $mysqli->query("SELECT * FROM clients ORDER BY id DESC");
@@ -108,7 +110,7 @@ function renderClientFields($fields, $data = [])
                                             <div class="modal-dialog modal-xl">
                                                 <div class="modal-content p-4">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title">Detajet e Klientit - ID <?= $client['id'] ?></h5>
+                                                        <h5 class="modal-title fw-bold text-primary mb-3">Detajet e Klientit - ID <?= $client['id'] ?></h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                     </div>
                                                     <div class="modal-body row">
@@ -124,7 +126,7 @@ function renderClientFields($fields, $data = [])
                                                         if (!empty($client['photos'])) {
                                                             echo '<div class="col-12 mb-3"><label class="form-label fw-bold">Photos:</label><div>';
                                                             foreach (explode(',', $client['photos']) as $photo) {
-                                                                echo '<img src="/new_project/uploads/clients/' . htmlspecialchars($photo) . '" width="80" class="me-1 mb-1">';
+                                                                echo '<img src="/new_project_bk/uploads/clients/' . htmlspecialchars($photo) . '" width="80" class="me-1 mb-1">';
                                                             }
                                                             echo '</div></div>';
                                                         }
@@ -155,7 +157,7 @@ function renderClientFields($fields, $data = [])
                                                                 <?php if (!empty($client['photos'])) : ?>
                                                                     <div class="mt-2">
                                                                         <?php foreach (explode(',', $client['photos']) as $photo) : ?>
-                                                                            <img src="/new_project/uploads/clients/<?= htmlspecialchars($photo) ?>" width="50" class="me-1 mb-1">
+                                                                            <img src="/new_project_bk/uploads/clients/<?= htmlspecialchars($photo) ?>" width="50" class="me-1 mb-1">
                                                                         <?php endforeach; ?>
                                                                     </div>
                                                                 <?php endif; ?>
@@ -181,7 +183,7 @@ function renderClientFields($fields, $data = [])
         </div>
     </div>
 </div>
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/general/client_management/add_client_modal.php'; ?>
+<?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/general/client_management/add_client_modal.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -208,4 +210,4 @@ function renderClientFields($fields, $data = [])
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/footer.php'; ?>
+<?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/footer.php'; ?>

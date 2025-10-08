@@ -42,7 +42,7 @@
         var submitBtn = form.querySelector('button[name="save_client"]');
         submitBtn.disabled = true;
 
-        fetch('/new_project/helper/save_client_ajax.php', {
+        fetch('/new_project_bk/helper/save_client_ajax.php', {
                 method: 'POST',
                 body: formData
             })

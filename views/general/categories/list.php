@@ -1,7 +1,7 @@
 <?php
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/helper/category.php';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/category.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
 ?>
 
 <div class="main-content">
@@ -121,7 +121,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
     </div>
 </div>
 
-<script src="/new_project/public/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/new_project_bk/public/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
 <script>
@@ -150,4 +150,4 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
     });
 </script>
 
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/footer.php'; ?>
+<?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/footer.php'; ?>

@@ -2,7 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/helper/search.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/search.php';
 
 ?>
 
@@ -14,12 +14,12 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/helper/search.php';
     <title>Auto Future Block</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="shortcut icon" href="/new_project/public/assets/images/favicon.ico">
+    <link rel="shortcut icon" href="/new_project_bk/public/assets/images/favicon.ico">
 
-    <link href="/new_project/public/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="/new_project/public/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-    <link href="/new_project/public/assets/css/app.min.css" rel="stylesheet" type="text/css" />
-    <link href="/new_project/public/assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+    <link href="/new_project_bk/public/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="/new_project_bk/public/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="/new_project_bk/public/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+    <link href="/new_project_bk/public/assets/css/custom.min.css" rel="stylesheet" type="text/css" />
 
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
@@ -383,8 +383,8 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/helper/search.php';
 
     <div class="app-menu navbar-menu" id="sidebar">
         <div class="navbar-brand-box">
-            <a href="/new_project/views/general/home/list.php" class="logo collapsed-sidebar-logo">
-                <img src="/new_project/uploads/cars/LOGO.jpg" alt="Logo">
+            <a href="/new_project_bk/views/general/home/list.php" class="logo collapsed-sidebar-logo">
+                <img src="/new_project_bk/uploads/cars/LOGO.jpg" alt="Logo">
                 <span class="logo-text">A.F.B</span>
                 <div class="full-logo">
                     <span class="title">Auto Future Block</span>
@@ -397,17 +397,17 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/helper/search.php';
                 <div id="two-column-menu"></div>
                 <ul class="navbar-nav mt-3">
                     <li class="menu-title"><span data-key="t-menu">Menu</span></li>
-                    <li class="nav-item"><a href="/new_project/views/general/home/list.php" class="nav-link fw-semibold"><i class="ri-home-4-line"></i> Home</a></li>
-                    <li class="nav-item"><a href="/new_project/views/general/brands/list.php" class="nav-link fw-semibold"><i class="ri-price-tag-line"></i> Brand-et</a></li>
-                    <li class="nav-item"><a class="nav-link menu-link" href="/new_project/views/general/categories/list.php"><i class="ri-layout-grid-fill"></i> Kategoritë</a></li>
-                    <li class="nav-item"><a class="nav-link menu-link" href="/new_project/views/general/cars/list.php"><i class="ri-car-fill"></i> Makina</a></li>
-                    <li class="nav-item"><a href="/new_project/views/general/client_management/list.php" class="nav-link fw-semibold"><i class="ri-user-add-fill"></i> Klientet</a></li>
-                    <li class="nav-item"><a href="/new_project/views/general/reservations/list.php" class="nav-link fw-semibold"><i class="ri-calendar-2-line"></i> Rezervime</a></li>
-                    <li class="nav-item"><a href="/new_project/views/general/order_status/list.php" class="nav-link fw-semibold"><i class="ri-compass-2-fill"></i> Gjendja e makines</a></li>
+                    <li class="nav-item"><a href="/new_project_bk/views/general/home/list.php" class="nav-link fw-semibold"><i class="ri-home-4-line"></i> Home</a></li>
+                    <li class="nav-item"><a href="/new_project_bk/views/general/brands/list.php" class="nav-link fw-semibold"><i class="ri-price-tag-line"></i> Brand-et</a></li>
+                    <li class="nav-item"><a class="nav-link menu-link" href="/new_project_bk/views/general/categories/list.php"><i class="ri-layout-grid-fill"></i> Kategoritë</a></li>
+                    <li class="nav-item"><a class="nav-link menu-link" href="/new_project_bk/views/general/cars/list.php"><i class="ri-car-fill"></i> Makina</a></li>
+                    <li class="nav-item"><a href="/new_project_bk/views/general/client_management/list.php" class="nav-link fw-semibold"><i class="ri-user-add-fill"></i> Klientet</a></li>
+                    <li class="nav-item"><a href="/new_project_bk/views/general/reservations/list.php" class="nav-link fw-semibold"><i class="ri-calendar-2-line"></i> Rezervime</a></li>
+                    <li class="nav-item"><a href="/new_project_bk/views/general/order_status/list.php" class="nav-link fw-semibold"><i class="ri-compass-2-fill"></i> Gjendja e makines</a></li>
                 </ul>
             </div>
         </div>
-    </div>w
+    </div>
 
     <div id="layout-wrapper">
         <header id="page-topbar">
@@ -415,7 +415,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/helper/search.php';
                 <div class="navbar-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
                         <button type="button" id="sidebar-toggle-btn"><i class="ri-arrow-right-line"></i> <span>Menu</span></button>
-                        <form class="d-flex ms-2" id="searchForm" method="GET" action="/new_project/helper/search.php">
+                        <form class="d-flex ms-2" id="searchForm" method="GET" action="/new_project_bk/helper/search.php">
                             <input type="text" id="search" name="q" placeholder="Kërko në projekt..." autocomplete="off" style="width:150px;padding:2px;">
                             <div id="suggestions" style="position:absolute; border:1px solid #ccc; max-height:100px; overflow-y:auto; background:#fff; z-index:1000;"></div>
                         </form>
@@ -440,7 +440,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/helper/search.php';
                         <div class="dropdown ms-sm-3 header-item topbar-user">
                             <button class="btn" type="button" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 <span class="d-flex align-items-center">
-                                    <img class="rounded-circle header-profile-user" src="/new_project/public/assets/images/users/avatar-1.jpg" alt="Header Avatar" width="35" height="35">
+                                    <img class="rounded-circle header-profile-user" src="/new_project_bk/public/assets/images/users/avatar-1.jpg" alt="Header Avatar" width="35" height="35">
                                     <span class="text-start ms-xl-2">
                                         <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">Emiljano Perhati</span>
                                         <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text">Founder</span>
@@ -451,9 +451,9 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/helper/search.php';
                                 <li>
                                     <h6 class="dropdown-header">Welcome Emiljano!</h6>
                                 </li>
-                                <li><a class="dropdown-item" href="/new_project/views/general/home/list.php"><i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> Profile</a></li>
-                                <li><a class="dropdown-item" href="/new_project/views/general/home/list.php"><i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> Lock screen</a></li>
-                                <li><a class="dropdown-item" href="/new_project/controllers/logout.php"><i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> Logout</a></li>
+                                <li><a class="dropdown-item" href="/new_project_bk/views/general/home/list.php"><i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> Profile</a></li>
+                                <li><a class="dropdown-item" href="/new_project_bk/views/general/home/list.php"><i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> Lock screen</a></li>
+                                <li><a class="dropdown-item" href="/new_project_bk/controllers/logout.php"><i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> Logout</a></li>
                             </ul>
                         </div>
                     </div>
@@ -465,7 +465,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/helper/search.php';
         </button>
     </div>
 
-    <script src="/new_project/public/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/new_project_bk/public/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -595,7 +595,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project/helper/search.php';
                 suggestionsDiv.innerHTML = '';
                 if (!query) return;
 
-                fetch(`/new_project/helper/search.php?q=${encodeURIComponent(query)}`)
+                fetch(`/new_project_bk/helper/search.php?q=${encodeURIComponent(query)}`)
                     .then(res => res.json())
                     .then(data => {
                         data.forEach(item => {

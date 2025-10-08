@@ -1,10 +1,12 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/db/db.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/helper/reservations.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/helper/client_helper.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/header.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/reservations.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/client_helper.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
 
 $clients_result = $mysqli->query("SELECT id, full_name FROM clients ORDER BY full_name ASC");
 $clients = $clients_result->fetch_all(MYSQLI_ASSOC);
@@ -104,7 +106,7 @@ function getCarImages($images)
                         <div class="card h-100 shadow-sm">
 
                             <!-- IMAGE OPENS MODAL -->
-                            <img src="/new_project/uploads/cars/<?= htmlspecialchars($main_image) ?>"
+                            <img src="/new_project_bk/uploads/cars/<?= htmlspecialchars($main_image) ?>"
                                 class="card-img-top"
                                 style="height:180px;object-fit:cover;cursor:pointer;"
                                 data-bs-toggle="modal"
@@ -141,28 +143,34 @@ function getCarImages($images)
                         <div class="modal-dialog modal-xl modal-dialog-centered">
                             <div class="modal-content p-4">
                                 <div class="modal-header">
-                                    <h5 class="modal-title"><?= htmlspecialchars($car['model']) ?> - Detajet e Makinës</h5>
+                                    <h5 class="modal-title fw-bold text-primary mb-3">
+                                        <?= htmlspecialchars($car['model']) ?> - Detajet e Makinës
+                                    </h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
                                 <div class="modal-body row">
                                     <div class="col-md-6">
                                         <?php foreach ($images as $img): ?>
-                                            <img src="/new_project/uploads/cars/<?= htmlspecialchars($img) ?>" class="img-fluid mb-2 rounded">
+                                            <img src="/new_project_bk/uploads/cars/<?= htmlspecialchars($img) ?>" class="img-fluid mb-2 rounded">
                                         <?php endforeach; ?>
                                     </div>
-                                    <div class="card mb-3">
-                                        <div class="row g-3">
-                                            <div class="col-12 col-sm-6 col-md-6 col-lg-4">
-                                                <p><strong>Brand:</strong> <?= htmlspecialchars($car['brand_name']) ?></p>
-                                                <p><strong>Kategori:</strong> <?= htmlspecialchars($car['category_name']) ?></p>
-                                                <p><strong>VIN:</strong> <?= htmlspecialchars($car['vin']) ?></p>
-                                                <p><strong>Çmim / ditë:</strong> $<?= number_format($car['price_per_day'], 2) ?></p>
-                                                <p><strong>Gjendja:</strong> <?= $status_info['status'] ?></p>
-                                                <?php if ($status_info['status'] == 'E zënë'): ?>
-                                                    <p><strong>Klienti:</strong> <?= htmlspecialchars($status_info['client_name']) ?> (<?= $days_reserved ?> ditë)</p>
-                                                    <p><strong>Periudha:</strong> <?= $status_info['start_date'] ?> - <?= $status_info['end_date'] ?></p>
-                                                <?php endif; ?>
-                                            </div>
+                                    <div class="col-md-6">
+                                        <div class="card p-3 mb-3">
+                                            <h5 class="mb-3">Informacion i Përgjithshëm</h5>
+                                            <p><strong>Brand:</strong> <?= htmlspecialchars($car['brand_name']) ?></p>
+                                            <p><strong>Kategori:</strong> <?= htmlspecialchars($car['category_name']) ?></p>
+                                            <p><strong>Model:</strong> <?= htmlspecialchars($car['model']) ?></p>
+                                            <p><strong>VIN:</strong> <?= htmlspecialchars($car['vin']) ?></p>
+                                            <p><strong>Çmim / ditë:</strong> $<?= number_format($car['price_per_day'], 2) ?></p>
+                                            <p><strong>Gjendja:</strong> <?= $status_info['status'] ?></p>
+                                            <?php if ($status_info['status'] == 'E zënë'): ?>
+                                                <p><strong>Klienti:</strong> <?= htmlspecialchars($status_info['client_name']) ?> (<?= $days_reserved ?> ditë)</p>
+                                                <p><strong>Periudha:</strong> <?= $status_info['start_date'] ?> - <?= $status_info['end_date'] ?></p>
+                                            <?php endif; ?>
+                                            <h5 class="mt-4 mb-2">Përshkrimi i makinës</h5>
+                                            <p>Kjo makinë kombinon performancën me elegancën, duke ofruar një drejtim të qetë dhe të sigurt në çdo rrugë. Dizajni modern dhe detajet e rafinuara e bëjnë atë të dallueshme në çdo situatë.</p>
+                                            <p>Me teknologji të avancuar dhe funksione të sigurta, ajo siguron komoditet maksimal për shoferin dhe pasagjerët. Lloji i karburantit, transmisioni dhe opsionet e tjera garantojnë efikasitet dhe ekonomicitet gjatë çdo udhëtimi.</p>
+                                            <p>Përshtatet për përdorim të përditshëm apo udhëtime të gjata, duke ofruar eksperiencë të jashtëzakonshme drejtimi. Ky model përfaqëson standardin më të lartë të cilësisë dhe besueshmërisë në treg.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -173,6 +181,8 @@ function getCarImages($images)
                         </div>
                     </div>
 
+
+
                     <!-- RESERVE MODAL -->
                     <?php if ($status_info['status'] == 'E lirë'): ?>
                         <div class="modal fade" id="reserveCarModal<?= $car['id'] ?>" tabindex="-1">
@@ -182,7 +192,7 @@ function getCarImages($images)
                                         <h5 class="modal-title">Rezervo <?= htmlspecialchars($car['model']) ?></h5>
                                         <button class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
-                                    <form method="POST" action="/new_project/helper/reservations.php">
+                                    <form method="POST" action="/new_project_bk/helper/reservations.php">
                                         <input type="hidden" name="car_id" value="<?= $car['id'] ?>">
                                         <div class="modal-body">
                                             <div class="mb-3">
@@ -326,7 +336,7 @@ function getCarImages($images)
         var submitBtn = this.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
 
-        fetch('/new_project/helper/save_client_ajax.php', {
+        fetch('/new_project_bk/helper/save_client_ajax.php', {
                 method: 'POST',
                 body: formData
             })
@@ -363,4 +373,4 @@ function getCarImages($images)
     });
 </script>
 
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project/views/layout/footer.php'; ?>
+<?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/footer.php'; ?>

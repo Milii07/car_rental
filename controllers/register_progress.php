@@ -1,10 +1,12 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project/db/db.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
@@ -14,26 +16,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
         $_SESSION['error'] = "Ju lutem plotësoni të gjitha fushat.";
-        header("Location: /new_project/views/auth/register.php");
+        header("Location: /new_project_bk/views/auth/register.php");
         exit;
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $_SESSION['error'] = "Adresa e email-it nuk është e vlefshme.";
-        header("Location: /new_project/views/auth/register.php");
+        header("Location: /new_project_bk/views/auth/register.php");
         exit;
     }
 
     if ($password !== $confirm_password) {
         $_SESSION['error'] = "Fjalëkalimet nuk përputhen.";
-        header("Location: /new_project/views/auth/register.php");
+        header("Location: /new_project_bk/views/auth/register.php");
         exit;
     }
 
     $strongPasswordPattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/';
     if (!preg_match($strongPasswordPattern, $password)) {
         $_SESSION['error'] = "Fjalëkalimi duhet të ketë të paktën 8 karaktere, shkronja të mëdha, të vogla, numra dhe karaktere speciale.";
-        header("Location: /new_project/views/auth/register.php");
+        header("Location: /new_project_bk/views/auth/register.php");
         exit;
     }
 
@@ -44,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($stmt->num_rows > 0) {
         $_SESSION['error'] = "Email ekziston tashmë.";
         $stmt->close();
-        header("Location: /new_project/views/auth/register.php");
+        header("Location: /new_project_bk/views/auth/register.php");
         exit;
     }
     $stmt->close();
@@ -58,15 +60,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($stmt->execute()) {
         $_SESSION['success'] = "Regjistrimi u krye me sukses! Mund të identifikohesh tani.";
         $stmt->close();
-        header("Location: /new_project/views/auth/login.php");
+        header("Location: /new_project_bk/views/auth/login.php");
         exit;
     } else {
         $_SESSION['error'] = "Gabim gjatë regjistrimit: " . $stmt->error;
         $stmt->close();
-        header("Location: /new_project/views/auth/register.php");
+        header("Location: /new_project_bk/views/auth/register.php");
         exit;
     }
 } else {
-    header("Location: /new_project/views/auth/register.php");
+    header("Location: /new_project_bk/views/auth/register.php");
     exit;
 }
