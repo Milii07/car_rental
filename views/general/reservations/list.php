@@ -11,8 +11,6 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
 $clients_result = $mysqli->query("SELECT id, full_name FROM clients ORDER BY full_name ASC");
 $clients = $clients_result->fetch_all(MYSQLI_ASSOC);
 
-
-
 $cars = $mysqli->query("
     SELECT c.id, c.model, c.vin, c.price_per_day,
            COALESCE(b.name, '-') AS brand_name,
@@ -51,7 +49,6 @@ function getCarStatus($car_id, $mysqli)
     $reservations = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
 
-
     foreach ($reservations as $r) {
         if ($today >= $r['start_date'] && $today <= $r['end_date']) {
             return [
@@ -68,8 +65,6 @@ function getCarStatus($car_id, $mysqli)
         'end_date' => null
     ];
 }
-
-
 ?>
 
 <div class="main-content">
@@ -118,6 +113,8 @@ function getCarStatus($car_id, $mysqli)
                                 <th>Data Fillimit</th>
                                 <th>Ora</th>
                                 <th>Data Mbarimit</th>
+                                <th>Kohezgjatja</th>
+                                <th>Ditë të mbetura</th>
                                 <th>Totali</th>
                                 <th>Status</th>
                                 <th>Veprime</th>
@@ -125,6 +122,11 @@ function getCarStatus($car_id, $mysqli)
                         </thead>
                         <tbody>
                             <?php foreach ($reservations as $r):
+                                $start = new DateTime($r['start_date']);
+                                $end = new DateTime($r['end_date']);
+                                $today = new DateTime();
+                                $days_reserved = $start->diff($end)->days + 1;
+                                $remaining_days = ($today <= $end) ? $today->diff($end)->days : 0;
                                 $carStatus = getCarStatus($r['car_id'], $mysqli);
                             ?>
                                 <tr>
@@ -136,8 +138,13 @@ function getCarStatus($car_id, $mysqli)
                                     <td><?= $r['start_date'] ?></td>
                                     <td><?= $r['time'] ?></td>
                                     <td><?= $r['end_date'] ?></td>
+                                    <td><?= $days_reserved ?> ditë</td>
+                                    <td><?= $remaining_days ?> ditë</td>
                                     <td>$<?= number_format($r['total_price'], 2) ?></td>
-                                    <td><?= $carStatus['status'] ?><?php if ($carStatus['client_name']) echo ' (' . htmlspecialchars($carStatus['client_name']) . ')'; ?></td>
+                                    <td>
+                                        <?= $carStatus['status'] ?>
+                                        <?php if ($carStatus['client_name']) echo ' (' . htmlspecialchars($carStatus['client_name']) . ')'; ?>
+                                    </td>
                                     <td>
                                         <a href="/new_project_bk/helper/reservations.php?delete=<?= $r['id'] ?>" class="btn btn-sm btn-danger delete-btn">
                                             <i class="ri-delete-bin-6-line"></i>
@@ -150,6 +157,7 @@ function getCarStatus($car_id, $mysqli)
                 </div>
             </div>
 
+            <!-- Modal Shto Rezervim -->
             <div class="modal fade" id="addReservationModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content p-4">
@@ -208,6 +216,7 @@ function getCarStatus($car_id, $mysqli)
                 </div>
             </div>
 
+            <!-- Modal Shto Klient -->
             <div class="modal fade" id="addClientModal" tabindex="-1">
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content p-4">
@@ -290,7 +299,6 @@ function getCarStatus($car_id, $mysqli)
 
     document.getElementById('addClientForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        console.log("sss");
         var formData = new FormData(this);
         var submitBtn = this.querySelector('button[type="submit"]');
         submitBtn.disabled = true;

@@ -3,8 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/reservations.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/client_helper.php';
+
 function getCarFiles()
 {
     $carDir = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/uploads/cars';
@@ -24,11 +23,8 @@ if ($result) {
     }
 }
 
-
-
 include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
 ?>
-
 
 <style>
     .modal {
@@ -170,10 +166,6 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
         color: #fff;
     }
 
-    .row.g-4 {
-        transition: all 0.5s ease;
-    }
-
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
     .car-grid {
@@ -210,36 +202,6 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
         transform: scale(1.05);
     }
 
-    .car-badge {
-        position: absolute;
-        top: 12px;
-        left: 12px;
-        background: linear-gradient(90deg, #007bff, #00c6ff);
-        color: #fff;
-        font-size: 0.7rem;
-        padding: 5px 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-
-    .car-content {
-        padding: 15px;
-        text-align: center;
-    }
-
-    .car-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .car-name {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #333;
-        margin: 0;
-    }
-
     .car-rating {
         position: absolute;
         top: 12px;
@@ -251,6 +213,11 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
         padding: 5px 8px;
         border-radius: 8px;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .car-content {
+        padding: 15px;
+        text-align: center;
     }
 
     .car-specs {
@@ -290,30 +257,11 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
         color: #777;
         font-weight: 400;
     }
-
-    .btn-rezervo {
-        background: #1E40AF;
-        color: #fff;
-        border: none;
-        padding: 8px 14px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        transition: all 0.2s ease-in-out;
-    }
-
-    .btn-rezervo:hover {
-        background: #032c69ff;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-    }
 </style>
 
 <div class="main-content">
     <div class="page-content">
         <div class="container-fluid">
-
             <div class="row mb-3">
                 <div class="col-12">
                     <div class="page-title-box d-sm-flex align-items-center justify-content-between">
@@ -330,36 +278,34 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
 
             <?php
             $allCars = [];
-            $newCars = 30;
-            $usedCars = 7;
-            foreach ($carFiles as $file) {
-                $fileName = basename($file);
-                if (stripos($fileName, 'LOGO') !== false) continue;
-
-                $relativePath = str_replace($_SERVER['DOCUMENT_ROOT'], '', $file);
-                $carName = pathinfo($file, PATHINFO_FILENAME);
-                $category = 'standard';
-                if (preg_match('/\/([a-zA-Z0-9_]+)\//', $relativePath, $matches)) {
-                    $category = strtolower($matches[1]);
+            $newCars = 0;
+            $usedCars = 0;
+            $uploadDir = '/new_project_bk/uploads/cars/';
+            $query = "SELECT * FROM cars ORDER BY id DESC";
+            $result = $mysqli->query($query);
+            if ($result) {
+                while ($row = $result->fetch_assoc()) {
+                    if (isset($row['category_id'])) {
+                        if ($row['category_id'] == 1) $newCars++;
+                        elseif ($row['category_id'] == 2) $usedCars++;
+                    }
+                    $firstImage = '';
+                    if (!empty($row['images'])) {
+                        $imagesArray = explode(',', $row['images']);
+                        $firstImage = trim($imagesArray[0]);
+                    }
+                    $allCars[] = [
+                        'id' => $row['id'],
+                        'name' => $row['model'],
+                        'image' => $uploadDir . $firstImage,
+                        'rating' => $row['rating'] ?? (rand(3, 10) . '.' . rand(0, 9)),
+                        'seats' => $row['seating_capacity'],
+                        'transmission' => $row['transmission'],
+                        'type' => $row['body_type'],
+                        'price' => $row['price_per_day'],
+                        'category_id' => $row['category_id'] ?? 0
+                    ];
                 }
-
-                if ($category === 'new') $newCars++;
-                elseif ($category === 'used') $usedCars++;
-
-                $carData = [
-                    'id' => $fileName,
-                    'name' => str_replace('_', ' ', $carName),
-                    'image' => $relativePath,
-                    'badge' => ucfirst($category),
-                    'rating' => rand(3, 10) . '.' . rand(0, 9),
-                    'seats' => rand(2, 7),
-                    'transmission' => 'Automatic',
-                    'type' => 'Sedan',
-                    'price' => rand(50, 300),
-                    'category' => $category
-                ];
-
-                $allCars[] = $carData;
             }
             $totalCars = count($allCars);
             ?>
@@ -379,21 +325,15 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
                 </div>
             </div>
 
-            <!-- === GRAFIKU === -->
             <canvas id="salesChart" style="max-height:400px; margin-bottom:30px;"></canvas>
 
-            <!-- === GRID MAKINASH === -->
             <div class="car-grid">
-
                 <?php foreach ($allCars as $carData):
-                    $modalId = "carModal" . md5($carData['image']);
+                    $modalId = "carModal" . $carData['id'];
                 ?>
                     <div class="car-card">
-                        <img src="<?= htmlspecialchars($carData['image']) ?>"
-                            alt="<?= htmlspecialchars($carData['name']) ?>"
-                            class="car-image"
-                            data-bs-toggle="modal"
-                            data-bs-target="#<?= $modalId ?>">
+                        <img src="<?= htmlspecialchars($carData['image']) ?>" alt="<?= htmlspecialchars($carData['name']) ?>"
+                            class="car-image" data-bs-toggle="modal" data-bs-target="#<?= $modalId ?>">
                         <div class="car-rating">⭐ <?= $carData['rating'] ?></div>
                         <div class="car-content">
                             <h3 class="car-name"><?= htmlspecialchars($carData['name']) ?></h3>
@@ -402,41 +342,41 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
                                 <span class="spec">⚙️ <?= htmlspecialchars($carData['transmission']) ?></span>
                                 <span class="spec">🚗 <?= htmlspecialchars($carData['type']) ?></span>
                             </div>
-                            <div class="car-footer">
-                                <div class="car-price-clean">
-                                    💰 <span class="price-value"><?= $carData['price'] ?>€</span>
-                                    <span class="price-label"> /ditë</span>
-                                </div>
-                                <a href="#"
-                                    class="btn btn-primary btn-rezervo"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#addReservationModal"
-                                    data-car-id="<?= htmlspecialchars($carData['id'] ?? '') ?>"
-                                    data-car-name="<?= htmlspecialchars($carData['name']) ?>">
-                                    Rezervo
-                                </a>
+                            <div class="car-footer d-flex justify-content-between align-items-center">
+                                <div class="car-price-clean">💰 <span class="price-value"><?= $carData['price'] ?>€</span> <span class="price-label">/ditë</span></div>
+                                <?php if (!empty($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
+                                    <button class="btn btn-sm btn-outline-primary edit-btn"
+                                        data-id="<?= $carData['id'] ?>"
+                                        data-name="<?= htmlspecialchars($carData['name']) ?>"
+                                        data-price="<?= $carData['price'] ?>"
+                                        data-seats="<?= $carData['seats'] ?>"
+                                        data-transmission="<?= htmlspecialchars($carData['transmission']) ?>"
+                                        data-type="<?= htmlspecialchars($carData['type']) ?>"
+                                        data-rating="<?= $carData['rating'] ?>">
+                                        Edito
+                                    </button>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
 
-                    <!-- MODAL DETAJET E MAKINËS -->
                     <div class="modal fade" id="<?= $modalId ?>" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered modal-lg">
                             <div class="modal-content">
                                 <div class="modal-body text-center p-4">
-                                    <img src="<?= htmlspecialchars($carData['image']) ?>"
-                                        class="img-fluid rounded mb-3"
-                                        style="max-height:400px; object-fit:cover;">
+                                    <img src="<?= htmlspecialchars($carData['image']) ?>" class="img-fluid rounded mb-3" style="max-height:400px; object-fit:cover;">
                                     <h5 class="fw-semibold"><?= htmlspecialchars($carData['name']) ?></h5>
-                                    <p class="text-muted mb-1">
-                                        <?= ucfirst($carData['category']) ?> | <?= htmlspecialchars($carData['type']) ?> | <?= htmlspecialchars($carData['transmission']) ?>
-                                    </p>
+                                    <p class="text-muted mb-1"><?= htmlspecialchars($carData['type']) ?> | <?= htmlspecialchars($carData['transmission']) ?></p>
                                     <p class="fs-5 fw-bold text-success">💰 <?= $carData['price'] ?> €/ditë</p>
                                     <p class="text-muted small">⭐ <?= $carData['rating'] ?> | 💺 <?= $carData['seats'] ?> vende</p>
                                     <hr class="my-3">
-                                    <p>Kjo makinë ofron kombinimin perfekt të performancës dhe elegancës, e ndërtuar për drejtim të rehatshëm dhe efikas në çdo terren.</p>
-                                    <p>Me teknologji moderne dhe dizajn të sofistikuar, ajo siguron eksperiencë të qetë drejtimi dhe komoditet maksimal për pasagjerët.</p>
-                                    <p>Përshtatet në mënyrë të shkëlqyer për udhëtime të gjata, por edhe për përdorim të përditshëm, duke përfaqësuar standardin më të lartë të cilësisë.</p>
+                                    <p>Komfort dhe luks:
+                                        Ky model makine ofron një eksperiencë të jashtëzakonshme udhëtimi. Sediljet janë të rehatshme dhe të rregullueshme sipas preferencave, ndërsa materiali i brendshëm dhe dizajni modern krijojnë një ambient luksoz për çdo pasagjer. Sistemet e klimës dhe izolimi i zhurmës e bëjnë udhëtimin qetësisht dhe komod.</p>
+                                    <p>Performancë dhe teknologji:
+                                        Me një motor të fuqishëm dhe efikas, kjo makinë kombinon performancën e lartë me ekonominë e karburantit. Pajisjet teknologjike, përfshirë navigacionin, sistemin e ndihmës për parkim dhe asistencën e vozitjes, garantojnë një eksperiencë të sigurt dhe të avancuar për shoferin.</p>
+                                    <p>Siguri dhe besueshmëri:
+                                        Siguria është prioriteti kryesor. Pajisjet moderne të sigurisë, si airbag-et, ABS, kontrolli i stabilitetit dhe sistemi i paralajmërimit për rrezik, sigurojnë mbrojtje maksimale për shoferin dhe pasagjerët. Kjo makinë nuk është vetëm një mjet transporti, por një shoqëruese e besueshme në çdo rrugë.</p>
+
                                     <button class="btn btn-secondary mt-3" data-bs-dismiss="modal">Mbyll</button>
                                 </div>
                             </div>
@@ -445,260 +385,136 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
                 <?php endforeach; ?>
             </div>
 
-            <!-- MODAL ADD RESERVATION  -->
-            <div class="modal fade" id="addReservationModal" tabindex="-1" aria-hidden="true">
+
+            <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content p-4">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Rezervo Makinen</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <form method="POST" action="/new_project_bk/helper/reservations.php" id="reservationForm">
+                    <div class="modal-content">
+                        <form id="editCarForm">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Ndrysho të dhënat e makinës</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
                             <div class="modal-body">
-                                <input type="hidden" name="car_id" value="<?= $carData['id'] ?>">
-                                <div class="mb-3">
-                                    <label class="form-label">Makina</label>
-                                    <input type="text" name="car_name" class="form-control" value="" readonly>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Klienti</label>
-                                    <select name="client_id" class="form-select" required>
-                                        <option value="">Zgjidh klientin</option>
-                                        <?php foreach ($clients as $cl): ?>
-                                            <option value="<?= $cl['id'] ?>"><?= htmlspecialchars($cl['full_name']) ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="row">
-                                    <div class="col mb-3">
-                                        <label class="form-label">Data Fillimit</label>
-                                        <input type="date" name="start_date" class="form-control" required>
-                                    </div>
-                                    <div class="col mb-3">
-                                        <label class="form-label">Ora Fillimit</label>
-                                        <input type="time" name="time" class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Data Mbarimit</label>
-                                    <input type="date" name="end_date" class="form-control" required>
-                                </div>
+                                <input type="hidden" id="editCarId" name="id">
+                                <div class="mb-3"><label class="form-label">Emri i makinës</label><input type="text" id="editCarName" name="name" class="form-control" required></div>
+                                <div class="mb-3"><label class="form-label">Çmimi (€ / ditë)</label><input type="number" id="editCarPrice" name="price" class="form-control" required></div>
+                                <div class="mb-3"><label class="form-label">Vende</label><input type="number" id="editCarSeats" name="seats" class="form-control" required></div>
+                                <div class="mb-3"><label class="form-label">Transmetimi</label><input type="text" id="editCarTransmission" name="transmission" class="form-control" required></div>
+                                <div class="mb-3"><label class="form-label">Tipi i makinës</label><input type="text" id="editCarType" name="type" class="form-control" required></div>
+                                <div class="mb-3"><label class="form-label">Rating</label><input type="number" step="0.1" id="editCarRating" name="rating" class="form-control" required></div>
                             </div>
                             <div class="modal-footer">
-                                <button type="submit" name="create" class="btn btn-success">Krijo Rezervim</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulo</button>
+                                <button type="submit" class="btn btn-primary">Ruaj Ndryshimet</button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-
-
-            <!-- === MODAL ADD CLIENT (vetëm një herë jashtë foreach) === -->
-            <div class="modal fade" id="addClientModal" tabindex="-1">
-                <div class="modal-dialog modal-xl">
-                    <div class="modal-content p-4">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Shto Klient</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <form id="addClientForm">
-                            <input type="hidden" name="from" value="reservation_modal">
-                            <div class="modal-body row">
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Profile Type</label>
-                                    <input type="text" class="form-control" name="profile_type" value="client" readonly>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Partner Type</label>
-                                    <select class="form-control" name="partner_type" required>
-                                        <option value="business">Business</option>
-                                        <option value="individual" selected>Individual</option>
-                                    </select>
-                                </div>
-                                <?php
-
-                                $clientFields = [
-                                    'full_name' => 'text',
-                                    'company_name' => 'text',
-                                    'nipt' => 'text',
-                                    'email' => 'email',
-                                    'phone' => 'tel',
-                                    'birthday' => 'date',
-                                    'country' => 'text',
-                                    'city' => 'text',
-                                    'zip' => 'text',
-                                    'reference' => 'text',
-                                    'address' => 'text',
-                                    'payment_terms' => 'text',
-                                    'remarks' => 'text'
-                                ];
-
-                                $clientFields = ['full_name', 'company_name', 'nipt', 'email', 'phone', 'birthday', 'country', 'city', 'zip', 'reference', 'address', 'payment_terms', 'remarks'];
-                                foreach ($clientFields as $field) {
-                                    $label = ucwords(str_replace('_', ' ', $field));
-                                    echo '<div class="col-md-3 mb-3">
-        <label class="form-label">' . $label . '</label>
-        <input type="text" class="form-control" name="' . $field . '" required>
-    </div>';
-                                }
-                                ?>
-
-
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" name="save_client" class="btn btn-success">Save Client</button>
-                            </div>
-                        </form>
-                        <div id="clientFormMessage" class="mt-2"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal fade" id="addReservationModal" tabindex="-1" aria-hidden="true">
-                ...
-            </div>
-
-
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
             <script>
-                document.querySelectorAll('[data-bs-target="#addClientModal"]').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const reservationModalEl = document.getElementById('addReservationModal');
-                        const reservationModalInstance = bootstrap.Modal.getInstance(reservationModalEl);
-                        if (reservationModalInstance) reservationModalInstance.hide();
-                    });
-                });
-
-                var addClientModalEl = document.getElementById('addClientModal');
-                addClientModalEl.addEventListener('hidden.bs.modal', function() {
-                    const reservationModal = new bootstrap.Modal(document.getElementById('addReservationModal'));
-                    reservationModal.show();
-                });
-
-                const ctx = document.getElementById('salesChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                        datasets: [{
-                            label: 'Shitjet e Makina',
-                            data: [12, 19, 14, 18, 22, 20, 25, 30, 28, 26, 32, 35],
-                            backgroundColor: '#032c69ff',
-                            borderRadius: 8
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-
-                // === COUNTER ===
-                const counters = document.querySelectorAll('.counter');
-                counters.forEach(counter => {
-                    const target = +counter.getAttribute('data-target');
-                    let count = 0;
-                    const step = target / 200;
-                    const updateCounter = () => {
-                        if (count < target) {
-                            count += step;
-                            counter.innerText = Math.ceil(count);
-                            requestAnimationFrame(updateCounter);
-                        } else counter.innerText = target;
-                    }
-                    updateCounter();
-                });
-
-                // === ANIMACIONI CARD ===
-                const cards = document.querySelectorAll('.card');
-                window.addEventListener('load', () => {
-                    cards.forEach((card, index) => {
-                        setTimeout(() => card.classList.add('show'), index * 150);
-                    });
-                });
-
-                // === EDIT BTN SWEETALERT ===
                 document.addEventListener("DOMContentLoaded", () => {
+                    const ctx = document.getElementById('salesChart')?.getContext('2d');
+                    if (ctx) {
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                                datasets: [{
+                                    label: 'Shitjet e Makina',
+                                    data: [12, 19, 14, 18, 22, 20, 25, 30, 28, 26, 32, 35],
+                                    backgroundColor: '#032c69ff',
+                                    borderRadius: 8
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    const counters = document.querySelectorAll('.counter');
+                    counters.forEach(counter => {
+                        const target = +counter.getAttribute('data-target');
+                        let count = 0;
+                        const step = target / 200;
+                        const updateCounter = () => {
+                            if (count < target) {
+                                count += step;
+                                counter.innerText = Math.ceil(count);
+                                requestAnimationFrame(updateCounter);
+                            } else {
+                                counter.innerText = target;
+                            }
+                        };
+                        updateCounter();
+                    });
+
+                    const cards = document.querySelectorAll('.card');
+                    window.addEventListener('load', () => {
+                        cards.forEach((card, index) => {
+                            setTimeout(() => card.classList.add('show'), index * 100);
+                        });
+                    });
+
+                    const editModalEl = document.getElementById('editModal');
+                    const editModal = new bootstrap.Modal(editModalEl);
+                    const editForm = document.getElementById('editCarForm');
+
                     document.querySelectorAll(".edit-btn").forEach(btn => {
                         btn.addEventListener("click", () => {
-                            const oldName = btn.getAttribute("data-old");
-                            Swal.fire({
-                                title: "Ndrysho emrin e makinës",
-                                input: "text",
-                                inputLabel: "Emri i ri",
-                                inputValue: oldName.replace(/\.[^/.]+$/, ""),
-                                showCancelButton: true,
-                                confirmButtonText: "Ruaj",
-                                cancelButtonText: "Anulo",
-                                preConfirm: (newName) => {
-                                    if (!newName) Swal.showValidationMessage("Emri nuk mund të jetë bosh");
-                                    return fetch("/new_project_bk/helper/renameCar.php", {
-                                            method: "POST",
-                                            headers: {
-                                                "Content-Type": "application/x-www-form-urlencoded"
-                                            },
-                                            body: "old_name=" + encodeURIComponent(oldName) + "&new_name=" + encodeURIComponent(newName)
-                                        }).then(res => res.json())
-                                        .catch(() => Swal.showValidationMessage("Gabim gjatë komunikimit me serverin"));
-                                }
-                            }).then(result => {
-                                if (result.isConfirmed) {
-                                    if (result.value.success) Swal.fire("Sukses!", "Emri u ndryshua.", "success").then(() => location.reload());
-                                    else Swal.fire("Gabim!", result.value.message, "error");
-                                }
-                            });
+                            editForm.id.value = btn.dataset.id;
+                            editForm.name.value = btn.dataset.name;
+                            editForm.price.value = btn.dataset.price;
+                            editForm.seats.value = btn.dataset.seats;
+                            editForm.transmission.value = btn.dataset.transmission;
+                            editForm.type.value = btn.dataset.type;
+                            editForm.rating.value = btn.dataset.rating;
+
+                            editModal.show();
                         });
                     });
-                });
 
-                console.log(<?= json_encode($allCars, JSON_PRETTY_PRINT) ?>);
-
-                var reservationModal = document.getElementById('addReservationModal');
-                reservationModal.addEventListener('show.bs.modal', function(event) {
-                    var button = event.relatedTarget; // buttoni që e hap modalin
-                    var carId = button.getAttribute('data-car-id');
-                    var carName = button.getAttribute('data-car-name');
-
-                    var modalForm = reservationModal.querySelector('#reservationForm');
-                    modalForm.querySelector('input[name="car_id"]').value = carId;
-                    modalForm.querySelector('input[name="car_name"]').value = carName;
-                });
-
-                document.querySelectorAll('.btn-rezervo').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const carId = btn.getAttribute('data-car-id');
-                        const carName = btn.getAttribute('data-car-name');
-                        document.getElementById('reservationCarId').value = carId;
-                        document.getElementById('reservationCarName').value = carName;
-                    });
-                });
-                document.getElementById('addClientForm').addEventListener('submit', function(e) {
-                    const inputs = this.querySelectorAll('input[required]:not([readonly]), select[required]');
-                    let valid = true;
-                    inputs.forEach(input => {
-                        if (!input.value.trim()) valid = false;
-                    });
-                    if (!valid) {
+                    editForm.addEventListener('submit', async e => {
                         e.preventDefault();
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Të gjitha fushat janë të detyrueshme!',
-                            confirmButtonText: 'OK'
-                        });
-                    }
+                        const formData = new FormData(editForm);
+
+                        try {
+                            const res = await fetch('/new_project_bk/helper/updateCar.php', {
+                                method: 'POST',
+                                body: formData
+                            });
+
+                            const result = await res.json();
+
+                            if (result.success) {
+                                editModal.hide();
+                                Swal.fire('Sukses!', 'Makina u përditësua me sukses.', 'success')
+                                    .then(() => location.reload());
+                            } else {
+                                Swal.fire('Gabim!', result.message || 'Ndodhi një problem.', 'error');
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            Swal.fire('Gabim!', 'Gabim gjatë komunikimit me serverin.', 'error');
+                        }
+                    });
                 });
             </script>
+
 
             <?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/footer.php'; ?>

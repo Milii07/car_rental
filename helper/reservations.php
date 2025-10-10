@@ -5,7 +5,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
 include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
 
-// Funksioni për statusin e makinës
 if (!function_exists('getCarStatus')) {
     function getCarStatus($car_id, $mysqli)
     {
@@ -52,7 +51,6 @@ if (!function_exists('getCarStatus')) {
     }
 }
 
-// Funksioni për marrjen e imazheve të makinës
 if (!function_exists('getCarImages')) {
     function getCarImages($images)
     {
@@ -60,7 +58,6 @@ if (!function_exists('getCarImages')) {
     }
 }
 
-// Funksioni për marrjen e makinave të lira
 if (!function_exists('getAvailableCars')) {
     function getAvailableCars($mysqli)
     {
@@ -84,7 +81,6 @@ if (!function_exists('getAvailableCars')) {
     }
 }
 
-// Merr të gjitha makinat dhe klientët për forms
 $cars = $mysqli->query("
     SELECT c.id, c.model, c.vin, c.price_per_day,
            COALESCE(b.name, '-') AS brand_name,
@@ -96,7 +92,6 @@ $cars = $mysqli->query("
 
 $clients = $mysqli->query("SELECT id, full_name FROM clients ORDER BY full_name ASC")->fetch_all(MYSQLI_ASSOC);
 
-// Merr të gjitha rezervimet
 $reservations = $mysqli->query("
     SELECT r.*, c.model, c.vin, 
            COALESCE(b.name, '-') AS brand_name, 
@@ -110,7 +105,6 @@ $reservations = $mysqli->query("
     ORDER BY r.id DESC
 ")->fetch_all(MYSQLI_ASSOC);
 
-// Krijimi i rezervimit
 if (isset($_POST['create'])) {
 
     $client_id = $_POST['client_id'] ?? 0;
@@ -131,7 +125,6 @@ if (isset($_POST['create'])) {
         exit;
     }
 
-    // Merr emrin e klientit
     $stmt = $mysqli->prepare("SELECT full_name FROM clients WHERE id=?");
     $stmt->bind_param("i", $client_id);
     $stmt->execute();
@@ -139,7 +132,6 @@ if (isset($_POST['create'])) {
     $client_name = $client['full_name'] ?? '';
     $stmt->close();
 
-    // Kontrollo nëse makina është e lirë
     $check = $mysqli->prepare("
         SELECT r.id, cl.full_name 
         FROM reservations r
@@ -159,7 +151,6 @@ if (isset($_POST['create'])) {
         exit;
     }
 
-    // Merr të dhënat e makinës
     $stmtCar = $mysqli->prepare("SELECT brand_id, category_id, price_per_day FROM cars WHERE id=?");
     $stmtCar->bind_param("i", $car_id);
     $stmtCar->execute();
@@ -170,12 +161,10 @@ if (isset($_POST['create'])) {
     $category_id = $car['category_id'] ?? 0;
     $price_per_day = $car['price_per_day'] ?? 0;
 
-    // Llogarit total_price
     $days = max(1, (abs(strtotime($end_date) - strtotime($start_date)) / 86400) + 1);
     $total_price = $price_per_day * $days;
 
     var_dump($car_id);
-    // Fut rezervimin
     $stmt = $mysqli->prepare("
         INSERT INTO reservations 
         (client_id, client_name, car_id, brand_id, category_id, start_date, time, end_date, total_price, status)
@@ -190,7 +179,6 @@ if (isset($_POST['create'])) {
     exit;
 }
 
-// Fshirja e rezervimit
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     $stmt = $mysqli->prepare("DELETE FROM reservations WHERE id=?");

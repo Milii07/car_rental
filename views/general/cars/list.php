@@ -8,21 +8,17 @@ require $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/home.php';
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
 
-// Fushat e makinës
 $carFields = ['vin', 'model', 'year', 'body_type', 'color', 'fuel_type', 'transmission', 'odometer', 'license_plate', 'seating_capacity'];
 $ownerFields = ['owner_name', 'dob', 'address', 'phone', 'email', 'license_number', 'tax_id'];
 $insuranceFields = ['insurance_provider', 'policy_number', 'coverage_type'];
 $financialFields = ['registration_fee', 'road_tax', 'sales_tax', 'payment_method', 'price_per_day'];
 $dealerFields = ['dealer_info', 'special_plate'];
 
-// Merr brands dhe categories
 $brands = $mysqli->query("SELECT * FROM brands ORDER BY name ASC")->fetch_all(MYSQLI_ASSOC);
 $categories = $mysqli->query("SELECT * FROM categories ORDER BY name ASC")->fetch_all(MYSQLI_ASSOC);
 
-// Merr makinat
 $result = $mysqli->query("SELECT * FROM cars ORDER BY id DESC");
 
-// Funksion për form fields
 function renderFields($fields, $data = [])
 {
     foreach ($fields as $field) {
@@ -93,7 +89,7 @@ function renderFields($fields, $data = [])
                                 </thead>
                                 <tbody>
                                     <?php while ($row = $result->fetch_assoc()) : ?>
-                                        <tr>
+                                        <tr class="car-card" data-name="<?= htmlspecialchars($row['model']) ?>">
                                             <td><?= $row['id'] ?></td>
                                             <td><?= htmlspecialchars($row['model']) ?></td>
                                             <td><?= htmlspecialchars($row['brand_id'] ? $mysqli->query("SELECT name FROM brands WHERE id=" . $row['brand_id'])->fetch_assoc()['name'] : '-') ?></td>
@@ -119,7 +115,6 @@ function renderFields($fields, $data = [])
                                             <div class="modal-dialog modal-lg modal-dialog-centered">
                                                 <div class="modal-content border-0 shadow-lg rounded-4">
 
-                                                    <!-- HEADER -->
                                                     <div class="modal-header  text-white rounded-top-4">
                                                         <h5 class="modal-title d-flex text-primary align-items-center">
                                                             <i class="ri-car-line me-2 fs-5"></i> Detajet e Makinës – ID <?= $row['id'] ?>
@@ -127,10 +122,8 @@ function renderFields($fields, $data = [])
                                                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                     </div>
 
-                                                    <!-- BODY -->
                                                     <div class="modal-body px-4 py-3">
 
-                                                        <!-- FOTOT (të vogla) -->
                                                         <?php if (!empty($row['images'])) : ?>
                                                             <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
                                                                 <?php foreach (explode(',', $row['images']) as $img) : ?>
@@ -146,7 +139,6 @@ function renderFields($fields, $data = [])
                                                             <p class="text-center text-muted mb-3">Nuk ka foto për këtë makinë.</p>
                                                         <?php endif; ?>
 
-                                                        <!-- INFORMACIONI -->
                                                         <div class="container">
                                                             <div class="row gy-2">
 
@@ -170,7 +162,6 @@ function renderFields($fields, $data = [])
                                                         </div>
                                                     </div>
 
-                                                    <!-- FOOTER -->
                                                     <div class="modal-footer border-0 justify-content-center pb-3">
                                                         <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
                                                             Mbyll
@@ -312,6 +303,16 @@ function renderFields($fields, $data = [])
                     window.location.href = deleteUrl;
                 }
             });
+        });
+    });
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase();
+        const cars = document.querySelectorAll('.car-card');
+
+        cars.forEach(car => {
+            const name = car.dataset.name.toLowerCase();
+            car.style.display = name.includes(query) || query === '' ? 'table-row' : 'none';
         });
     });
 </script>

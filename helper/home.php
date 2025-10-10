@@ -5,9 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
 
-/**
- * Merr të gjitha skedarët e makinave nga dosja uploads/cars
- */
+
 function getCarFiles()
 {
     $carDir = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/uploads/cars';

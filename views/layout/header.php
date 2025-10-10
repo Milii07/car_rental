@@ -2,7 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/search.php';
+
 
 ?>
 
@@ -252,7 +252,6 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/search.php';
             color: #ffffff !important;
         }
 
-        /* Dark mode për modal-et specifik */
         [id^="reserveCarModal"].dark-mode .modal-content,
         [id^="viewCarModal"].dark-mode .modal-content {
             background-color: #1a1a1a;
@@ -261,13 +260,11 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/search.php';
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Butonët "close" */
         [id^="reserveCarModal"].dark-mode .btn-close,
         [id^="viewCarModal"].dark-mode .btn-close {
             filter: invert(1);
         }
 
-        /* Inputs dhe textarea */
         [id^="reserveCarModal"].dark-mode input,
         [id^="reserveCarModal"].dark-mode textarea,
         [id^="viewCarModal"].dark-mode input,
@@ -277,19 +274,16 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/search.php';
             border: 1px solid #555;
         }
 
-        /* Labels */
         [id^="reserveCarModal"].dark-mode label,
         [id^="viewCarModal"].dark-mode label {
             color: #f1f1f1;
         }
 
-        /* Buttons brenda modalit */
         [id^="reserveCarModal"].dark-mode .btn,
         [id^="viewCarModal"].dark-mode .btn {
             border-radius: 0.25rem;
         }
 
-        /* SweetAlert Dark Mode */
         body.dark-mode .swal2-popup {
             background-color: #1a1a1a !important;
             color: #ffffff !important;
@@ -310,7 +304,6 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/search.php';
             color: #ffffff !important;
         }
 
-        /* Logos */
         .navbar-brand-box a {
             display: flex;
             flex-direction: column;
@@ -357,7 +350,6 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/search.php';
             line-height: 1.1;
         }
 
-        /* Overlay për dropdown */
         .dropdown-backdrop {
             position: fixed;
             top: 0;
@@ -365,13 +357,10 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/search.php';
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.6);
-            /* gri shumë e errët */
             z-index: 1000;
-            /* poshtë dropdown-it */
             display: none;
         }
 
-        /* Kur është dark mode, overlay bëhet edhe më i errët */
         [data-bs-theme="dark"] .dropdown-backdrop {
             background: rgba(0, 0, 0, 0.75);
         }
@@ -415,9 +404,9 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/search.php';
                 <div class="navbar-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
                         <button type="button" id="sidebar-toggle-btn"><i class="ri-arrow-right-line"></i> <span>Menu</span></button>
-                        <form class="d-flex ms-2" id="searchForm" method="GET" action="/new_project_bk/helper/search.php">
-                            <input type="text" id="search" name="q" placeholder="Kërko në projekt..." autocomplete="off" style="width:150px;padding:2px;">
-                            <div id="suggestions" style="position:absolute; border:1px solid #ccc; max-height:100px; overflow-y:auto; background:#fff; z-index:1000;"></div>
+                        <form class="d-flex ms-2 position-relative" id="searchForm" method="GET" action="#">
+                            <input type="text" id="search" name="q" placeholder="Kërko në katalog..." autocomplete="off" style="width:200px;padding:5px;">
+                            <div id="suggestions" style="position:absolute; border:1px solid #ccc; max-height:200px; overflow-y:auto; background:#fff; z-index:1000; width:100%;"></div>
                         </form>
 
                         <script src="helper/search_live.js"></script>
@@ -469,12 +458,12 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/search.php';
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-
+            // ================= Sidebar Toggle =================
             const sidebar = document.getElementById('sidebar');
             const toggleBtn = document.getElementById('sidebar-toggle-btn');
-            const toggleIcon = toggleBtn.querySelector('i');
+            const toggleIcon = toggleBtn?.querySelector('i');
 
-            toggleBtn.addEventListener('click', function() {
+            toggleBtn?.addEventListener('click', function() {
                 if (window.innerWidth <= 768) {
                     sidebar.classList.toggle('mobile-open');
                     toggleIcon.classList.toggle('ri-arrow-right-line');
@@ -483,7 +472,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/search.php';
             });
 
             document.addEventListener('click', function(e) {
-                if (window.innerWidth <= 768 && sidebar.classList.contains('mobile-open')) {
+                if (window.innerWidth <= 768 && sidebar?.classList.contains('mobile-open')) {
                     if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target) && !e.target.closest('.dropdown')) {
                         sidebar.classList.remove('mobile-open');
                         toggleIcon.classList.add('ri-arrow-right-line');
@@ -492,34 +481,27 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/search.php';
                 }
             });
 
+            // ================= Fullscreen =================
             const btnFullscreen = document.getElementById("btn-fullscreen");
             const fullscreenIcon = document.getElementById("fullscreen-icon");
-
-            btnFullscreen.addEventListener("click", () => {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen();
-                } else {
-                    document.exitFullscreen();
-                }
+            btnFullscreen?.addEventListener("click", () => {
+                if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+                else document.exitFullscreen();
             });
-
             document.addEventListener("fullscreenchange", () => {
-                fullscreenIcon.classList.toggle("bx-fullscreen");
-                fullscreenIcon.classList.toggle("bx-exit-fullscreen");
+                fullscreenIcon?.classList.toggle("bx-fullscreen");
+                fullscreenIcon?.classList.toggle("bx-exit-fullscreen");
             });
 
-
+            // ================= Dark Mode =================
             const darkModeToggle = document.getElementById("darkModeToggle");
             const icon = darkModeToggle?.querySelector("i");
 
             function applyDarkModeToModals() {
-                const modals = document.querySelectorAll('[id^="viewCarModal"], [id^="reserveCarModal"]');
+                const modals = document.querySelectorAll('.modal');
                 modals.forEach(modal => {
-                    if (document.body.classList.contains('dark-mode')) {
-                        modal.classList.add('dark-mode');
-                    } else {
-                        modal.classList.remove('dark-mode');
-                    }
+                    if (document.body.classList.contains('dark-mode')) modal.classList.add('dark-mode');
+                    else modal.classList.remove('dark-mode');
                 });
             }
 
@@ -541,47 +523,41 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/search.php';
                 applyDarkModeToModals();
             });
 
-            const observer = new MutationObserver(() => {
-                applyDarkModeToModals();
-            });
+            const observer = new MutationObserver(() => applyDarkModeToModals());
             observer.observe(document.body, {
                 childList: true,
                 subtree: true
             });
 
+            // ================= SweetAlert Fshirje =================
             document.addEventListener('click', function(e) {
-                if (e.target.closest('.delete-btn')) {
-                    e.preventDefault();
-                    const button = e.target.closest('.delete-btn');
-                    const deleteUrl = button.href;
+                const button = e.target.closest('.delete-btn');
+                if (!button) return;
+                e.preventDefault();
+                const deleteUrl = button.href;
+                const isDark = document.body.classList.contains('dark-mode');
 
-                    if (typeof Swal !== 'undefined') {
-                        const isDark = document.body.classList.contains('dark-mode');
-
-                        Swal.fire({
-                            title: 'Jeni i sigurt?',
-                            text: "Kjo nuk mund të anulohet!",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonText: 'Po, fshi!',
-                            cancelButtonText: 'Anulo',
-                            background: isDark ? '#1a1a1a' : '#fff',
-                            color: isDark ? '#ffffff' : '#000000',
-                            confirmButtonColor: isDark ? '#a83232' : '#3085d6',
-                            cancelButtonColor: isDark ? '#444444' : '#aaa'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = deleteUrl;
-                            }
-                        });
-                    } else {
-                        if (confirm("Jeni i sigurt që doni ta fshini?")) {
-                            window.location.href = deleteUrl;
-                        }
-                    }
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Jeni i sigurt?',
+                        text: "Kjo nuk mund të anulohet!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Po, fshi!',
+                        cancelButtonText: 'Anulo',
+                        background: isDark ? '#1a1a1a' : '#fff',
+                        color: isDark ? '#ffffff' : '#000000',
+                        confirmButtonColor: isDark ? '#a83232' : '#3085d6',
+                        cancelButtonColor: isDark ? '#444444' : '#aaa'
+                    }).then(result => {
+                        if (result.isConfirmed) window.location.href = deleteUrl;
+                    });
+                } else {
+                    if (confirm("Jeni i sigurt që doni ta fshini?")) window.location.href = deleteUrl;
                 }
             });
 
+            // ================= Search Suggestions =================
             const searchInput = document.getElementById('search');
             const suggestionsDiv = document.getElementById('suggestions');
 
@@ -590,7 +566,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/search.php';
                 return text.replace(re, '<mark>$1</mark>');
             }
 
-            searchInput.addEventListener('input', function() {
+            searchInput?.addEventListener('input', function() {
                 const query = this.value.trim();
                 suggestionsDiv.innerHTML = '';
                 if (!query) return;
@@ -600,40 +576,165 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/search.php';
                     .then(data => {
                         data.forEach(item => {
                             const div = document.createElement('div');
-                            div.innerHTML = highlight(item.columns.name || 'No name', query) +
-                                ' (' + item.table + ')';
-                            div.style.padding = '5px';
+                            div.classList.add('search-suggestion');
+                            div.style.padding = 'px';
                             div.style.cursor = 'pointer';
+
+
+                            let displayText = item.columns?.name || 'No name';
+
+                            div.innerHTML = highlight(displayText, query);
+
                             div.addEventListener('click', () => {
-                                window.location.href = item.url;
+                                if (item.table === 'Makina') {
+                                    const modalId = `carModal${item.id}`;
+                                    const modalEl = document.getElementById(modalId);
+                                    if (modalEl) new bootstrap.Modal(modalEl).show();
+                                } else {
+                                    window.location.href = item.url + (item.id ? `?id=${item.id}` : '');
+                                }
+                                suggestionsDiv.innerHTML = '';
+                                searchInput.value = '';
                             });
+
                             suggestionsDiv.appendChild(div);
                         });
-                    });
+                    })
+                    .catch(err => console.error('Search error:', err));
             });
 
+            document.addEventListener('click', function(e) {
+                if (!searchInput?.contains(e.target) && !suggestionsDiv?.contains(e.target)) {
+                    suggestionsDiv.innerHTML = '';
+                }
+            });
 
-
+            // ================= Logo Hover =================
             const logo = document.querySelector('.collapsed-sidebar-logo');
-            const AFBText = logo.querySelector('.logo-text');
-            const fullLogo = logo.querySelector('.full-logo');
+            if (logo) {
+                const AFBText = logo.querySelector('.logo-text');
+                const fullLogo = logo.querySelector('.full-logo');
 
-            logo.addEventListener('mouseenter', () => {
-                AFBText.style.display = 'none';
-                fullLogo.style.display = 'flex';
-            });
+                logo.addEventListener('mouseenter', () => {
+                    AFBText.style.display = 'none';
+                    fullLogo.style.display = 'flex';
+                });
+                logo.addEventListener('mouseleave', () => {
+                    AFBText.style.display = 'inline';
+                    fullLogo.style.display = 'none';
+                });
+            }
 
-            logo.addEventListener('mouseleave', () => {
-                AFBText.style.display = 'inline';
-                fullLogo.style.display = 'none';
-            });
-
+            // ================= Bootstrap Dropdown =================
             var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
-            var dropdownList = dropdownElementList.map(function(dropdownToggleEl) {
-                return new bootstrap.Dropdown(dropdownToggleEl);
+            dropdownElementList.map(el => new bootstrap.Dropdown(el));
+
+            // ================= Chart Shitjesh =================
+            const ctx = document.getElementById('salesChart')?.getContext('2d');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        datasets: [{
+                            label: 'Shitjet e Makina',
+                            data: [12, 19, 14, 18, 22, 20, 25, 30, 28, 26, 32, 35],
+                            backgroundColor: '#032c69ff',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            // ================= Counter Animacion =================
+            const counters = document.querySelectorAll('.counter');
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                let count = 0;
+                const step = target / 200;
+                const updateCounter = () => {
+                    if (count < target) {
+                        count += step;
+                        counter.innerText = Math.ceil(count);
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                updateCounter();
             });
+
+            // ================= Animacion për Kartat =================
+            const cards = document.querySelectorAll('.card');
+            window.addEventListener('load', () => {
+                cards.forEach((card, index) => {
+                    setTimeout(() => card.classList.add('show'), index * 100);
+                });
+            });
+
+            // ================= Edit Car Modal =================
+            const editModalEl = document.getElementById('editModal');
+            const editModal = editModalEl ? new bootstrap.Modal(editModalEl) : null;
+            const editForm = document.getElementById('editCarForm');
+
+            document.querySelectorAll(".edit-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    editForm.id.value = btn.dataset.id;
+                    editForm.name.value = btn.dataset.name;
+                    editForm.price.value = btn.dataset.price;
+                    editForm.seats.value = btn.dataset.seats;
+                    editForm.transmission.value = btn.dataset.transmission;
+                    editForm.type.value = btn.dataset.type;
+                    editForm.rating.value = btn.dataset.rating;
+                    editModal?.show();
+                });
+            });
+
+            editForm?.addEventListener('submit', async e => {
+                e.preventDefault();
+                const formData = new FormData(editForm);
+                try {
+                    const res = await fetch('/new_project_bk/helper/updateCar.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        editModal?.hide();
+                        Swal.fire('Sukses!', 'Makina u përditësua me sukses.', 'success')
+                            .then(() => location.reload());
+                    } else {
+                        Swal.fire('Gabim!', result.message || 'Ndodhi një problem.', 'error');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    Swal.fire('Gabim!', 'Gabim gjatë komunikimit me serverin.', 'error');
+                }
+            });
+
         });
     </script>
+
+
+
+
+
+
+
+
 
 </body>
 

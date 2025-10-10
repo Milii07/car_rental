@@ -63,8 +63,6 @@ function getCarImages($images)
 <div class="main-content">
     <div class="page-content">
         <div class="container-fluid">
-
-            <!-- PAGE TITLE -->
             <div class="row mb-3">
                 <div class="col-12">
                     <div class="page-title-box d-sm-flex align-items-center justify-content-between">
@@ -79,7 +77,6 @@ function getCarImages($images)
                 </div>
             </div>
 
-            <!-- ALERT MESSAGES -->
             <?php if (isset($_SESSION['message'])): ?>
                 <div id="alertMessage" class="alert alert-success"><?= $_SESSION['message'];
                                                                     unset($_SESSION['message']); ?></div>
@@ -101,11 +98,9 @@ function getCarImages($images)
                         $days_reserved = $start->diff($end)->days + 1;
                     }
                 ?>
-                    <!-- CAR CARD -->
                     <div class="col-md-4 col-lg-3">
                         <div class="card h-100 shadow-sm">
 
-                            <!-- IMAGE OPENS MODAL -->
                             <img src="/new_project_bk/uploads/cars/<?= htmlspecialchars($main_image) ?>"
                                 class="card-img-top"
                                 style="height:180px;object-fit:cover;cursor:pointer;"
@@ -138,7 +133,6 @@ function getCarImages($images)
                         </div>
                     </div>
 
-                    <!-- CAR DETAILS MODAL -->
                     <div class="modal fade" id="viewCarModal<?= $car['id'] ?>" tabindex="-1">
                         <div class="modal-dialog modal-xl modal-dialog-centered">
                             <div class="modal-content p-4">
@@ -168,9 +162,14 @@ function getCarImages($images)
                                                 <p><strong>Periudha:</strong> <?= $status_info['start_date'] ?> - <?= $status_info['end_date'] ?></p>
                                             <?php endif; ?>
                                             <h5 class="mt-4 mb-2">Përshkrimi i makinës</h5>
-                                            <p>Kjo makinë kombinon performancën me elegancën, duke ofruar një drejtim të qetë dhe të sigurt në çdo rrugë. Dizajni modern dhe detajet e rafinuara e bëjnë atë të dallueshme në çdo situatë.</p>
-                                            <p>Me teknologji të avancuar dhe funksione të sigurta, ajo siguron komoditet maksimal për shoferin dhe pasagjerët. Lloji i karburantit, transmisioni dhe opsionet e tjera garantojnë efikasitet dhe ekonomicitet gjatë çdo udhëtimi.</p>
-                                            <p>Përshtatet për përdorim të përditshëm apo udhëtime të gjata, duke ofruar eksperiencë të jashtëzakonshme drejtimi. Ky model përfaqëson standardin më të lartë të cilësisë dhe besueshmërisë në treg.</p>
+                                            <p>Udhëtim i jashtëzakonshëm, rehati maksimale
+                                                Hyni në botën e luksit dhe rehatisë me këtë makinë të shkëlqyer. Çdo udhëtim shndërrohet në një eksperiencë të qetë dhe të këndshme, falë teknologjisë moderne dhe komoditetit të jashtëzakonshëm të sediljeve. Udhëtimet në qytet apo në rrugë të largëta bëhen të sigurta dhe të këndshme.
+
+                                            <p> Performancë dhe stil që tërheq vëmendjen
+                                                Me motor të fuqishëm dhe stabilitet të lartë, kjo makinë ofron performancë të shkëlqyer në çdo rrugë. Linjat elegante dhe dizajni modern e bëjnë makinën një zgjedhje perfekte për çdo rast – nga një takim biznesi tek një udhëtim relaksues fundjavash.
+
+                                                Siguri dhe besueshmëri në çdo kilometër
+                                                Pajisjet më të fundit të sigurisë dhe teknologjia e avancuar garanton një udhëtim pa shqetësime. Me këtë makinë, nuk merrni vetëm një mjet transporti – merrni besueshmëri, stil dhe luks që e shoqëron çdo rrugëtim tuajin. Zgjidhni këtë makinë për një eksperiencë të paharrueshme dhe udhëtime të sigurt për ju dhe pasagjerët tuaj.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -183,7 +182,6 @@ function getCarImages($images)
 
 
 
-                    <!-- RESERVE MODAL -->
                     <?php if ($status_info['status'] == 'E lirë'): ?>
                         <div class="modal fade" id="reserveCarModal<?= $car['id'] ?>" tabindex="-1">
                             <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -242,7 +240,7 @@ function getCarImages($images)
     </div>
 </div>
 
-<!-- MODAL ADD CLIENT -->
+
 <div class="modal fade" id="addClientModal" tabindex="-1">
     <div class="modal-dialog modal-xl">
         <div class="modal-content p-4">
@@ -284,7 +282,6 @@ function getCarImages($images)
     </div>
 </div>
 
-<!-- INIT TOOLTIP -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
@@ -300,77 +297,127 @@ function getCarImages($images)
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-    });
 
+        // -------------------------
+        // Aktivizo tooltip-et Bootstrap me info të personalizuar
+        // -------------------------
+        document.querySelectorAll('.badge.bg-danger[data-bs-toggle="tooltip"]').forEach(function(el) {
 
+            // Lexojmë datat nga atributi ekzistues
+            const originalTitle = el.getAttribute('data-bs-title');
+            if (!originalTitle) return;
 
-    setTimeout(() => {
-        const alert = document.getElementById('alertMessage');
-        if (alert) alert.remove();
-    }, 5000);
+            let parts = originalTitle.split(' - ');
+            let startDate = parts[0] || '';
+            let endDate = parts[1] || '';
 
-    var modals = document.querySelectorAll('.modal');
-    modals.forEach(modal => {
-        modal.addEventListener('hidden.bs.modal', function() {
-            document.body.classList.remove('modal-open');
-            document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
-        });
-    });
+            // Llogarit ditët që kanë mbetur
+            let today = new Date();
+            let start = new Date(startDate);
+            let end = new Date(endDate);
+            let remainingDays = Math.ceil((end - today) / (1000 * 60 * 60 * 24)) + 1;
+            remainingDays = remainingDays < 0 ? 0 : remainingDays;
 
-    var currentReservationModalId = null;
-    document.querySelectorAll('.add-client-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            currentReservationModalId = this.getAttribute('data-current-reserve-modal');
-        });
-    });
+            // Merr emrin e klientit nga teksti i badge
+            let clientName = el.textContent.split(' ')[0];
 
-    document.getElementById('addClientForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+            // Përmbajtja HTML e tooltip-it
+            const tooltipContent = `
+            <div style="color:red;font-weight:bold;">${clientName}</div>
+            <div>${startDate} - ${endDate}</div>
+            <div style="color:red;">Ditë të mbetura: ${remainingDays}</div>
+        `;
 
-        console.log("sss");
-        var formData = new FormData(this);
-        var submitBtn = this.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-
-        fetch('/new_project_bk/helper/save_client_ajax.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                submitBtn.disabled = false;
-                var msgDiv = document.getElementById('clientFormMessage');
-
-                if (data.success) {
-                    msgDiv.innerHTML = '<div class="alert alert-success">Klienti u ruajt me sukses!</div>';
-
-                    if (currentReservationModalId) {
-                        var reserveSelect = document.querySelector('#' + currentReservationModalId + ' select.reserve-client-select');
-                        if (reserveSelect) {
-                            var option = new Option(data.client_name, data.client_id, true, true);
-                            reserveSelect.appendChild(option);
-                            reserveSelect.value = data.client_id;
-                        }
-                        var reserveModal = new bootstrap.Modal(document.getElementById(currentReservationModalId));
-                        reserveModal.show();
-                    }
-
-                    var addClientModal = bootstrap.Modal.getInstance(document.getElementById('addClientModal'));
-                    addClientModal.hide();
-                } else {
-                    msgDiv.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Gabim ne ruajtjen e klientit') + '</div>';
-                }
-            })
-            .catch(err => {
-                submitBtn.disabled = false;
-                document.getElementById('clientFormMessage').innerHTML = '<div class="alert alert-danger">Gabim ne server</div>';
-                console.error(err);
+            // Inicializo tooltip me opsion HTML
+            new bootstrap.Tooltip(el, {
+                title: tooltipContent,
+                html: true,
+                placement: 'top'
             });
+        });
+
+        // -------------------------
+        // Hiq alert pas 5 sekondash
+        // -------------------------
+        setTimeout(() => {
+            const alert = document.getElementById('alertMessage');
+            if (alert) alert.remove();
+        }, 5000);
+
+        // -------------------------
+        // Pastrimi i modal-backdrop kur mbyllet modal
+        // -------------------------
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            modal.addEventListener('hidden.bs.modal', function() {
+                document.body.classList.remove('modal-open');
+                document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+            });
+        });
+
+        // -------------------------
+        // AJAX "Shto Klient" në modalin e rezervimit
+        // -------------------------
+        let currentReservationModalId = null;
+
+        document.querySelectorAll('.add-client-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                currentReservationModalId = this.dataset.currentReserveModal;
+            });
+        });
+
+        const addClientForm = document.getElementById('addClientForm');
+        if (addClientForm) {
+            addClientForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+
+                fetch('/new_project_bk/helper/save_client_ajax.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        submitBtn.disabled = false;
+                        const msgDiv = document.getElementById('clientFormMessage');
+
+                        if (data.success) {
+                            msgDiv.innerHTML = '<div class="alert alert-success">Klienti u ruajt me sukses!</div>';
+
+                            if (currentReservationModalId) {
+                                const reserveSelect = document.querySelector('#' + currentReservationModalId + ' select.reserve-client-select');
+                                if (reserveSelect) {
+                                    const option = new Option(data.client_name, data.client_id, true, true);
+                                    reserveSelect.appendChild(option);
+                                    reserveSelect.value = data.client_id;
+                                }
+                                const reserveModal = new bootstrap.Modal(document.getElementById(currentReservationModalId));
+                                reserveModal.show();
+                            }
+
+                            const addClientModal = bootstrap.Modal.getInstance(document.getElementById('addClientModal'));
+                            addClientModal.hide();
+                            addClientForm.reset();
+                            currentReservationModalId = null;
+                            setTimeout(() => {
+                                msgDiv.innerHTML = '';
+                            }, 3000);
+                        } else {
+                            msgDiv.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Gabim ne ruajtjen e klientit') + '</div>';
+                        }
+                    })
+                    .catch(err => {
+                        submitBtn.disabled = false;
+                        document.getElementById('clientFormMessage').innerHTML = '<div class="alert alert-danger">Gabim ne server</div>';
+                        console.error(err);
+                    });
+            });
+        }
+
     });
 </script>
+
 
 <?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/footer.php'; ?>

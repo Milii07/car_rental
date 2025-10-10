@@ -1,123 +1,149 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-$mysqli = new mysqli('localhost', 'root', '', 'auto_future_block');
-if ($mysqli->connect_error) {
-    die("Connection failed: " . $mysqli->connect_error);
-}
+header('Content-Type: application/json');
+include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
 
-$tables = ['brands', 'cars', 'categories', 'clients', 'menu_items', 'password_resets', 'reservations', 'users'];
+$q = strtolower($_GET['q'] ?? '');
+$q = $mysqli->real_escape_string($q);
 
-$projectDir = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk';
+$results = [];
 
-
-function getTextColumns($table, $mysqli)
-{
-    $db = $mysqli->query("SELECT DATABASE()")->fetch_row()[0];
-    $sql = "SELECT column_name, data_type 
-            FROM information_schema.columns 
-            WHERE table_schema = '{$db}' 
-              AND table_name = '{$table}'";
-    $res = $mysqli->query($sql);
-    $columns = [];
-    while ($row = $res->fetch_assoc()) {
-        if (in_array($row['data_type'], ['varchar', 'char', 'text', 'longtext'])) {
-            $columns[] = $row['column_name'];
-        }
-    }
-    return $columns;
-}
-
-function searchDatabase($query, $tables, $mysqli)
-{
-    $results = [];
-    $query = $mysqli->real_escape_string($query);
-
-    foreach ($tables as $table) {
-        $columns = getTextColumns($table, $mysqli);
-        if (empty($columns)) continue;
-
-        $where = [];
-        foreach ($columns as $col) {
-            $where[] = "$col LIKE '%$query%'";
-        }
-
-        $sql = "SELECT " . implode(',', $columns) . " FROM $table WHERE " . implode(' OR ', $where) . " LIMIT 20";
-        $res = $mysqli->query($sql);
-
-        if ($res && $res->num_rows > 0) {
-            while ($row = $res->fetch_assoc()) {
-                $results[] = [
-                    'type' => 'db',
-                    'table' => $table,
-                    'columns' => $row,
-                    'url' => "/new_project_bk/views/general/$table/list.php"
-                ];
-            }
-        }
-    }
-    return $results;
-}
-
-function scanFiles($dir, &$results = [])
-{
-    $files = scandir($dir);
-    foreach ($files as $file) {
-        if ($file === '.' || $file === '..') continue;
-        $fullPath = $dir . DIRECTORY_SEPARATOR . $file;
-        if (is_dir($fullPath)) {
-            scanFiles($fullPath, $results);
-        } else {
-            $results[] = $fullPath;
-        }
-    }
-    return $results;
-}
-
-function searchFiles($query, $projectDir)
-{
-    $query = strtolower($query);
-    $allFiles = scanFiles($projectDir);
-    $matches = [];
-
-    foreach ($allFiles as $file) {
-        $filename = strtolower(basename($file));
-        if (strpos($filename, $query) !== false) {
-            $matches[] = [
-                'type' => 'file',
-                'name' => basename($file),
-                'path' => str_replace($_SERVER['DOCUMENT_ROOT'], '', $file)
+if ($q !== '') {
+    $query = "SELECT c.id, c.model, c.phone, b.name AS brand_name, cat.name AS category_name
+              FROM cars c
+              LEFT JOIN brands b ON c.brand_id = b.id
+              LEFT JOIN categories cat ON c.category_id = cat.id
+              WHERE LOWER(c.model) LIKE '%$q%' OR LOWER(c.phone) LIKE '%$q%' 
+                 OR LOWER(b.name) LIKE '%$q%' OR LOWER(cat.name) LIKE '%$q%'
+              LIMIT 20";
+    $res = $mysqli->query($query);
+    if ($res) {
+        while ($row = $res->fetch_assoc()) {
+            $columns = [
+                'name' => $row['model'],
+                'phone' => $row['phone']
             ];
-            continue;
-        }
+            if (!empty($row['brand_name'])) $columns['brand'] = $row['brand_name'];
+            if (!empty($row['category_name'])) $columns['category'] = $row['category_name'];
 
-        $ext = pathinfo($file, PATHINFO_EXTENSION);
-        if (in_array($ext, ['php', 'html', 'js', 'css', 'txt'])) {
-            $content = strtolower(file_get_contents($file));
-            if (strpos($content, $query) !== false) {
-                $matches[] = [
-                    'type' => 'content',
-                    'name' => basename($file),
-                    'path' => str_replace($_SERVER['DOCUMENT_ROOT'], '', $file)
-                ];
-            }
+            $results[] = [
+                'columns' => $columns,
+                'table' => 'Makina',
+                'url' => "/new_project_bk/views/general/cars/list.php?id=" . $row['id'],
+                'id' => $row['id']
+            ];
         }
     }
 
-    return $matches;
+    $res = $mysqli->query("SELECT id, name FROM brands WHERE LOWER(name) LIKE '%$q%' LIMIT 10");
+    while ($row = $res->fetch_assoc()) {
+        $results[] = [
+            'columns' => ['name' => $row['name']],
+            'table' => 'Brands',
+            'url' => "/new_project_bk/views/general/brands/list.php?id=" . $row['id'],
+            'id' => $row['id']
+        ];
+    }
+
+    $res = $mysqli->query("SELECT id, name FROM categories WHERE LOWER(name) LIKE '%$q%' LIMIT 10");
+    while ($row = $res->fetch_assoc()) {
+        $results[] = [
+            'columns' => ['name' => $row['name']],
+            'table' => 'Categories',
+            'url' => "/new_project_bk/views/general/categories/list.php?id=" . $row['id'],
+            'id' => $row['id']
+        ];
+    }
+
+    $res = $mysqli->query("SELECT id, full_name, company_name, phone, email FROM clients 
+                           WHERE LOWER(full_name) LIKE '%$q%' 
+                              OR LOWER(company_name) LIKE '%$q%' 
+                              OR LOWER(email) LIKE '%$q%' 
+                              OR LOWER(phone) LIKE '%$q%'
+                           LIMIT 20");
+    while ($row = $res->fetch_assoc()) {
+        $columns = [
+            'name' => $row['full_name'] ?: $row['company_name'],
+            'phone' => $row['phone'],
+            'email' => $row['email']
+        ];
+        $results[] = [
+            'columns' => $columns,
+            'table' => 'Klient',
+            'url' => "/new_project_bk/views/general/client_management/list.php?id=" . $row['id'],
+            'id' => $row['id']
+        ];
+    }
+
+    $res = $mysqli->query("SELECT id, title, content FROM files_index 
+                           WHERE LOWER(title) LIKE '%$q%' OR LOWER(content) LIKE '%$q%' LIMIT 10");
+    while ($row = $res->fetch_assoc()) {
+        $results[] = [
+            'columns' => ['name' => $row['title']],
+            'table' => 'Files',
+            'url' => "/new_project_bk/views/general/files/list.php?id=" . $row['id'],
+            'id' => $row['id']
+        ];
+    }
+
+    $res = $mysqli->query("SELECT id, username, email FROM users 
+                           WHERE LOWER(username) LIKE '%$q%' OR LOWER(email) LIKE '%$q%' LIMIT 10");
+    while ($row = $res->fetch_assoc()) {
+        $results[] = [
+            'columns' => ['name' => $row['username'], 'email' => $row['email']],
+            'table' => 'Users',
+            'url' => "/new_project_bk/views/general/users/list.php?id=" . $row['id'],
+            'id' => $row['id']
+        ];
+    }
+
+    $res = $mysqli->query("SELECT id, client_name, display_name FROM reservations 
+                           WHERE LOWER(client_name) LIKE '%$q%' OR LOWER(display_name) LIKE '%$q%' LIMIT 10");
+    while ($row = $res->fetch_assoc()) {
+        $results[] = [
+            'columns' => ['name' => $row['client_name'], 'display' => $row['display_name']],
+            'table' => 'Rezervime',
+            'url' => "/new_project_bk/views/general/reservations/list.php?id=" . $row['id'],
+            'id' => $row['id']
+        ];
+    }
+
+    $res = $mysqli->query("SELECT id, name FROM menu_items WHERE LOWER(name) LIKE '%$q%' LIMIT 10");
+    while ($row = $res->fetch_assoc()) {
+        $results[] = [
+            'columns' => ['name' => $row['name']],
+            'table' => 'Menu',
+            'url' => "/new_project_bk/views/general/menu_items/list.php?id=" . $row['id'],
+            'id' => $row['id']
+        ];
+    }
 }
 
+$generalPages = [
+    [
+        'title' => 'Home',
+        'url' => '/new_project_bk/views/general/home/list.php',
+        'keywords' => ['home', 'ballina', 'faqja kryesore']
+    ],
+    [
+        'title' => 'Order Status',
+        'url' => '/new_project_bk/views/general/order_status/list.php',
+        'keywords' => ['orders', 'porosi', 'status', 'gjendja e makines']
+    ],
+];
 
-if (!empty($_GET['q'])) {
-    header('Content-Type: application/json; charset=utf-8');
-    $query = trim($_GET['q']);
-
-    $dbResults = searchDatabase($query, $tables, $mysqli);
-    $fileResults = searchFiles($query, $projectDir);
-
-    $results = array_merge($dbResults, $fileResults);
-
-    echo json_encode(array_slice($results, 0, 50));
-    exit;
+foreach ($generalPages as $page) {
+    foreach ($page['keywords'] as $keyword) {
+        if (strpos(strtolower($keyword), $q) !== false) {
+            $results[] = [
+                'columns' => ['name' => $page['title']],
+                'table' => 'Faqe',
+                'url' => $page['url'],
+                'keyword' => $keyword
+            ];
+            break;
+        }
+    }
 }
+
+echo json_encode($results);
+exit;

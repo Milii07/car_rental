@@ -33,7 +33,6 @@ foreach ($carFiles as $file) {
     ];
 }
 
-// Handle filter request
 $selectedCategory = isset($_GET['category']) ? $_GET['category'] : 'all';
 $filteredCars     = $selectedCategory === 'all'
     ? $allCars
