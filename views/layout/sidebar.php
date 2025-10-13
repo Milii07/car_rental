@@ -190,36 +190,16 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
     </div>
 
     <ul class="nav flex-column mb-auto mt-3">
-      <li class="nav-item">
-        <a href="/new_project_bk/views/general/brands/list.php" class="nav-link fw-semibold" data-tooltip="Brand-et">
-          <i class="bi bi-tags-fill me-2 fs-5"></i>
-          <span class="nav-link-text">Brand-et</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="/new_project_bk/views/general/categories/list.php" class="nav-link fw-semibold" data-tooltip="Kategoritë">
-          <i class="bi bi-grid-fill me-2 fs-5"></i>
-          <span class="nav-link-text">Kategoritë</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="/new_project_bk/views/general/cars/list.php" class="nav-link fw-semibold" data-tooltip="Makina">
-          <i class="bi bi-car-front-fill me-2 fs-5"></i>
-          <span class="nav-link-text">Makina</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="/new_project_bk/views/general/reservations/list.php" class="nav-link fw-semibold" data-tooltip="Rezervime">
-          <i class="bi bi-calendar-check-fill me-2 fs-5"></i>
-          <span class="nav-link-text">Rezervime</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="/new_project_bk/views/general/client_management/list.php" class="nav-link fw-semibold" data-tooltip="Klientët">
-          <i class="bi bi-people-fill me-2 fs-5"></i>
-          <span class="nav-link-text">Klientët</span>
-        </a>
-      </li>
+      <li class="menu-title"><span data-key="t-menu">Menu</span></li>
+      <li class="nav-item"><a href="/new_project_bk/views/general/home/list.php" class="nav-link fw-semibold"><i class="ri-home-4-line"></i> Home</a></li>
+      <li class="nav-item"><a href="/new_project_bk/views/general/brands/list.php" class="nav-link fw-semibold"><i class="ri-price-tag-line"></i> Brand-et</a></li>
+      <li class="nav-item"><a class="nav-link menu-link" href="/new_project_bk/views/general/categories/list.php"><i class="ri-layout-grid-fill"></i> Kategoritë</a></li>
+      <li class="nav-item"><a class="nav-link menu-link" href="/new_project_bk/views/general/cars/list.php"><i class="ri-car-fill"></i> Makina</a></li>
+      <li class="nav-item"><a href="/new_project_bk/views/general/client_management/list.php" class="nav-link fw-semibold"><i class="ri-user-add-fill"></i> Klientet</a></li>
+      <li class="nav-item"><a href="/new_project_bk/views/general/reservations/list.php" class="nav-link fw-semibold"><i class="ri-calendar-2-line"></i> Rezervime</a></li>
+      <li class="nav-item"><a href="/new_project_bk/views/general/order_status/list.php" class="nav-link fw-semibold"><i class="ri-compass-2-fill"></i> Gjendja e makines</a></li>
+      <li class="nav-item"><a href="/new_project_bk/views/general/sales_car/list.php" class="nav-link fw-semibold"><i class="bi bi-tags-fill"></i> Statusi i shitjes</a></li>
+
     </ul>
   </div>
 

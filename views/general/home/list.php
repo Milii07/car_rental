@@ -42,6 +42,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
         opacity: 1;
     }
 
+
     .modal-backdrop {
         z-index: 1990 !important;
         background: rgba(0, 0, 0, 0.45);
@@ -81,6 +82,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
         position: relative;
         overflow: hidden;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+
     }
 
     .card.show {

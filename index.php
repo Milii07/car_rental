@@ -23,25 +23,7 @@ define('HEADER_PATH', VIEWS_PATH . '/layout/header.php');
 
 define('FOOTER_PATH', VIEWS_PATH . '/layout/layout.php');
 
-// function includeAllPHP($dir)
-// {
-//     if (!is_dir($dir)) return;
 
-//     $iterator = new RecursiveIteratorIterator(
-//         new RecursiveDirectoryIterator($dir)
-//     );
-
-//     foreach ($iterator as $file) {
-//         if ($file->isFile() && pathinfo($file, PATHINFO_EXTENSION) === 'php') {
-//             include_once $file->getPathname();
-//         }
-//     }
-// }
-
-
-// includeAllPHP(DB_PATH);
-// includeAllPHP(HELPER_PATH);
-// includeAllPHP(CONTROLLERS_PATH);
 
 
 include HEADER_PATH;

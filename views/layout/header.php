@@ -393,6 +393,8 @@ if (session_status() === PHP_SESSION_NONE) {
                     <li class="nav-item"><a href="/new_project_bk/views/general/client_management/list.php" class="nav-link fw-semibold"><i class="ri-user-add-fill"></i> Klientet</a></li>
                     <li class="nav-item"><a href="/new_project_bk/views/general/reservations/list.php" class="nav-link fw-semibold"><i class="ri-calendar-2-line"></i> Rezervime</a></li>
                     <li class="nav-item"><a href="/new_project_bk/views/general/order_status/list.php" class="nav-link fw-semibold"><i class="ri-compass-2-fill"></i> Gjendja e makines</a></li>
+                    <li class="nav-item"><a href="/new_project_bk/views/general/sales_car/list.php" class="nav-link fw-semibold"><i class="ri-information-2-fill"></i> Statusi i shitjes</a></li>
+
                 </ul>
             </div>
         </div>
@@ -458,7 +460,6 @@ if (session_status() === PHP_SESSION_NONE) {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            // ================= Sidebar Toggle =================
             const sidebar = document.getElementById('sidebar');
             const toggleBtn = document.getElementById('sidebar-toggle-btn');
             const toggleIcon = toggleBtn?.querySelector('i');
@@ -481,7 +482,6 @@ if (session_status() === PHP_SESSION_NONE) {
                 }
             });
 
-            // ================= Fullscreen =================
             const btnFullscreen = document.getElementById("btn-fullscreen");
             const fullscreenIcon = document.getElementById("fullscreen-icon");
             btnFullscreen?.addEventListener("click", () => {
@@ -493,7 +493,6 @@ if (session_status() === PHP_SESSION_NONE) {
                 fullscreenIcon?.classList.toggle("bx-exit-fullscreen");
             });
 
-            // ================= Dark Mode =================
             const darkModeToggle = document.getElementById("darkModeToggle");
             const icon = darkModeToggle?.querySelector("i");
 
@@ -529,7 +528,6 @@ if (session_status() === PHP_SESSION_NONE) {
                 subtree: true
             });
 
-            // ================= SweetAlert Fshirje =================
             document.addEventListener('click', function(e) {
                 const button = e.target.closest('.delete-btn');
                 if (!button) return;
@@ -557,7 +555,6 @@ if (session_status() === PHP_SESSION_NONE) {
                 }
             });
 
-            // ================= Search Suggestions =================
             const searchInput = document.getElementById('search');
             const suggestionsDiv = document.getElementById('suggestions');
 
@@ -609,7 +606,6 @@ if (session_status() === PHP_SESSION_NONE) {
                 }
             });
 
-            // ================= Logo Hover =================
             const logo = document.querySelector('.collapsed-sidebar-logo');
             if (logo) {
                 const AFBText = logo.querySelector('.logo-text');
@@ -625,11 +621,9 @@ if (session_status() === PHP_SESSION_NONE) {
                 });
             }
 
-            // ================= Bootstrap Dropdown =================
             var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
             dropdownElementList.map(el => new bootstrap.Dropdown(el));
 
-            // ================= Chart Shitjesh =================
             const ctx = document.getElementById('salesChart')?.getContext('2d');
             if (ctx) {
                 new Chart(ctx, {
@@ -659,7 +653,6 @@ if (session_status() === PHP_SESSION_NONE) {
                 });
             }
 
-            // ================= Counter Animacion =================
             const counters = document.querySelectorAll('.counter');
             counters.forEach(counter => {
                 const target = +counter.getAttribute('data-target');
@@ -677,7 +670,6 @@ if (session_status() === PHP_SESSION_NONE) {
                 updateCounter();
             });
 
-            // ================= Animacion për Kartat =================
             const cards = document.querySelectorAll('.card');
             window.addEventListener('load', () => {
                 cards.forEach((card, index) => {
@@ -685,7 +677,6 @@ if (session_status() === PHP_SESSION_NONE) {
                 });
             });
 
-            // ================= Edit Car Modal =================
             const editModalEl = document.getElementById('editModal');
             const editModal = editModalEl ? new bootstrap.Modal(editModalEl) : null;
             const editForm = document.getElementById('editCarForm');
@@ -727,15 +718,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
         });
     </script>
-
-
-
-
-
-
-
-
-
 </body>
 
 </html>

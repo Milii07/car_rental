@@ -1,7 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+if (session_status() === PHP_SESSION_NONE) session_start();
 
 include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
 include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/reservations.php';
@@ -60,6 +58,84 @@ function getCarImages($images)
     return explode(',', $images);
 }
 ?>
+
+<style>
+    .modal-dialog-centered {
+        display: flex !important;
+        align-items: center !important;
+        min-height: calc(100vh - 1rem);
+    }
+
+    .modal {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1055 !important;
+        overflow: auto;
+    }
+
+    .modal.show {
+        display: flex !important;
+    }
+
+    .modal-dialog {
+        margin: auto;
+        transform: translateY(0);
+        transition: all 0.25s ease-in-out;
+    }
+
+    .modal-content {
+        z-index: 1060 !important;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        background: #fff;
+        pointer-events: auto;
+    }
+
+    .modal.modal-second {
+        z-index: 1075 !important;
+    }
+
+    .modal.modal-second .modal-content {
+        pointer-events: auto !important;
+    }
+
+    .modal-backdrop.modal-backdrop-second {
+        z-index: 1070 !important;
+    }
+
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+        z-index: 1050 !important;
+        opacity: 1 !important;
+    }
+
+    body.modal-open {
+        overflow: hidden !important;
+    }
+
+    .tooltip-inner .remaining-days {
+        color: red;
+        font-weight: bold;
+    }
+
+    .custom-modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1040;
+        display: none;
+    }
+</style>
+
 <div class="main-content">
     <div class="page-content">
         <div class="container-fluid">
@@ -163,13 +239,13 @@ function getCarImages($images)
                                             <?php endif; ?>
                                             <h5 class="mt-4 mb-2">Përshkrimi i makinës</h5>
                                             <p>Udhëtim i jashtëzakonshëm, rehati maksimale
-                                                Hyni në botën e luksit dhe rehatisë me këtë makinë të shkëlqyer. Çdo udhëtim shndërrohet në një eksperiencë të qetë dhe të këndshme, falë teknologjisë moderne dhe komoditetit të jashtëzakonshëm të sediljeve. Udhëtimet në qytet apo në rrugë të largëta bëhen të sigurta dhe të këndshme.
+                                                Hyni në botën e luksit dhe rehatisë me këtë makinë të shkëlqyer. Çdo udhëtim shndërrohet në një eksperiencë të qetë dhe të këndshme. Udhëtimet në qytet apo në rrugë të largëta bëhen të sigurta dhe të këndshme.
 
                                             <p> Performancë dhe stil që tërheq vëmendjen
-                                                Me motor të fuqishëm dhe stabilitet të lartë, kjo makinë ofron performancë të shkëlqyer në çdo rrugë. Linjat elegante dhe dizajni modern e bëjnë makinën një zgjedhje perfekte për çdo rast – nga një takim biznesi tek një udhëtim relaksues fundjavash.
+                                                Me motor të fuqishëm dhe stabilitet të lartë, kjo makinë ofron performancë të shkëlqyer në çdo rrugë. Linjat elegante dhe dizajni modern e bëjnë makinën një zgjedhje perfekte për çdo rast.
 
-                                                Siguri dhe besueshmëri në çdo kilometër
-                                                Pajisjet më të fundit të sigurisë dhe teknologjia e avancuar garanton një udhëtim pa shqetësime. Me këtë makinë, nuk merrni vetëm një mjet transporti – merrni besueshmëri, stil dhe luks që e shoqëron çdo rrugëtim tuajin. Zgjidhni këtë makinë për një eksperiencë të paharrueshme dhe udhëtime të sigurt për ju dhe pasagjerët tuaj.</p>
+                                            <p>Siguri dhe besueshmëri në çdo kilometër
+                                                Pajisjet më të fundit të sigurisë dhe teknologjia e avancuar garanton një udhëtim pa shqetësime. Zgjidhni këtë makinë për një eksperiencë të paharrueshme dhe udhëtime të sigurt për ju dhe pasagjerët tuaj.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -282,28 +358,17 @@ function getCarImages($images)
     </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-    });
-</script>
-
-
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<div id="customBackdrop" class="custom-modal-backdrop"></div>
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
 
-        // -------------------------
-        // Aktivizo tooltip-et Bootstrap me info të personalizuar
-        // -------------------------
         document.querySelectorAll('.badge.bg-danger[data-bs-toggle="tooltip"]').forEach(function(el) {
-
-            // Lexojmë datat nga atributi ekzistues
             const originalTitle = el.getAttribute('data-bs-title');
             if (!originalTitle) return;
 
@@ -311,24 +376,19 @@ function getCarImages($images)
             let startDate = parts[0] || '';
             let endDate = parts[1] || '';
 
-            // Llogarit ditët që kanë mbetur
             let today = new Date();
-            let start = new Date(startDate);
             let end = new Date(endDate);
             let remainingDays = Math.ceil((end - today) / (1000 * 60 * 60 * 24)) + 1;
             remainingDays = remainingDays < 0 ? 0 : remainingDays;
 
-            // Merr emrin e klientit nga teksti i badge
             let clientName = el.textContent.split(' ')[0];
 
-            // Përmbajtja HTML e tooltip-it
             const tooltipContent = `
-            <div style="color:red;font-weight:bold;">${clientName}</div>
-            <div>${startDate} - ${endDate}</div>
-            <div style="color:red;">Ditë të mbetura: ${remainingDays}</div>
-        `;
+        <div><strong>${clientName}</strong></div>
+        <div>${startDate} - ${endDate}</div>
+        <div class="remaining-days">Ditë të mbetura: ${remainingDays}</div>
+    `;
 
-            // Inicializo tooltip me opsion HTML
             new bootstrap.Tooltip(el, {
                 title: tooltipContent,
                 html: true,
@@ -336,28 +396,25 @@ function getCarImages($images)
             });
         });
 
-        // -------------------------
-        // Hiq alert pas 5 sekondash
-        // -------------------------
+
         setTimeout(() => {
             const alert = document.getElementById('alertMessage');
             if (alert) alert.remove();
         }, 5000);
 
-        // -------------------------
-        // Pastrimi i modal-backdrop kur mbyllet modal
-        // -------------------------
+        const backdrop = document.getElementById('customBackdrop');
         const modals = document.querySelectorAll('.modal');
+
         modals.forEach(modal => {
+            modal.addEventListener('show.bs.modal', function() {
+                backdrop.style.display = 'block';
+            });
+
             modal.addEventListener('hidden.bs.modal', function() {
-                document.body.classList.remove('modal-open');
-                document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+                backdrop.style.display = 'none';
             });
         });
 
-        // -------------------------
-        // AJAX "Shto Klient" në modalin e rezervimit
-        // -------------------------
         let currentReservationModalId = null;
 
         document.querySelectorAll('.add-client-btn').forEach(btn => {
@@ -401,9 +458,7 @@ function getCarImages($images)
                             addClientModal.hide();
                             addClientForm.reset();
                             currentReservationModalId = null;
-                            setTimeout(() => {
-                                msgDiv.innerHTML = '';
-                            }, 3000);
+                            setTimeout(() => msgDiv.innerHTML = '', 3000);
                         } else {
                             msgDiv.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Gabim ne ruajtjen e klientit') + '</div>';
                         }
@@ -418,6 +473,7 @@ function getCarImages($images)
 
     });
 </script>
+
 
 
 <?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/footer.php'; ?>

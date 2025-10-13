@@ -157,7 +157,6 @@ function getCarStatus($car_id, $mysqli)
                 </div>
             </div>
 
-            <!-- Modal Shto Rezervim -->
             <div class="modal fade" id="addReservationModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content p-4">
@@ -216,7 +215,6 @@ function getCarStatus($car_id, $mysqli)
                 </div>
             </div>
 
-            <!-- Modal Shto Klient -->
             <div class="modal fade" id="addClientModal" tabindex="-1">
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content p-4">
