@@ -3,8 +3,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/client_helper.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/index.php';
+
+include_once HELPER_PATH . 'client_helper.php';
+include_once LAYOUT_PATH . 'header.php';
 
 
 $result = $mysqli->query("SELECT * FROM clients ORDER BY id DESC");

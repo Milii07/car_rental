@@ -3,10 +3,14 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/reservations.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/client_helper.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
+
+include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/index.php';
+
+include_once DB_PATH . 'db.php';
+include_once HELPER_PATH . 'reservations.php';
+include_once HELPER_PATH . 'client_helper.php';
+include_once LAYOUT_PATH . 'header.php';
+
 
 $today = date('Y-m-d');
 
@@ -104,7 +108,6 @@ function getCarImages($images)
                             </div>
                         </div>
                     </div>
-
                     <div class="modal fade" id="viewCarModal<?= $car['id'] ?>" tabindex="-1">
                         <div class="modal-dialog modal-xl modal-dialog-centered">
                             <div class="modal-content p-4">
@@ -112,6 +115,7 @@ function getCarImages($images)
                                     <h5 class="modal-title"><?= htmlspecialchars($car['model']) ?> - Detaje Makine</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
+
                                 <div class="modal-body row">
                                     <div class="col-md-6">
                                         <?php foreach ($images as $img): ?>
@@ -146,6 +150,7 @@ function getCarImages($images)
         </div>
     </div>
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>

@@ -1,7 +1,7 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+include_once __DIR__ . '/../../../index.php';
+
+
 include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
 
 function getCarFiles()
@@ -23,7 +23,7 @@ if ($result) {
     }
 }
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
+include_once LAYOUT_PATH . 'header.php';
 ?>
 
 <style>
@@ -313,15 +313,15 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
             ?>
 
             <div class="dashboard-cards" style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:30px;">
-                <div class="card total-card" style="flex:1; min-width:150px; padding:20px; border-radius:12px; background:#1E40AF; color:#fff !important; text-align:center;">
+                <div class="card total-card keep-color" style="flex:1; min-width:150px; padding:20px; border-radius:12px; background:#1E40AF; color:#fff !important; text-align:center;">
                     <h5 class="text-white">Total Makina</h5>
                     <span class="counter" data-target="<?= $totalCars ?>">0</span>
                 </div>
-                <div class="card total-card" style="flex:1; min-width:150px; padding:20px; border-radius:12px; background:#10B981; color:#fff !important; text-align:center;">
+                <div class="card total-card keep-color" style="flex:1; min-width:150px; padding:20px; border-radius:12px; background:#10B981; color:#fff !important; text-align:center;">
                     <h5 class="text-white">Të Reja</h5>
                     <span class="counter" data-target="<?= $newCars ?>">0</span>
                 </div>
-                <div class="card total-card" style="flex:1; min-width:150px; padding:20px; border-radius:12px; background:#F59E0B; color:#fff !important; text-align:center;">
+                <div class="card total-card keep-color" style="flex:1; min-width:150px; padding:20px; border-radius:12px; background:#F59E0B; color:#fff !important; text-align:center;">
                     <h5 class="text-white">Të Përdorura</h5>
                     <span class="counter" data-target="<?= $usedCars ?>">0</span>
                 </div>
@@ -427,7 +427,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
                             data: {
                                 labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                                 datasets: [{
-                                    label: 'Shitjet e Makina',
+                                    label: 'Shitjet e Makinave',
                                     data: [12, 19, 14, 18, 22, 20, 25, 30, 28, 26, 32, 35],
                                     backgroundColor: '#032c69ff',
                                     borderRadius: 8

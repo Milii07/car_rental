@@ -46,10 +46,8 @@ function insert_car($mysqli, $data)
         vin, brand_id, category_id, model, year, body_type, color, fuel_type, transmission,
         odometer, license_plate, seating_capacity, owner_name, dob, address, phone, email,
         license_number, tax_id, insurance_provider, policy_number, coverage_type, registration_fee,
-        road_tax, sales_tax, payment_method, dealer_info, special_plate, images, created_at, file_hash
-    ) VALUES (
-        ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
-    )");
+        road_tax, sales_tax, payment_method, dealer_info, special_plate, images, created_at, file_hash) 
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
     $created_at = date('Y-m-d H:i:s');
 

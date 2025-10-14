@@ -3,10 +3,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include __DIR__ . '/../../../db/db.php';
-require $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/home.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/index.php';
 
-include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
+include_once DB_PATH . 'db.php';
+include_once HELPER_PATH . 'home.php';
+include_once LAYOUT_PATH . 'header.php';
 
 $carFields = ['vin', 'model', 'year', 'body_type', 'color', 'fuel_type', 'transmission', 'odometer', 'license_plate', 'seating_capacity'];
 $ownerFields = ['owner_name', 'dob', 'address', 'phone', 'email', 'license_number', 'tax_id'];

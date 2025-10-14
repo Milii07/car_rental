@@ -1,8 +1,10 @@
 <?php
 
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/brand.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/index.php';
+
+include_once HELPER_PATH . 'brand.php';
+include_once LAYOUT_PATH . 'header.php';
 ?>
 
 <div class="main-content">

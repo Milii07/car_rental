@@ -24,10 +24,8 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/layout.php';
       background: #fff;
       border-radius: 25px;
       padding: 100px 120px;
-      /* më shumë hapësirë */
       box-shadow: 0 12px 60px rgba(0, 0, 0, 0.18);
       max-width: 900px;
-      /* më e gjerë */
       margin: 70px auto;
       text-align: center;
     }

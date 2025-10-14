@@ -203,7 +203,6 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
     </ul>
   </div>
 
-
   <nav class="navbar navbar-expand-lg navbar-dark shadow-sm bg-dark">
     <div class="container-fluid">
       <button class="btn btn-sm btn-outline-light me-3 d-none d-md-block" onclick="toggleSidebar()">

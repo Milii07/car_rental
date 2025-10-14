@@ -1,12 +1,9 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/index.php';
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/reservations.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/helper/client_helper.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/header.php';
+include_once HELPER_PATH . 'reservations.php';
+include_once HELPER_PATH . 'client_helper.php';
+include_once LAYOUT_PATH . 'header.php';
 
 $clients_result = $mysqli->query("SELECT id, full_name FROM clients ORDER BY full_name ASC");
 $clients = $clients_result->fetch_all(MYSQLI_ASSOC);

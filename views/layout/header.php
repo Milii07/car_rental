@@ -55,7 +55,7 @@ if (session_status() === PHP_SESSION_NONE) {
         @media (max-width: 768px) {
             #sidebar-toggle-btn {
                 display: inline-flex;
-                background: #1e1e2f;
+                background: #032c69ff;
             }
 
             .app-menu {
@@ -64,7 +64,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 left: -260px;
                 width: 260px;
                 height: 100%;
-                background: #1e1e2f;
+                background: #032c69ff;
                 transition: 0.3s ease;
                 z-index: 1200;
             }
@@ -252,6 +252,36 @@ if (session_status() === PHP_SESSION_NONE) {
             color: #ffffff !important;
         }
 
+        .dark-mode .car-card,
+        .dark-mode .total-card {
+            background-color: #1e1e1e;
+            color: #f5f5f5;
+            border: 1px solid #333;
+        }
+
+        .dark-mode .car-card .card-title,
+        .dark-mode .total-card .card-title {
+            color: #fff;
+        }
+
+        .dark-mode .car-card img {
+            opacity: 0.85;
+        }
+
+        .toggle-dark {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #222;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+
+
         [id^="reserveCarModal"].dark-mode .modal-content,
         [id^="viewCarModal"].dark-mode .modal-content {
             background-color: #1a1a1a;
@@ -364,6 +394,27 @@ if (session_status() === PHP_SESSION_NONE) {
         [data-bs-theme="dark"] .dropdown-backdrop {
             background: rgba(0, 0, 0, 0.75);
         }
+
+
+
+        body.dark-mode span.spec {
+            color: #c8c8c8 !important;
+        }
+
+        body.dark-mode .total-card:not(.keep-color) {
+            background-color: #1e1e1e !important;
+            color: #f1f1f1 !important;
+            border: 1px solid #333 !important;
+        }
+
+        #suggestions .search-suggestion:hover {
+            background-color: #f0f0f0;
+        }
+
+        #suggestions mark {
+            background-color: white;
+            color: black;
+        }
     </style>
 
 </head>
@@ -407,12 +458,11 @@ if (session_status() === PHP_SESSION_NONE) {
                     <div class="d-flex align-items-center">
                         <button type="button" id="sidebar-toggle-btn"><i class="ri-arrow-right-line"></i> <span>Menu</span></button>
                         <form class="d-flex ms-2 position-relative" id="searchForm" method="GET" action="#">
-                            <input type="text" id="search" name="q" placeholder="Kërko në katalog..." autocomplete="off" style="width:200px;padding:5px;">
-                            <div id="suggestions" style="position:absolute; border:1px solid #ccc; max-height:200px; overflow-y:auto; background:#fff; z-index:1000; width:100%;"></div>
+                            <input type="text" id="search" name="q" placeholder="Kërko në katalog..." autocomplete="off" style="width:200px; padding:5px;">
+                            <div id="suggestions" style="position: absolute; top: 100%; left: 0; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; 
+                            background: #fff;  z-index: 1000; width: 100%; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.1);   border-radius: 4px;"></div>
                         </form>
-
                         <script src="helper/search_live.js"></script>
-
 
                     </div>
 
@@ -520,6 +570,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     icon?.classList.replace("bx-sun", "bx-moon");
                 }
                 applyDarkModeToModals();
+                applyTotalCardColors();
             });
 
             const observer = new MutationObserver(() => applyDarkModeToModals());
@@ -566,21 +617,30 @@ if (session_status() === PHP_SESSION_NONE) {
             searchInput?.addEventListener('input', function() {
                 const query = this.value.trim();
                 suggestionsDiv.innerHTML = '';
-                if (!query) return;
+                if (!query) {
+                    suggestionsDiv.style.display = 'none';
+                    return;
+                }
 
                 fetch(`/new_project_bk/helper/search.php?q=${encodeURIComponent(query)}`)
                     .then(res => res.json())
                     .then(data => {
+                        if (!data.length) {
+                            suggestionsDiv.style.display = 'none';
+                            return;
+                        }
+
+                        suggestionsDiv.style.display = 'block';
+
                         data.forEach(item => {
                             const div = document.createElement('div');
                             div.classList.add('search-suggestion');
-                            div.style.padding = 'px';
+                            div.style.padding = '8px';
                             div.style.cursor = 'pointer';
+                            div.style.borderBottom = '1px solid #eee';
+                            div.style.backgroundColor = '#fff';
 
-
-                            let displayText = item.columns?.name || 'No name';
-
-                            div.innerHTML = highlight(displayText, query);
+                            div.innerHTML = highlight(item.columns?.name || 'No name', query);
 
                             div.addEventListener('click', () => {
                                 if (item.table === 'Makina') {
@@ -591,6 +651,7 @@ if (session_status() === PHP_SESSION_NONE) {
                                     window.location.href = item.url + (item.id ? `?id=${item.id}` : '');
                                 }
                                 suggestionsDiv.innerHTML = '';
+                                suggestionsDiv.style.display = 'none';
                                 searchInput.value = '';
                             });
 
@@ -603,8 +664,10 @@ if (session_status() === PHP_SESSION_NONE) {
             document.addEventListener('click', function(e) {
                 if (!searchInput?.contains(e.target) && !suggestionsDiv?.contains(e.target)) {
                     suggestionsDiv.innerHTML = '';
+                    suggestionsDiv.style.display = 'none';
                 }
             });
+
 
             const logo = document.querySelector('.collapsed-sidebar-logo');
             if (logo) {
@@ -631,7 +694,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     data: {
                         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                         datasets: [{
-                            label: 'Shitjet e Makina',
+                            label: 'Shitjet e Makinave',
                             data: [12, 19, 14, 18, 22, 20, 25, 30, 28, 26, 32, 35],
                             backgroundColor: '#032c69ff',
                             borderRadius: 8
@@ -716,8 +779,21 @@ if (session_status() === PHP_SESSION_NONE) {
                 }
             });
 
+
+            function applyTotalCardColors() {
+                document.querySelectorAll('.total-card.keep-color').forEach(card => {
+                    const bg = card.dataset.bg;
+                    card.style.backgroundColor = bg;
+                    card.style.color = '#fff';
+                });
+            }
+
+            applyTotalCardColors();
+
         });
     </script>
+
+
 </body>
 
 </html>
