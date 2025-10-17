@@ -2,7 +2,9 @@
 if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/layout.php';
+include '../../db/db.php';
+include '../layout/layout.php';
+
 ?>
 
 <!DOCTYPE html>

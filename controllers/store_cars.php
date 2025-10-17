@@ -2,6 +2,9 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/index.php';
+
 function upload_images($files)
 {
     $uploaded = [];
@@ -9,7 +12,7 @@ function upload_images($files)
         foreach ($files['tmp_name'] as $key => $tmp_name) {
             if ($tmp_name) {
                 $filename = time() . '_' . basename($files['name'][$key]);
-                $target = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/uploads/cars/' . $filename;
+                $target = UPLOADS_PATH . 'cars/' . $filename;
                 if (move_uploaded_file($tmp_name, $target)) {
                     $uploaded[] = $filename;
                 }
@@ -18,7 +21,6 @@ function upload_images($files)
     }
     return implode(',', $uploaded);
 }
-
 
 function insert_car($mysqli, $data)
 {
@@ -29,7 +31,7 @@ function insert_car($mysqli, $data)
         $hash = null;
     } else {
         $imagesArr = explode(',', $data['images']);
-        $firstFile = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/uploads/cars/' . $imagesArr[0];
+        $firstFile = UPLOADS_PATH . 'cars/' . $imagesArr[0];
         $hash = md5_file($firstFile);
 
         $stmtChk = $mysqli->prepare("SELECT id FROM cars WHERE file_hash = ?");

@@ -2,7 +2,7 @@
 header("Content-Type: application/json");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $uploadDir = $_SERVER['DOCUMENT_ROOT'] . "/new_project_bk/uploads/cars/";
+    $uploadDir = UPLOADS_PATH . 'cars/';
 
     $oldName = basename($_POST['old_name']);
     $newName = basename($_POST['new_name']);

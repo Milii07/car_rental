@@ -1,8 +1,8 @@
 <?php
 include_once __DIR__ . '/../../../index.php';
 
+include DB_PATH . 'db.php';
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
 
 function getCarFiles()
 {
@@ -372,13 +372,9 @@ include_once LAYOUT_PATH . 'header.php';
                                     <p class="fs-5 fw-bold text-success">💰 <?= $carData['price'] ?> €/ditë</p>
                                     <p class="text-muted small">⭐ <?= $carData['rating'] ?> | 💺 <?= $carData['seats'] ?> vende</p>
                                     <hr class="my-3">
-                                    <p>Komfort dhe luks:
-                                        Ky model makine ofron një eksperiencë të jashtëzakonshme udhëtimi. Sediljet janë të rehatshme dhe të rregullueshme sipas preferencave, ndërsa materiali i brendshëm dhe dizajni modern krijojnë një ambient luksoz për çdo pasagjer. Sistemet e klimës dhe izolimi i zhurmës e bëjnë udhëtimin qetësisht dhe komod.</p>
-                                    <p>Performancë dhe teknologji:
-                                        Me një motor të fuqishëm dhe efikas, kjo makinë kombinon performancën e lartë me ekonominë e karburantit. Pajisjet teknologjike, përfshirë navigacionin, sistemin e ndihmës për parkim dhe asistencën e vozitjes, garantojnë një eksperiencë të sigurt dhe të avancuar për shoferin.</p>
-                                    <p>Siguri dhe besueshmëri:
-                                        Siguria është prioriteti kryesor. Pajisjet moderne të sigurisë, si airbag-et, ABS, kontrolli i stabilitetit dhe sistemi i paralajmërimit për rrezik, sigurojnë mbrojtje maksimale për shoferin dhe pasagjerët. Kjo makinë nuk është vetëm një mjet transporti, por një shoqëruese e besueshme në çdo rrugë.</p>
-
+                                    <p>Ky model makine ofron një eksperiencë të jashtëzakonshme udhëtimi. Sediljet janë të rehatshme dhe të rregullueshme sipas preferencave.</p>
+                                    <p>Pajisjet teknologjike, përfshirë navigacionin, sistemin e ndihmës për parkim dhe asistencën e vozitjes, garantojnë një eksperiencë të sigurt.</p>
+                                    <p>Pajisjet moderne të sigurisë, si airbag-et, ABS, kontrolli i stabilitetit dhe sistemi i paralajmërimit për rrezik.</p>
                                     <button class="btn btn-secondary mt-3" data-bs-dismiss="modal">Mbyll</button>
                                 </div>
                             </div>
@@ -519,4 +515,4 @@ include_once LAYOUT_PATH . 'header.php';
             </script>
 
 
-            <?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/footer.php'; ?>
+            <?php include LAYOUT_PATH . 'footer.php'; ?>

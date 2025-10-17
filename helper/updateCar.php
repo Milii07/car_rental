@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
+require_once dirname(__DIR__) . '/index.php';
 
 $response = ['success' => false, 'message' => 'Diçka shkoi keq.'];
 

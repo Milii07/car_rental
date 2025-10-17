@@ -2,7 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
+require_once dirname(__DIR__) . '/index.php';
 
 
 if (isset($_POST['save_client'])) {
@@ -40,10 +40,10 @@ if (isset($_POST['save_client'])) {
     $stmt->close();
 
     if (isset($_POST['from']) && $_POST['from'] === 'order_status') {
-        header("Location: /new_project_bk/views/general/order_status/list.php");
-        exit;
+        header("Location: " . BASE_URL . "views/general/order_status/list.php");
+        exit;;
     } else {
-        header("Location: /new_project_bk/views/general/client_management/list.php");
+        header("Location: " . BASE_URL . "views/general/client_management/list.php");
         exit;
     }
 }
@@ -75,7 +75,7 @@ if (isset($_GET['delete'])) {
         $_SESSION['message'] = "Client u fshi me sukses!";
     }
 
-    header("Location: /new_project_bk/views/general/client_management/list.php");
+    header("Location: " . BASE_URL . "views/general/client_management/list.php");
     exit;
 }
 
@@ -118,7 +118,7 @@ if (isset($_POST['update_client'])) {
     $stmt->close();
 
     $_SESSION['message'] = "Client u përditësua me sukses!";
-    header("Location: /new_project_bk/views/general/client_management/list.php");
+    header("Location: " . BASE_URL . "views/general/client_management/list.php");
     exit;
 }
 

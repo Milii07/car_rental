@@ -2,7 +2,8 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
+
+require_once dirname(__DIR__) . '/index.php';
 
 if (isset($_POST['create'])) {
     $name = trim($_POST['name']);
@@ -15,7 +16,7 @@ if (isset($_POST['create'])) {
     } else {
         $_SESSION['error'] = "Emri i brand-it nuk mund të jetë bosh!";
     }
-    header("Location: /new_project_bk/views/general/brands/list.php");
+    header("Location: " . BASE_URL . "views/general/brands/list.php");
     exit;
 }
 
@@ -31,7 +32,7 @@ if (isset($_POST['update'])) {
     } else {
         $_SESSION['error'] = "Emri i brand-it nuk mund të jetë bosh!";
     }
-    header("Location: /new_project_bk/views/general/brands/list.php");
+    header("Location: " . BASE_URL . "views/general/brands/list.php");
     exit;
 }
 
@@ -42,7 +43,7 @@ if (isset($_GET['delete'])) {
     $stmt->execute();
     $stmt->close();
     $_SESSION['message'] = "Brand u fshi me sukses!";
-    header("Location: /new_project_bk/views/general/brands/list.php");
+    header("Location: " . BASE_URL . "views/general/brands/list.php");
     exit;
 }
 

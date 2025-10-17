@@ -128,7 +128,7 @@ function renderClientFields($fields, $data = [])
                                                         if (!empty($client['photos'])) {
                                                             echo '<div class="col-12 mb-3"><label class="form-label fw-bold">Photos:</label><div>';
                                                             foreach (explode(',', $client['photos']) as $photo) {
-                                                                echo '<img src="/new_project_bk/uploads/clients/' . htmlspecialchars($photo) . '" width="80" class="me-1 mb-1">';
+                                                                echo '<img src="' . UPLOADS_URL . 'clients/' . htmlspecialchars($photo) . '" width="80" class="me-1 mb-1" alt="Foto klienti">';
                                                             }
                                                             echo '</div></div>';
                                                         }
@@ -159,7 +159,7 @@ function renderClientFields($fields, $data = [])
                                                                 <?php if (!empty($client['photos'])) : ?>
                                                                     <div class="mt-2">
                                                                         <?php foreach (explode(',', $client['photos']) as $photo) : ?>
-                                                                            <img src="/new_project_bk/uploads/clients/<?= htmlspecialchars($photo) ?>" width="50" class="me-1 mb-1">
+                                                                            <img src="<?= UPLOADS_URL ?>clients/<?= htmlspecialchars($photo) ?>" width="50" class="me-1 mb-1 rounded shadow-sm" alt="Foto klienti">
                                                                         <?php endforeach; ?>
                                                                     </div>
                                                                 <?php endif; ?>
@@ -185,7 +185,7 @@ function renderClientFields($fields, $data = [])
         </div>
     </div>
 </div>
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/general/client_management/add_client_modal.php'; ?>
+<?php include GENERAL_PATH . 'client_management/add_client_modal.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -212,4 +212,5 @@ function renderClientFields($fields, $data = [])
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/footer.php'; ?>
+
+<?php include LAYOUT_PATH . 'footer.php'; ?>

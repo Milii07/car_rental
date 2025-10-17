@@ -182,25 +182,14 @@ include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
 
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <img src="/new_project_bk/uploads/cars/LOGO.jpg" alt="Logo">
+      <img src="/new_project_bk/uploads/cars/LOGO.png" alt="Logo">
       <div class="title-slogan">
         <span class="title">A.F.B</span>
         <span class="slogan">Rent Cars with Style!</span>
       </div>
     </div>
 
-    <ul class="nav flex-column mb-auto mt-3">
-      <li class="menu-title"><span data-key="t-menu">Menu</span></li>
-      <li class="nav-item"><a href="/new_project_bk/views/general/home/list.php" class="nav-link fw-semibold"><i class="ri-home-4-line"></i> Home</a></li>
-      <li class="nav-item"><a href="/new_project_bk/views/general/brands/list.php" class="nav-link fw-semibold"><i class="ri-price-tag-line"></i> Brand-et</a></li>
-      <li class="nav-item"><a class="nav-link menu-link" href="/new_project_bk/views/general/categories/list.php"><i class="ri-layout-grid-fill"></i> Kategoritë</a></li>
-      <li class="nav-item"><a class="nav-link menu-link" href="/new_project_bk/views/general/cars/list.php"><i class="ri-car-fill"></i> Makina</a></li>
-      <li class="nav-item"><a href="/new_project_bk/views/general/client_management/list.php" class="nav-link fw-semibold"><i class="ri-user-add-fill"></i> Klientet</a></li>
-      <li class="nav-item"><a href="/new_project_bk/views/general/reservations/list.php" class="nav-link fw-semibold"><i class="ri-calendar-2-line"></i> Rezervime</a></li>
-      <li class="nav-item"><a href="/new_project_bk/views/general/order_status/list.php" class="nav-link fw-semibold"><i class="ri-compass-2-fill"></i> Gjendja e makines</a></li>
-      <li class="nav-item"><a href="/new_project_bk/views/general/sales_car/list.php" class="nav-link fw-semibold"><i class="bi bi-tags-fill"></i> Statusi i shitjes</a></li>
 
-    </ul>
   </div>
 
   <nav class="navbar navbar-expand-lg navbar-dark shadow-sm bg-dark">

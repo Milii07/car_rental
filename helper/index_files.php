@@ -32,4 +32,4 @@ function indexFiles($dir, $mysqli)
 
 $mysqli->query("TRUNCATE TABLE files_index");
 indexFiles($projectDir, $mysqli);
-echo "✅ Indexing completed!";
+echo "Indexing completed!";

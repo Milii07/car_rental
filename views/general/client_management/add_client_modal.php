@@ -36,11 +36,11 @@
 <script>
     document.getElementById('addClientForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        console.log("sss");
-        var form = this;
-        var formData = new FormData(form);
-        var submitBtn = form.querySelector('button[name="save_client"]');
+        const form = this;
+        const submitBtn = form.querySelector('button[name="save_client"]');
         submitBtn.disabled = true;
+
+        const formData = new FormData(form);
 
         fetch('/new_project_bk/helper/save_client_ajax.php', {
                 method: 'POST',
@@ -50,28 +50,36 @@
             .then(data => {
                 submitBtn.disabled = false;
                 const msgDiv = document.getElementById('clientFormMessage');
-
                 if (data.success) {
                     msgDiv.innerHTML = '<div class="alert alert-success">Klienti u ruajt me sukses!</div>';
 
-                    var addModal = bootstrap.Modal.getInstance(document.getElementById('addClientModal'));
+                    const addModalEl = document.getElementById('addClientModal');
+                    let addModal = bootstrap.Modal.getInstance(addModalEl);
+
+                    if (!addModal) addModal = new bootstrap.Modal(addModalEl);
                     addModal.hide();
 
-                    if (window.currentReservationModalId) {
-                        var reserveModalEl = document.getElementById(window.currentReservationModalId);
-                        if (reserveModalEl) {
-                            var reserveModal = new bootstrap.Modal(reserveModalEl);
-                            reserveModal.show();
+                    document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
 
-                            var select = reserveModalEl.querySelector('select[name="client_id"]');
-                            if (select) {
-                                var option = new Option(data.full_name, data.client_id, true, true);
-                                select.appendChild(option);
-                                select.value = data.client_id;
-                            }
-                        }
-                    }
+                    document.body.classList.remove('modal-open');
 
+                    const tbody = document.querySelector('table tbody');
+                    const newRow = document.createElement('tr');
+                    newRow.id = 'clientRow' + data.client_id;
+                    newRow.innerHTML = `
+        <td>${data.client_id}</td>
+        <td>${data.full_name}</td>
+        <td>${form.company_name?.value || ''}</td>
+        <td>${form.email?.value || ''}</td>
+        <td>${form.phone?.value || ''}</td>
+        <td class="d-flex">
+            <button class="btn btn-info btn-sm me-1 view-btn" data-id="${data.client_id}"><i class="ri-eye-fill"></i></button>
+            <button class="btn btn-warning btn-sm me-1 edit-btn" data-id="${data.client_id}"><i class="ri-edit-2-fill"></i></button>
+            <a href="list.php?delete=${data.client_id}" class="btn btn-danger btn-sm delete-btn"><i class="ri-delete-bin-6-line"></i></a>
+        </td>`;
+                    tbody.prepend(newRow);
+
+                    form.reset();
                 } else {
                     msgDiv.innerHTML = '<div class="alert alert-danger">' + (data.error || 'Gabim ne ruajtjen e klientit') + '</div>';
                 }

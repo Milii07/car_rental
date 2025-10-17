@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
+require_once dirname(__DIR__) . '/index.php';
 
 $carFields       = ['vin', 'model', 'year', 'body_type', 'color', 'fuel_type', 'transmission', 'odometer', 'license_plate', 'seating_capacity'];
 $ownerFields     = ['owner_name', 'dob', 'address', 'phone', 'email', 'license_number', 'tax_id'];
@@ -18,7 +18,7 @@ function upload_images($files)
         foreach ($files['tmp_name'] as $key => $tmp_name) {
             if ($tmp_name) {
                 $filename = time() . '_' . basename($files['name'][$key]);
-                $target = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/uploads/cars/' . $filename;
+                $target = UPLOADS_PATH . 'cars/' . $filename;
                 if (move_uploaded_file($tmp_name, $target)) {
                     $uploaded[] = $filename;
                 }
@@ -28,14 +28,13 @@ function upload_images($files)
     return implode(',', $uploaded);
 }
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])) {
     $data = $_POST;
     $data['images'] = isset($_FILES['images']) ? upload_images($_FILES['images']) : '';
 
     $hash = null;
     if (!empty($data['images'])) {
-        $firstFile = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/uploads/cars/' . explode(',', $data['images'])[0];
+        $firstFile = UPLOADS_PATH . 'cars/' . explode(',', $data['images'])[0];
         $hash = md5_file($firstFile);
 
         $stmtChk = $mysqli->prepare("SELECT id FROM cars WHERE file_hash = ?");
@@ -45,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])) {
         $stmtChk->close();
         if ($res->num_rows > 0) {
             $_SESSION['message'] = "Kjo makinë ekziston më parë!";
-            header("Location: /new_project_bk/views/general/cars/list.php");
+            header("Location: " . GENERAL_URL . "cars/list.php");
             exit;
         }
     }
@@ -67,10 +66,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])) {
     $stmt->close();
 
     $_SESSION['message'] = "Makina u shtua me sukses!";
-    header("Location: /new_project_bk/views/general/cars/list.php");
+    header("Location: " . GENERAL_URL . "cars/list.php");
     exit;
 }
-
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update']) && isset($_POST['id'])) {
     $id = $_POST['id'];
@@ -83,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update']) && isset($_
 
     $hash = null;
     if (!empty($images)) {
-        $firstFile = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/uploads/cars/' . explode(',', $images)[0];
+        $firstFile = UPLOADS_PATH . 'cars/' . explode(',', $images)[0];
         $hash = md5_file($firstFile);
     }
 
@@ -106,10 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update']) && isset($_
     $stmt->close();
 
     $_SESSION['message'] = "Makina u përditësua me sukses!";
-    header("Location: /new_project_bk/views/general/cars/list.php");
+    header("Location: " . GENERAL_URL . "cars/list.php");
     exit;
 }
-
 
 if (isset($_GET['delete'])) {
     $id  = intval($_GET['delete']);
@@ -117,7 +114,7 @@ if (isset($_GET['delete'])) {
 
     if (!empty($row['images'])) {
         foreach (explode(',', $row['images']) as $img) {
-            $file = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/uploads/cars/' . $img;
+            $file = UPLOADS_PATH . 'cars/' . $img;
             if (file_exists($file)) unlink($file);
         }
     }
@@ -128,6 +125,6 @@ if (isset($_GET['delete'])) {
     $stmt->close();
 
     $_SESSION['message'] = "Makina u fshi me sukses!";
-    header("Location: /new_project_bk/views/general/cars/list.php");
+    header("Location: " . GENERAL_URL . "cars/list.php");
     exit;
 }

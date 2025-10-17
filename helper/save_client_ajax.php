@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
+require_once dirname(__DIR__) . '/index.php';
 header('Content-Type: application/json');
 
 if (isset($_POST['full_name']) && !empty(trim($_POST['full_name']))) {
@@ -58,6 +58,6 @@ if (isset($_POST['full_name']) && !empty(trim($_POST['full_name']))) {
         exit;
     }
 } else {
-    // echo json_encode(['success' => false, 'error' => 'Fusha emri eshte e zbrazet']);
-    // exit;
+    echo json_encode(['success' => false, 'error' => 'Fusha emri eshte e zbrazet']);
+    exit;
 }

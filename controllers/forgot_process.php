@@ -3,29 +3,25 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$base_path = $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/';
-
-include_once $base_path . 'db/db.php';
-include_once $base_path . 'views/layout/layout.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/index.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_SESSION['error'] = "Kjo faqe duhet të aksesohet me POST.";
-    header("Location: /new_project_bk/views/auth/forgot.php");
+    header("Location: " . BASE_URL . "views/auth/forgot.php");
     exit;
 }
 
 $email = trim($_POST['email'] ?? '');
-
 if (empty($email)) {
     $_SESSION['error'] = "Ju lutem shkruani emailin e përdoruesit.";
-    header("Location: /new_project_bk/views/auth/forgot.php");
+    header("Location: " . BASE_URL . "views/auth/forgot.php");
     exit;
 }
 
 $stmt = $mysqli->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
 if (!$stmt) {
     $_SESSION['error'] = "Gabim gjatë përgatitjes së query-së: " . $mysqli->error;
-    header("Location: /new_project_bk/views/auth/forgot.php");
+    header("Location: " . BASE_URL . "views/auth/forgot.php");
     exit;
 }
 
@@ -51,10 +47,10 @@ if ($user = $result->fetch_assoc()) {
         $stmt_insert->close();
     }
 
-    header("Location: /new_project_bk/views/auth/reset_password.php?token=" . urlencode($token));
+    header("Location: " . BASE_URL . "views/auth/reset_password.php?token=" . urlencode($token));
     exit;
 } else {
     $_SESSION['error'] = "Përdoruesi nuk u gjet.";
-    header("Location: /new_project_bk/views/auth/forgot.php");
+    header("Location: " . BASE_URL . "views/auth/forgot.php");
     exit;
 }

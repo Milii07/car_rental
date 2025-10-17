@@ -152,4 +152,4 @@ include_once LAYOUT_PATH . 'header.php';
     });
 </script>
 
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/footer.php'; ?>
+<?php include LAYOUT_PATH . 'footer.php'; ?>

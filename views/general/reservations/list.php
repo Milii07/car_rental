@@ -1,6 +1,5 @@
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/index.php';
-
 include_once HELPER_PATH . 'reservations.php';
 include_once HELPER_PATH . 'client_helper.php';
 include_once LAYOUT_PATH . 'header.php';
@@ -18,7 +17,7 @@ $cars = $mysqli->query("
 ")->fetch_all(MYSQLI_ASSOC);
 
 $reservations_result = $mysqli->query("
-    SELECT r.*, c.model, c.vin, 
+    SELECT r.*, c.model, c.vin, c.price_per_day,
            COALESCE(b.name, '-') AS brand_name, 
            COALESCE(cat.name, '-') AS category_name, 
            cl.full_name AS client_name
@@ -33,7 +32,8 @@ $reservations = $reservations_result->fetch_all(MYSQLI_ASSOC);
 
 function getCarStatus($car_id, $mysqli)
 {
-    $today = date('Y-m-d H:i:s');
+    $now = new DateTime();
+
     $stmt = $mysqli->prepare("
         SELECT r.*, cl.full_name 
         FROM reservations r
@@ -47,7 +47,12 @@ function getCarStatus($car_id, $mysqli)
     $stmt->close();
 
     foreach ($reservations as $r) {
-        if ($today >= $r['start_date'] && $today <= $r['end_date']) {
+        if (empty($r['start_date']) || empty($r['end_date']) || empty($r['time'])) continue;
+
+        $start = new DateTime($r['start_date'] . ' ' . $r['time']);
+        $end = new DateTime($r['end_date'] . ' ' . $r['time']);
+
+        if ($now >= $start && $now < $end) {
             return [
                 'status' => 'E zënë',
                 'client_name' => $r['full_name'],
@@ -61,6 +66,30 @@ function getCarStatus($car_id, $mysqli)
         'client_name' => null,
         'end_date' => null
     ];
+}
+
+function calculateDuration($start_date, $start_time, $end_date, $end_time)
+{
+    $start = new DateTime($start_date . ' ' . $start_time);
+    $end = new DateTime($end_date . ' ' . $end_time);
+
+    if ($end < $start) {
+        return ['days' => 0, 'hours' => 0, 'minutes' => 0];
+    }
+
+    $diff = $start->diff($end);
+
+    return [
+        'days' => $diff->days,
+        'hours' => $diff->h,
+        'minutes' => $diff->i
+    ];
+}
+
+function calculateTotalPrice($price_per_day, $duration)
+{
+    $total_days = max(1, $duration['days']);
+    return $total_days * $price_per_day;
 }
 ?>
 
@@ -119,12 +148,35 @@ function getCarStatus($car_id, $mysqli)
                         </thead>
                         <tbody>
                             <?php foreach ($reservations as $r):
-                                $start = new DateTime($r['start_date']);
-                                $end = new DateTime($r['end_date']);
-                                $today = new DateTime();
-                                $days_reserved = $start->diff($end)->days + 1;
-                                $remaining_days = ($today <= $end) ? $today->diff($end)->days : 0;
+                                $duration = calculateDuration($r['start_date'], $r['time'], $r['end_date'], $r['time']);
+
+                                $days_reserved = $duration['days'];
+                                $hours_reserved = $duration['hours'];
+                                $minutes_reserved = $duration['minutes'];
+
+                                $total_price = calculateTotalPrice($r['price_per_day'], $duration);
+                                $now = new DateTime();
+                                $end = new DateTime($r['end_date'] . ' ' . $r['time']);
+
+                                if ($now < $end) {
+                                    $remainingInterval = $now->diff($end);
+                                    $remaining_text = "{$remainingInterval->d} ditë, {$remainingInterval->h} orë, {$remainingInterval->i} min";
+                                    $is_free = false;
+                                } else {
+                                    $remaining_text = "0 ditë, 0 orë, 0 min";
+                                    $is_free = true;
+                                }
+
                                 $carStatus = getCarStatus($r['car_id'], $mysqli);
+
+                                if ($is_free) {
+                                    $remainingClass = 'text-success fw-bold';
+                                    $status_text = '<span class="text-success fw-bold">E lirë</span>';
+                                } else {
+                                    $remainingClass = 'text-danger fw-bold';
+                                    $status_text = '<span class="text-danger fw-bold">' . $carStatus['status'] . '</span>';
+                                }
+
                             ?>
                                 <tr>
                                     <td><?= $r['id'] ?></td>
@@ -135,15 +187,17 @@ function getCarStatus($car_id, $mysqli)
                                     <td><?= $r['start_date'] ?></td>
                                     <td><?= $r['time'] ?></td>
                                     <td><?= $r['end_date'] ?></td>
-                                    <td><?= $days_reserved ?> ditë</td>
-                                    <td><?= $remaining_days ?> ditë</td>
-                                    <td>$<?= number_format($r['total_price'], 2) ?></td>
+                                    <td><?= $days_reserved ?> ditë <?= $hours_reserved > 0 ? ', ' . $hours_reserved . ' orë' : '' ?></td>
+                                    <td class="<?= $remainingClass ?>"><?= $remaining_text ?></td>
+                                    <td>$<?= number_format($total_price, 2) ?></td>
                                     <td>
-                                        <?= $carStatus['status'] ?>
-                                        <?php if ($carStatus['client_name']) echo ' (' . htmlspecialchars($carStatus['client_name']) . ')'; ?>
+                                        <?= $status_text ?>
+                                        <?php if (!empty($carStatus['client_name']) && !$is_free): ?>
+                                            (<?= htmlspecialchars($carStatus['client_name']) ?>)
+                                        <?php endif; ?>
                                     </td>
                                     <td>
-                                        <a href="/new_project_bk/helper/reservations.php?delete=<?= $r['id'] ?>" class="btn btn-sm btn-danger delete-btn">
+                                        <a href="<?= BASE_URL ?>helper/reservations.php?delete=<?= $r['id'] ?>" class="btn btn-sm btn-danger delete-btn">
                                             <i class="ri-delete-bin-6-line"></i>
                                         </a>
                                     </td>
@@ -161,7 +215,7 @@ function getCarStatus($car_id, $mysqli)
                             <h5 class="modal-title">Shto Rezervim</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-                        <form method="POST" action="/new_project_bk/helper/reservations.php" id="reservationForm">
+                        <form method="POST" action="<?= BASE_URL ?>helper/reservations.php" id="reservationForm">
                             <div class="modal-body">
                                 <div class="mb-3">
                                     <label class="form-label">Klienti</label>
@@ -257,83 +311,63 @@ function getCarStatus($car_id, $mysqli)
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    document.querySelectorAll('.delete-btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            let deleteUrl = this.href;
-            Swal.fire({
-                title: 'Jeni i sigurt?',
-                text: "Kjo nuk mund të anulohet!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: 'rgba(226, 40, 40, 1)',
-                confirmButtonText: 'Po, fshi!',
-                cancelButtonText: 'Anulo'
-            }).then(result => {
-                if (result.isConfirmed) {
-                    window.location.href = deleteUrl;
-                }
+    document.addEventListener("DOMContentLoaded", function() {
+        let currentReservationModalId = null;
+        document.querySelectorAll('.add-client-btn, [data-current-reserve-modal]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                currentReservationModalId = this.dataset.currentReserveModal || this.getAttribute('data-current-reserve-modal');
             });
         });
-    });
 
-    setTimeout(function() {
-        const alert = document.getElementById('alertMessage');
-        if (alert) alert.remove();
-    }, 5000);
+        const addClientForm = document.getElementById('addClientForm');
+        if (addClientForm) {
+            addClientForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
 
-    var currentReservationModalId = null;
-    document.querySelectorAll('[data-current-reserve-modal]').forEach(btn => {
-        btn.addEventListener('click', function() {
-            currentReservationModalId = this.getAttribute('data-current-reserve-modal');
-        });
-    });
-
-    document.getElementById('addClientForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        var formData = new FormData(this);
-        var submitBtn = this.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-
-        fetch('/new_project_bk/helper/save_client_ajax.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                submitBtn.disabled = false;
-                var msgDiv = document.getElementById('clientFormMessage');
-
-                if (data.success) {
-                    msgDiv.innerHTML = '<div class="alert alert-success">Klienti u ruajt me sukses!</div>';
-
-                    if (currentReservationModalId) {
-                        var reserveSelect = document.querySelector('#' + currentReservationModalId + ' select[name="client_id"]');
-                        if (reserveSelect) {
-                            var option = new Option(data.client_name, data.client_id, true, true);
-                            reserveSelect.appendChild(option);
-                            reserveSelect.value = data.client_id;
+                fetch('/new_project_bk/helper/save_client_ajax.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        submitBtn.disabled = false;
+                        const msgDiv = document.getElementById('clientFormMessage');
+                        if (data.success) {
+                            msgDiv.innerHTML = '<div class="alert alert-success">Klienti u ruajt me sukses!</div>';
+                            if (currentReservationModalId) {
+                                const reserveSelect = document.querySelector('#' + currentReservationModalId + ' select[name="client_id"]');
+                                if (reserveSelect) {
+                                    const option = new Option(data.client_name, data.client_id, true, true);
+                                    reserveSelect.appendChild(option);
+                                    reserveSelect.value = data.client_id;
+                                }
+                                const reserveModal = new bootstrap.Modal(document.getElementById(currentReservationModalId));
+                                reserveModal.show();
+                            }
+                            const addClientModal = bootstrap.Modal.getInstance(document.getElementById('addClientModal'));
+                            if (addClientModal) addClientModal.hide();
+                            addClientForm.reset();
+                            currentReservationModalId = null;
+                            setTimeout(() => msgDiv.innerHTML = '', 3000);
+                        } else {
+                            msgDiv.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Gabim në ruajtjen e klientit') + '</div>';
                         }
-                        var reserveModal = new bootstrap.Modal(document.getElementById(currentReservationModalId));
-                        reserveModal.show();
-                    }
-
-                    var addClientModal = bootstrap.Modal.getInstance(document.getElementById('addClientModal'));
-                    addClientModal.hide();
-                } else {
-                    msgDiv.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Gabim ne ruajtjen e klientit') + '</div>';
-                }
-            })
-            .catch(err => {
-                submitBtn.disabled = false;
-                document.getElementById('clientFormMessage').innerHTML = '<div class="alert alert-danger">Gabim ne server</div>';
-                console.error(err);
+                    })
+                    .catch(err => {
+                        submitBtn.disabled = false;
+                        const msgDiv = document.getElementById('clientFormMessage');
+                        msgDiv.innerHTML = '<div class="alert alert-danger">Gabim në server</div>';
+                        console.error(err);
+                    });
             });
+        }
     });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/footer.php'; ?>
+<?php include LAYOUT_PATH . 'footer.php'; ?>

@@ -14,12 +14,13 @@ if (session_status() === PHP_SESSION_NONE) {
     <title>Auto Future Block</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="shortcut icon" href="/new_project_bk/public/assets/images/favicon.ico">
+    <link rel="shortcut icon" href="<?= BASE_URL ?>public/assets/images/favicon.ico">
 
-    <link href="/new_project_bk/public/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="/new_project_bk/public/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-    <link href="/new_project_bk/public/assets/css/app.min.css" rel="stylesheet" type="text/css" />
-    <link href="/new_project_bk/public/assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+    <link href="<?= BASE_URL ?>public/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="<?= BASE_URL ?>public/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="<?= BASE_URL ?>public/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+    <link href="<?= BASE_URL ?>public/assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+
 
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
@@ -340,12 +341,12 @@ if (session_status() === PHP_SESSION_NONE) {
             align-items: center;
             justify-content: center;
             gap: 1px;
-            padding-top: 8px;
+            padding-top: 3px;
             transition: all 0.3s ease;
         }
 
         .navbar-brand-box img {
-            height: 70px;
+            height: 90px;
             transition: all 0.3s ease;
         }
 
@@ -355,7 +356,7 @@ if (session_status() === PHP_SESSION_NONE) {
             transition: all 0.3s ease;
             text-align: center;
             color: #ffffffff;
-            line-height: 1.8;
+            line-height: 0.1;
         }
 
         .full-logo {
@@ -370,7 +371,7 @@ if (session_status() === PHP_SESSION_NONE) {
             font-size: 1rem;
             font-weight: 600;
             color: #fff;
-            line-height: 1.2;
+            line-height: 0.8;
         }
 
         .full-logo span.slogan {
@@ -423,8 +424,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
     <div class="app-menu navbar-menu" id="sidebar">
         <div class="navbar-brand-box">
-            <a href="/new_project_bk/views/general/home/list.php" class="logo collapsed-sidebar-logo">
-                <img src="/new_project_bk/uploads/cars/LOGO.jpg" alt="Logo">
+            <a href="<?= BASE_URL ?>views/general/home/list.php" class="logo collapsed-sidebar-logo">
+                <img src="<?= UPLOADS_URL ?>cars/LOGO.png" alt="Logo">
                 <span class="logo-text">A.F.B</span>
                 <div class="full-logo">
                     <span class="title">Auto Future Block</span>
@@ -437,14 +438,45 @@ if (session_status() === PHP_SESSION_NONE) {
                 <div id="two-column-menu"></div>
                 <ul class="navbar-nav mt-3">
                     <li class="menu-title"><span data-key="t-menu">Menu</span></li>
-                    <li class="nav-item"><a href="/new_project_bk/views/general/home/list.php" class="nav-link fw-semibold"><i class="ri-home-4-line"></i> Home</a></li>
-                    <li class="nav-item"><a href="/new_project_bk/views/general/brands/list.php" class="nav-link fw-semibold"><i class="ri-price-tag-line"></i> Brand-et</a></li>
-                    <li class="nav-item"><a class="nav-link menu-link" href="/new_project_bk/views/general/categories/list.php"><i class="ri-layout-grid-fill"></i> Kategoritë</a></li>
-                    <li class="nav-item"><a class="nav-link menu-link" href="/new_project_bk/views/general/cars/list.php"><i class="ri-car-fill"></i> Makina</a></li>
-                    <li class="nav-item"><a href="/new_project_bk/views/general/client_management/list.php" class="nav-link fw-semibold"><i class="ri-user-add-fill"></i> Klientet</a></li>
-                    <li class="nav-item"><a href="/new_project_bk/views/general/reservations/list.php" class="nav-link fw-semibold"><i class="ri-calendar-2-line"></i> Rezervime</a></li>
-                    <li class="nav-item"><a href="/new_project_bk/views/general/order_status/list.php" class="nav-link fw-semibold"><i class="ri-compass-2-fill"></i> Gjendja e makines</a></li>
-                    <li class="nav-item"><a href="/new_project_bk/views/general/sales_car/list.php" class="nav-link fw-semibold"><i class="ri-information-2-fill"></i> Statusi i shitjes</a></li>
+                    <li class="nav-item"><a href="<?= BASE_URL ?>views/general/home/list.php" class="nav-link fw-semibold">
+                            <i class="ri-home-4-line"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= BASE_URL ?>views/general/brands/list.php" class="nav-link fw-semibold">
+                            <i class="ri-price-tag-line"></i> Brand-et
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= BASE_URL ?>views/general/categories/list.php" class="nav-link menu-link">
+                            <i class="ri-layout-grid-fill"></i> Kategoritë
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= BASE_URL ?>views/general/cars/list.php" class="nav-link menu-link">
+                            <i class="ri-car-fill"></i> Makina
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= BASE_URL ?>views/general/client_management/list.php" class="nav-link fw-semibold">
+                            <i class="ri-user-add-fill"></i> Klientet
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= BASE_URL ?>views/general/reservations/list.php" class="nav-link fw-semibold">
+                            <i class="ri-calendar-2-line"></i> Rezervime
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= BASE_URL ?>views/general/order_status/list.php" class="nav-link fw-semibold">
+                            <i class="ri-compass-2-fill"></i> Gjendja e makines
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= BASE_URL ?>views/general/sales_car/list.php" class="nav-link fw-semibold">
+                            <i class="ri-information-2-fill"></i> Statusi i shitjes
+                        </a>
+                    </li>
 
                 </ul>
             </div>
@@ -481,7 +513,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         <div class="dropdown ms-sm-3 header-item topbar-user">
                             <button class="btn" type="button" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 <span class="d-flex align-items-center">
-                                    <img class="rounded-circle header-profile-user" src="/new_project_bk/public/assets/images/users/avatar-1.jpg" alt="Header Avatar" width="35" height="35">
+                                    <img class="rounded-circle header-profile-user" src="<?= BASE_URL ?>public/assets/images/users/avatar-1.jpg" alt="Header Avatar" width="35" height="35">
                                     <span class="text-start ms-xl-2">
                                         <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">Emiljano Perhati</span>
                                         <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text">Founder</span>
@@ -492,9 +524,22 @@ if (session_status() === PHP_SESSION_NONE) {
                                 <li>
                                     <h6 class="dropdown-header">Welcome Emiljano!</h6>
                                 </li>
-                                <li><a class="dropdown-item" href="/new_project_bk/views/general/home/list.php"><i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> Profile</a></li>
-                                <li><a class="dropdown-item" href="/new_project_bk/views/general/home/list.php"><i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> Lock screen</a></li>
-                                <li><a class="dropdown-item" href="/new_project_bk/controllers/logout.php"><i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> Logout</a></li>
+                                <li>
+                                    <a class="dropdown-item" href="<?= BASE_URL ?>views/general/home/list.php">
+                                        <i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?= BASE_URL ?>views/general/home/list.php">
+                                        <i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> Lock screen
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?= BASE_URL ?>controllers/logout.php">
+                                        <i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> Logout
+                                    </a>
+                                </li>
+
                             </ul>
                         </div>
                     </div>

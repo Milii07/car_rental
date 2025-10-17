@@ -2,7 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
+require_once dirname(__DIR__) . '/index.php';
 
 $cars_result = $mysqli->query("
 SELECT c.id, c.model, c.vin, c.price_per_day, c.images,

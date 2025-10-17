@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
+require_once dirname(__DIR__) . '/index.php';
 
 $q = strtolower($_GET['q'] ?? '');
 $q = $mysqli->real_escape_string($q);
@@ -28,7 +28,7 @@ if ($q !== '') {
             $results[] = [
                 'columns' => $columns,
                 'table' => 'Makina',
-                'url' => "/new_project_bk/views/general/cars/list.php?id=" . $row['id'],
+                'url' => BASE_URL . "views/general/cars/list.php?id=" . $row['id'],
                 'id' => $row['id']
             ];
         }
@@ -39,7 +39,7 @@ if ($q !== '') {
         $results[] = [
             'columns' => ['name' => $row['name']],
             'table' => 'Brands',
-            'url' => "/new_project_bk/views/general/brands/list.php?id=" . $row['id'],
+            'url' => BASE_URL . "views/general/brands/list.php?id=" . $row['id'],
             'id' => $row['id']
         ];
     }
@@ -49,7 +49,7 @@ if ($q !== '') {
         $results[] = [
             'columns' => ['name' => $row['name']],
             'table' => 'Categories',
-            'url' => "/new_project_bk/views/general/categories/list.php?id=" . $row['id'],
+            'url' => BASE_URL . "views/general/categories/list.php?id=" . $row['id'],
             'id' => $row['id']
         ];
     }
@@ -69,7 +69,7 @@ if ($q !== '') {
         $results[] = [
             'columns' => $columns,
             'table' => 'Klient',
-            'url' => "/new_project_bk/views/general/client_management/list.php?id=" . $row['id'],
+            'url' => BASE_URL . "views/general/client_management/list.php?id=" . $row['id'],
             'id' => $row['id']
         ];
     }
@@ -80,7 +80,7 @@ if ($q !== '') {
         $results[] = [
             'columns' => ['name' => $row['title']],
             'table' => 'Files',
-            'url' => "/new_project_bk/views/general/files/list.php?id=" . $row['id'],
+            'url' => BASE_URL . "views/general/files/list.php?id=" . $row['id'],
             'id' => $row['id']
         ];
     }
@@ -91,7 +91,7 @@ if ($q !== '') {
         $results[] = [
             'columns' => ['name' => $row['username'], 'email' => $row['email']],
             'table' => 'Users',
-            'url' => "/new_project_bk/views/general/users/list.php?id=" . $row['id'],
+            'url' => BASE_URL . "views/general/users/list.php?id=" . $row['id'],
             'id' => $row['id']
         ];
     }
@@ -102,7 +102,7 @@ if ($q !== '') {
         $results[] = [
             'columns' => ['name' => $row['client_name'], 'display' => $row['display_name']],
             'table' => 'Rezervime',
-            'url' => "/new_project_bk/views/general/reservations/list.php?id=" . $row['id'],
+            'url' => BASE_URL . "views/general/reservations/list.php?id=" . $row['id'],
             'id' => $row['id']
         ];
     }
@@ -112,7 +112,7 @@ if ($q !== '') {
         $results[] = [
             'columns' => ['name' => $row['name']],
             'table' => 'Menu',
-            'url' => "/new_project_bk/views/general/menu_items/list.php?id=" . $row['id'],
+            'url' => BASE_URL . "views/general/menu_items/list.php?id=" . $row['id'],
             'id' => $row['id']
         ];
     }

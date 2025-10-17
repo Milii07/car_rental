@@ -2,7 +2,8 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include '../db/db.php';
+
+include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/index.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
@@ -11,20 +12,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($email) || empty($password)) {
         $_SESSION['error'] = "Ju lutem plotësoni të gjitha fushat.";
-        header("Location: ../views/auth/login.php");
+        header("Location: " . BASE_URL . "views/auth/login.php");
         exit;
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $_SESSION['error'] = "Email-i nuk është i saktë.";
-        header("Location: ../views/auth/login.php");
+        header("Location: " . BASE_URL . "views/auth/login.php");
         exit;
     }
 
     $stmt = $mysqli->prepare("SELECT id, username, password, is_admin FROM users WHERE email = ? LIMIT 1");
     if (!$stmt) {
         $_SESSION['error'] = "Gabim gjatë përpunimit të kërkesës.";
-        header("Location: ../views/auth/login.php");
+        header("Location: " . BASE_URL . "views/auth/login.php");
         exit;
     }
 
@@ -37,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['is_admin'] = $user['is_admin'];
+
 
             if ($remember) {
                 $token = bin2hex(random_bytes(16));
@@ -62,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 );
             }
 
-            header("Location: ../views/general/home/list.php");
+            header("Location: " . BASE_URL . "views/general/home/list.php");
             exit;
         } else {
             $_SESSION['error'] = "Fjalëkalimi është i pasaktë.";
@@ -72,9 +74,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $stmt->close();
-    header("Location: ../views/auth/login.php");
+    header("Location: " . BASE_URL . "views/auth/login.php");
     exit;
 } else {
-    header("Location: ../views/auth/login.php");
+    header("Location: " . BASE_URL . "views/auth/login.php");
     exit;
 }

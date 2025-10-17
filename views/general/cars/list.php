@@ -216,7 +216,7 @@ function renderFields($fields, $data = [])
                                                                 <?php if (!empty($row['images'])) : ?>
                                                                     <div class="mt-2">
                                                                         <?php foreach (explode(',', $row['images']) as $img) : ?>
-                                                                            <img src="/new_project_bk/uploads/cars/Makina\Camera Roll/<?= htmlspecialchars($img) ?>" width="50" class="me-1 mb-1">
+                                                                            <img src="<?= UPLOADS_URL ?>cars/Makina/Camera Roll/<?= htmlspecialchars($img) ?>" width="50" class="me-1 mb-1" alt="Foto Makine">
                                                                         <?php endforeach; ?>
                                                                     </div>
                                                                 <?php endif; ?>
@@ -250,7 +250,7 @@ function renderFields($fields, $data = [])
                 <h5 class="modal-title">Shto Makine</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="POST" action="/new_project_bk/helper/cars.php" enctype="multipart/form-data">
+            <form method="POST" action="<?= BASE_URL ?>helper/cars.php" enctype="multipart/form-data">
                 <div class="modal-body row">
                     <?php renderFields(array_merge($carFields, $ownerFields, $insuranceFields, $financialFields, $dealerFields)); ?>
                     <div class="col-md-3 mb-3">
@@ -319,4 +319,4 @@ function renderFields($fields, $data = [])
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<?php include __DIR__ . '/../../../views/layout/footer.php'; ?>
+<?php include LAYOUT_PATH . 'footer.php'; ?>

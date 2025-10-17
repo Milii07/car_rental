@@ -3,40 +3,43 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/db/db.php';
+require_once dirname(__DIR__) . '/index.php';
+
 
 if (!function_exists('getCarStatus')) {
     function getCarStatus($car_id, $mysqli)
     {
-        $today = new DateTime();
+        $now = new DateTime();
 
         $stmt = $mysqli->prepare("
             SELECT r.*, cl.full_name
             FROM reservations r
             JOIN clients cl ON r.client_id = cl.id
             WHERE r.car_id = ? AND r.status != 'cancelled'
-            ORDER BY r.start_date ASC
+            ORDER BY r.start_date ASC, r.time ASC
         ");
         $stmt->bind_param("i", $car_id);
         $stmt->execute();
-        $results = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $reservations = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         $stmt->close();
 
-        foreach ($results as $res) {
-            if (empty($res['start_date']) || empty($res['end_date']) || $res['end_date'] === '0000-00-00') {
-                continue;
-            }
+        foreach ($reservations as $r) {
+            if (empty($r['start_date']) || empty($r['end_date']) || $r['end_date'] === '0000-00-00') continue;
 
-            $start = new DateTime($res['start_date']);
-            $end = new DateTime($res['end_date']);
+            $start = new DateTime($r['start_date'] . ' ' . $r['time']);
+            $end = new DateTime(datetime: $r['end_date'] . ' 23:59:59');
 
-            if ($today >= $start && $today <= $end) {
+            if ($now >= $start && $now <= $end) {
+                $diff = $now->diff($end);
                 return [
                     'status' => 'E zënë',
-                    'client_name' => $res['full_name'],
-                    'start_date' => $res['start_date'],
-                    'end_date' => $res['end_date'],
-                    'time' => $res['time']
+                    'client_name' => $r['full_name'],
+                    'start_date' => $r['start_date'],
+                    'end_date' => $r['end_date'],
+                    'time' => $r['time'],
+                    'remaining_days' => $diff->d,
+                    'remaining_hours' => $diff->h,
+                    'remaining_minutes' => $diff->i
                 ];
             }
         }
@@ -46,10 +49,15 @@ if (!function_exists('getCarStatus')) {
             'client_name' => null,
             'start_date' => null,
             'end_date' => null,
-            'time' => null
+            'time' => null,
+            'remaining_days' => 0,
+            'remaining_hours' => 0,
+            'remaining_minutes' => 0
         ];
     }
 }
+
+
 
 if (!function_exists('getCarImages')) {
     function getCarImages($images)
@@ -58,52 +66,6 @@ if (!function_exists('getCarImages')) {
     }
 }
 
-if (!function_exists('getAvailableCars')) {
-    function getAvailableCars($mysqli)
-    {
-        $cars = $mysqli->query("
-            SELECT c.id, c.model, c.vin, c.price_per_day,
-                   COALESCE(b.name, '-') AS brand_name,
-                   COALESCE(cat.name, '-') AS category_name
-            FROM cars c
-            LEFT JOIN brands b ON c.brand_id=b.id
-            LEFT JOIN categories cat ON c.category_id=cat.id
-        ")->fetch_all(MYSQLI_ASSOC);
-
-        $availableCars = [];
-        foreach ($cars as $car) {
-            $status = getCarStatus($car['id'], $mysqli);
-            if ($status['status'] === 'E lirë') {
-                $availableCars[] = $car;
-            }
-        }
-        return $availableCars;
-    }
-}
-
-$cars = $mysqli->query("
-    SELECT c.id, c.model, c.vin, c.price_per_day,
-           COALESCE(b.name, '-') AS brand_name,
-           COALESCE(cat.name, '-') AS category_name
-    FROM cars c
-    LEFT JOIN brands b ON c.brand_id = b.id
-    LEFT JOIN categories cat ON c.category_id = cat.id
-")->fetch_all(MYSQLI_ASSOC);
-
-$clients = $mysqli->query("SELECT id, full_name FROM clients ORDER BY full_name ASC")->fetch_all(MYSQLI_ASSOC);
-
-$reservations = $mysqli->query("
-    SELECT r.*, c.model, c.vin, 
-           COALESCE(b.name, '-') AS brand_name, 
-           COALESCE(cat.name, '-') AS category_name, 
-           cl.full_name AS client_name
-    FROM reservations r
-    JOIN cars c ON r.car_id = c.id
-    LEFT JOIN brands b ON c.brand_id = b.id
-    LEFT JOIN categories cat ON c.category_id = cat.id
-    JOIN clients cl ON r.client_id = cl.id
-    ORDER BY r.id DESC
-")->fetch_all(MYSQLI_ASSOC);
 
 if (isset($_POST['create'])) {
 
@@ -113,15 +75,15 @@ if (isset($_POST['create'])) {
     $end_date = $_POST['end_date'] ?? $start_date;
     $time = $_POST['time'] ?? '';
 
-    if (!$car_id || !$client_id || !$start_date) {
+    if (!$car_id || !$client_id || !$start_date || !$time) {
         $_SESSION['error'] = "Të gjitha fushat janë të detyrueshme!";
-        header("Location: /new_project_bk/views/general/reservations/list.php");
+        header("Location: " . BASE_URL . "views/general/reservations/list.php");
         exit;
     }
 
     if ($start_date > $end_date) {
         $_SESSION['error'] = "Data e fillimit nuk mund të jetë pas datës së mbarimit!";
-        header("Location: /new_project_bk/views/general/reservations/list.php");
+        header("Location: " . BASE_URL . "views/general/reservations/list.php");
         exit;
     }
 
@@ -133,21 +95,24 @@ if (isset($_POST['create'])) {
     $stmt->close();
 
     $check = $mysqli->prepare("
-        SELECT r.id, cl.full_name 
+        SELECT r.id, cl.full_name
         FROM reservations r
         JOIN clients cl ON r.client_id = cl.id
         WHERE r.car_id=? AND r.status!='cancelled'
-        AND NOT (DATE(r.end_date) < ? OR DATE(r.start_date) > ?)
+        AND NOT (
+            CONCAT(r.end_date, ' ', r.time) <= CONCAT(?, ' ', ?)
+            OR CONCAT(r.start_date, ' ', r.time) >= CONCAT(?, ' ', ?)
+        )
         LIMIT 1
     ");
-    $check->bind_param("iss", $car_id, $start_date, $end_date);
+    $check->bind_param("issss", $car_id, $start_date, $time, $end_date, $time);
     $check->execute();
     $res_check = $check->get_result()->fetch_assoc();
     $check->close();
 
     if ($res_check) {
         $_SESSION['error'] = "Makina është rezervuar nga: " . htmlspecialchars($res_check['full_name']);
-        header("Location: /new_project_bk/views/general/reservations/list.php");
+        header("Location: " . BASE_URL . "views/general/reservations/list.php");
         exit;
     }
 
@@ -161,23 +126,24 @@ if (isset($_POST['create'])) {
     $category_id = $car['category_id'] ?? 0;
     $price_per_day = $car['price_per_day'] ?? 0;
 
-    $days = max(1, (abs(strtotime($end_date) - strtotime($start_date)) / 86400) + 1);
+    $startDateTime = new DateTime($start_date);
+    $endDateTime = new DateTime($end_date);
+    $days = $startDateTime->diff($endDateTime)->days + 1;
     $total_price = $price_per_day * $days;
 
-    var_dump($car_id);
-    $stmt = $mysqli->prepare("
-        INSERT INTO reservations 
+    $stmt = $mysqli->prepare("INSERT INTO reservations 
         (client_id, client_name, car_id, brand_id, category_id, start_date, time, end_date, total_price, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
-    ");
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
+
     $stmt->bind_param("isiiisssd", $client_id, $client_name, $car_id, $brand_id, $category_id, $start_date, $time, $end_date, $total_price);
     $stmt->execute();
     $stmt->close();
 
     $_SESSION['message'] = "Rezervimi u krijua me sukses!";
-    header("Location: /new_project_bk/views/general/reservations/list.php");
+    header("Location: " . BASE_URL . "views/general/reservations/list.php");
     exit;
 }
+
 
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
@@ -187,6 +153,6 @@ if (isset($_GET['delete'])) {
     $stmt->close();
 
     $_SESSION['message'] = "Rezervimi u fshi me sukses!";
-    header("Location: /new_project_bk/views/general/reservations/list.php");
+    header("Location: " . BASE_URL . "views/general/reservations/list.php");
     exit;
 }

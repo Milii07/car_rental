@@ -1,8 +1,5 @@
 <?php
-
 include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/index.php';
-
-
 include_once HELPER_PATH . 'reservations.php';
 include_once HELPER_PATH . 'client_helper.php';
 include_once LAYOUT_PATH . 'header.php';
@@ -17,41 +14,6 @@ $cars = $mysqli->query("
     LEFT JOIN brands b ON c.brand_id = b.id
     LEFT JOIN categories cat ON c.category_id = cat.id
 ")->fetch_all(MYSQLI_ASSOC);
-
-function getCarStatus($car_id, $mysqli)
-{
-    $today = date('Y-m-d');
-    $stmt = $mysqli->prepare("
-        SELECT r.*, cl.full_name 
-        FROM reservations r
-        JOIN clients cl ON r.client_id = cl.id
-        WHERE r.car_id=? AND r.status!='cancelled'
-        ORDER BY r.start_date ASC
-    ");
-    $stmt->bind_param("i", $car_id);
-    $stmt->execute();
-    $reservations = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
-
-    foreach ($reservations as $r) {
-        if (!empty($r['end_date']) && $r['end_date'] != '0000-00-00' && $today >= $r['start_date'] && $today <= $r['end_date']) {
-            return [
-                'status' => 'E zënë',
-                'client_name' => $r['full_name'],
-                'start_date' => $r['start_date'],
-                'end_date' => $r['end_date'],
-                'time' => $r['time']
-            ];
-        }
-    }
-    return [
-        'status' => 'E lirë',
-        'client_name' => null,
-        'start_date' => null,
-        'end_date' => null,
-        'time' => null
-    ];
-}
 
 function getCarImages($images)
 {
@@ -116,9 +78,24 @@ function getCarImages($images)
         opacity: 1 !important;
     }
 
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+        z-index: 1050 !important;
+        opacity: 1 !important;
+    }
+
+
     body.modal-open {
         overflow: hidden !important;
     }
+
+
+
+
+    .custom-modal-backdrop.show {
+        opacity: 1;
+    }
+
 
     .tooltip-inner .remaining-days {
         color: red;
@@ -140,6 +117,7 @@ function getCarImages($images)
 <div class="main-content">
     <div class="page-content">
         <div class="container-fluid">
+
             <div class="row mb-3">
                 <div class="col-12">
                     <div class="page-title-box d-sm-flex align-items-center justify-content-between">
@@ -169,33 +147,49 @@ function getCarImages($images)
                     $images = getCarImages($car['images']);
                     $main_image = !empty($images) ? $images[0] : 'default-car.png';
 
-                    if ($status_info['status'] == 'E zënë') {
-                        $start = new DateTime($status_info['start_date']);
-                        $end = new DateTime($status_info['end_date']);
-                        $days_reserved = $start->diff($end)->days + 1;
+                    $days_reserved = $hours_reserved = $minutes_reserved = 0;
+                    $remaining_days = $remaining_hours = $remaining_minutes = 0;
+
+                    if (!empty($status_info['start_date']) && !empty($status_info['end_date'])) {
+                        $start_date = new DateTime($status_info['start_date'] . ' ' . ($status_info['time'] ?? '00:00'));
+                        $end_date = new DateTime($status_info['end_date'] . ' ' . ($status_info['time'] ?? '23:59:59'));
+                        $now = new DateTime();
+
+                        $totalInterval = $start_date->diff($end_date);
+                        $days_reserved = $totalInterval->days;
+                        $hours_reserved = $totalInterval->h;
+                        $minutes_reserved = $totalInterval->i;
+
+                        if ($now < $end_date) {
+                            $remainInterval = $now->diff($end_date);
+                            $remaining_days = $remainInterval->days;
+                            $remaining_hours = $remainInterval->h;
+                            $remaining_minutes = $remainInterval->i;
+                        } else {
+                            $remaining_days = $remaining_hours = $remaining_minutes = 0;
+                        }
                     }
                 ?>
                     <div class="col-md-4 col-lg-3">
                         <div class="card h-100 shadow-sm">
-
-                            <img src="/new_project_bk/uploads/cars/<?= htmlspecialchars($main_image) ?>"
-                                class="card-img-top"
+                            <img src="/new_project_bk/uploads/cars/<?= htmlspecialchars($main_image) ?>" class="card-img-top"
                                 style="height:180px;object-fit:cover;cursor:pointer;"
-                                data-bs-toggle="modal"
-                                data-bs-target="#viewCarModal<?= $car['id'] ?>">
+                                data-bs-toggle="modal" data-bs-target="#viewCarModal<?= $car['id'] ?>">
 
                             <div class="card-body">
                                 <h5 class="card-title"><?= htmlspecialchars($car['model']) ?></h5>
                                 <p class="mb-1"><strong>Brand:</strong> <?= htmlspecialchars($car['brand_name']) ?></p>
                                 <p class="mb-1"><strong>Kategori:</strong> <?= htmlspecialchars($car['category_name']) ?></p>
                                 <p class="mb-1"><strong>Çmim / ditë:</strong> $<?= number_format($car['price_per_day'], 2) ?></p>
+
                                 <p class="mb-3"><strong>Gjendja:</strong>
                                     <?php if ($status_info['status'] == 'E zënë'): ?>
-                                        <span class="badge bg-danger"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-title="<?= $status_info['start_date'] ?> - <?= $status_info['end_date'] ?>">
-                                            <?= htmlspecialchars($status_info['client_name']) ?> (<?= $days_reserved ?> ditë)
-                                        </span>
+                                        <span class="badge bg-danger" data-bs-toggle="tooltip" data-bs-html="true" title="
+<strong><?= htmlspecialchars($status_info['client_name'] ?? 'Klient') ?></strong><br>
+<?= $status_info['start_date'] ?? '-' ?> - <?= $status_info['end_date'] ?? '-' ?><br>
+Kohezgjatja: <?= $days_reserved ?> ditë, <?= $hours_reserved ?> orë, <?= $minutes_reserved ?> min<br>
+Mbetur: <?= $remaining_days ?> ditë, <?= $remaining_hours ?> orë, <?= $remaining_minutes ?> min
+"><?= $status_info['status'] ?></span>
                                     <?php else: ?>
                                         <span class="badge bg-success">E lirë</span>
                                     <?php endif; ?>
@@ -222,7 +216,8 @@ function getCarImages($images)
                                 <div class="modal-body row">
                                     <div class="col-md-6">
                                         <?php foreach ($images as $img): ?>
-                                            <img src="/new_project_bk/uploads/cars/<?= htmlspecialchars($img) ?>" class="img-fluid mb-2 rounded">
+                                            <img src="/new_project_bk/uploads/cars/<?= htmlspecialchars($img) ?>"
+                                                class="img-fluid mb-2 rounded">
                                         <?php endforeach; ?>
                                     </div>
                                     <div class="col-md-6">
@@ -233,20 +228,19 @@ function getCarImages($images)
                                             <p><strong>Model:</strong> <?= htmlspecialchars($car['model']) ?></p>
                                             <p><strong>VIN:</strong> <?= htmlspecialchars($car['vin']) ?></p>
                                             <p><strong>Çmim / ditë:</strong> $<?= number_format($car['price_per_day'], 2) ?></p>
-                                            <p><strong>Gjendja:</strong> <?= $status_info['status'] ?></p>
+                                            <p><strong>Gjendja:</strong> <?= htmlspecialchars($status_info['status']) ?></p>
+
                                             <?php if ($status_info['status'] == 'E zënë'): ?>
-                                                <p><strong>Klienti:</strong> <?= htmlspecialchars($status_info['client_name']) ?> (<?= $days_reserved ?> ditë)</p>
+                                                <p><strong>Klienti:</strong> <?= htmlspecialchars($status_info['client_name']) ?></p>
                                                 <p><strong>Periudha:</strong> <?= $status_info['start_date'] ?> - <?= $status_info['end_date'] ?></p>
+                                                <p><strong>Kohezgjatja:</strong> <?= $days_reserved ?> ditë, <?= $hours_reserved ?> orë, <?= $minutes_reserved ?> min</p>
+                                                <p><strong>Dite të mbetura:</strong> <?= $remaining_days ?> ditë, <?= $remaining_hours ?> orë, <?= $remaining_minutes ?> min</p>
                                             <?php endif; ?>
+
                                             <h5 class="mt-4 mb-2">Përshkrimi i makinës</h5>
-                                            <p>Udhëtim i jashtëzakonshëm, rehati maksimale
-                                                Hyni në botën e luksit dhe rehatisë me këtë makinë të shkëlqyer. Çdo udhëtim shndërrohet në një eksperiencë të qetë dhe të këndshme. Udhëtimet në qytet apo në rrugë të largëta bëhen të sigurta dhe të këndshme.
-
-                                            <p> Performancë dhe stil që tërheq vëmendjen
-                                                Me motor të fuqishëm dhe stabilitet të lartë, kjo makinë ofron performancë të shkëlqyer në çdo rrugë. Linjat elegante dhe dizajni modern e bëjnë makinën një zgjedhje perfekte për çdo rast.
-
-                                            <p>Siguri dhe besueshmëri në çdo kilometër
-                                                Pajisjet më të fundit të sigurisë dhe teknologjia e avancuar garanton një udhëtim pa shqetësime. Zgjidhni këtë makinë për një eksperiencë të paharrueshme dhe udhëtime të sigurt për ju dhe pasagjerët tuaj.</p>
+                                            <p>Ky model makine ofron një eksperiencë të jashtëzakonshme udhëtimi. Sediljet janë të rehatshme dhe të rregullueshme sipas preferencave.</p>
+                                            <p>Pajisjet teknologjike, përfshirë navigacionin, sistemin e ndihmës për parkim dhe asistencën e vozitjes, garantojnë një eksperiencë të sigurt.</p>
+                                            <p>Pajisjet moderne të sigurisë, si airbag-et, ABS, kontrolli i stabilitetit dhe sistemi i paralajmërimit për rrezik.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -256,8 +250,6 @@ function getCarImages($images)
                             </div>
                         </div>
                     </div>
-
-
 
                     <?php if ($status_info['status'] == 'E lirë'): ?>
                         <div class="modal fade" id="reserveCarModal<?= $car['id'] ?>" tabindex="-1">
@@ -312,11 +304,13 @@ function getCarImages($images)
                     <?php endif; ?>
 
                 <?php endforeach; ?>
+
+
+
             </div>
         </div>
     </div>
 </div>
-
 
 <div class="modal fade" id="addClientModal" tabindex="-1">
     <div class="modal-dialog modal-xl">
@@ -359,6 +353,9 @@ function getCarImages($images)
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<div id="customBackdrop" class="custom-modal-backdrop"></div>
+
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -368,35 +365,14 @@ function getCarImages($images)
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-
-        document.querySelectorAll('.badge.bg-danger[data-bs-toggle="tooltip"]').forEach(function(el) {
-            const originalTitle = el.getAttribute('data-bs-title');
-            if (!originalTitle) return;
-
-            let parts = originalTitle.split(' - ');
-            let startDate = parts[0] || '';
-            let endDate = parts[1] || '';
-
-            let today = new Date();
-            let end = new Date(endDate);
-            let remainingDays = Math.ceil((end - today) / (1000 * 60 * 60 * 24)) + 1;
-            remainingDays = remainingDays < 0 ? 0 : remainingDays;
-
-            let clientName = el.textContent.split(' ')[0];
-
-            const tooltipContent = `
-        <div><strong>${clientName}</strong></div>
-        <div>${startDate} - ${endDate}</div>
-        <div class="remaining-days">Ditë të mbetura: ${remainingDays}</div>
-    `;
-
+        const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltips.forEach(el => {
             new bootstrap.Tooltip(el, {
-                title: tooltipContent,
                 html: true,
-                placement: 'top'
+                placement: 'top',
+                trigger: 'hover focus'
             });
         });
-
 
         setTimeout(() => {
             const alert = document.getElementById('alertMessage');
@@ -405,19 +381,18 @@ function getCarImages($images)
 
         const backdrop = document.getElementById('customBackdrop');
         const modals = document.querySelectorAll('.modal');
-
-        modals.forEach(modal => {
-            modal.addEventListener('show.bs.modal', function() {
-                backdrop.style.display = 'block';
+        if (backdrop) {
+            modals.forEach(modal => {
+                modal.addEventListener('show.bs.modal', function() {
+                    backdrop.style.display = 'block';
+                });
+                modal.addEventListener('hidden.bs.modal', function() {
+                    backdrop.style.display = 'none';
+                });
             });
-
-            modal.addEventListener('hidden.bs.modal', function() {
-                backdrop.style.display = 'none';
-            });
-        });
+        }
 
         let currentReservationModalId = null;
-
         document.querySelectorAll('.add-client-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 currentReservationModalId = this.dataset.currentReserveModal;
@@ -456,25 +431,39 @@ function getCarImages($images)
                             }
 
                             const addClientModal = bootstrap.Modal.getInstance(document.getElementById('addClientModal'));
-                            addClientModal.hide();
+                            if (addClientModal) addClientModal.hide();
                             addClientForm.reset();
                             currentReservationModalId = null;
                             setTimeout(() => msgDiv.innerHTML = '', 3000);
                         } else {
-                            msgDiv.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Gabim ne ruajtjen e klientit') + '</div>';
+                            msgDiv.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Gabim në ruajtjen e klientit') + '</div>';
                         }
                     })
                     .catch(err => {
                         submitBtn.disabled = false;
-                        document.getElementById('clientFormMessage').innerHTML = '<div class="alert alert-danger">Gabim ne server</div>';
+                        const msgDiv = document.getElementById('clientFormMessage');
+                        if (msgDiv) msgDiv.innerHTML = '<div class="alert alert-danger">Gabim në server</div>';
                         console.error(err);
                     });
             });
         }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('.btn-close').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modal = btn.closest('.modal');
+                    const bsModal = bootstrap.Modal.getInstance(modal);
+                    if (bsModal) bsModal.hide();
+                });
+            });
+        });
+
+
 
     });
 </script>
 
 
 
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/views/layout/footer.php'; ?>
+
+<?php include LAYOUT_PATH . 'footer.php'; ?>
