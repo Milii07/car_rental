@@ -88,6 +88,34 @@
         z-index: 3002;
         cursor: pointer;
     }
+
+    .chat-calendar {
+        background: #f4f6f8;
+        border-radius: 10px;
+        padding: 10px;
+        margin: 10px 0;
+    }
+
+    .chat-calendar input {
+        display: block;
+        width: 100%;
+        margin: 6px 0;
+        padding: 5px;
+    }
+
+    .chat-calendar button {
+        margin-top: 8px;
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .chat-calendar button:hover {
+        background: #0056b3;
+    }
 </style>
 
 <div id="chatRobot">
@@ -119,52 +147,138 @@
 <script src="/new_project_bk/public/assets/js/app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
+
+
 <script>
     const chatRobot = document.getElementById('chatRobot');
     const chatWidget = document.getElementById('chatWidget');
     const chatClose = document.getElementById('chatClose');
     const chatBody = document.getElementById('chatBody');
     const chatInput = document.getElementById('chatInput');
+    const chatSendBtn = document.getElementById('chatSendBtn');
 
-    chatRobot.addEventListener('click', () => {
-        chatWidget.style.display = chatWidget.style.display === 'flex' ? 'none' : 'flex';
-        chatInput.focus();
-    });
-
-    chatClose.addEventListener('click', () => chatWidget.style.display = 'none');
+    let lastBotResponse = null;
 
     const appendMessage = (msg, sender = 'bot') => {
         const div = document.createElement('div');
         div.classList.add('chat-message', sender === 'bot' ? 'chat-bot' : 'chat-user');
-        div.textContent = msg;
+        div.innerHTML = msg;
         chatBody.appendChild(div);
         chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    const sendMessage = async (payload, autoAppend = true) => {
+        try {
+            const res = await fetch('/new_project_bk/helper/chatHandler.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            lastBotResponse = data;
+            if (autoAppend && data.reply) appendMessage(data.reply, 'bot');
+            return data;
+        } catch (err) {
+            console.error(err);
+            appendMessage('Gabim gjatë komunikimit me serverin', 'bot');
+        }
+    }
+
+    const greetOnOpen = async () => await sendMessage({
+        event: 'open'
+    });
+
+    const showReservationCalendar = (startDate) => {
+        if (document.querySelector('.chat-calendar')) return;
+
+        const calendarDiv = document.createElement('div');
+        calendarDiv.classList.add('chat-calendar');
+        calendarDiv.innerHTML = `
+        <div class="calendar-box">
+            <p><strong>Zgjidh datat e rezervimit:</strong></p>
+            <label>Data e nisjes:</label>
+            <input type="date" id="start-date" min="${startDate}" value="${startDate}">
+            <label>Data e mbarimit:</label>
+            <input type="date" id="end-date" min="${startDate}">
+            <button id="confirm-reservation">Rezervo</button>
+        </div>
+    `;
+        chatBody.appendChild(calendarDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+
+        const oldBtn = document.getElementById('confirm-reservation');
+        if (oldBtn) oldBtn.replaceWith(oldBtn.cloneNode(true));
+
+        document.getElementById('confirm-reservation').addEventListener('click', async () => {
+            const start = document.getElementById('start-date').value;
+            const end = document.getElementById('end-date').value;
+
+            if (!start || !end) {
+                alert("Zgjidh datat e rezervimit!");
+                return;
+            }
+
+            appendMessage(`Rezervimi nga ${start} deri më ${end}.`, 'user');
+
+            const res = await sendMessage({
+                action: 'reserve',
+                start_date: start,
+                end_date: end
+            }, false);
+            if (res.reply) appendMessage(res.reply, 'bot');
+
+            document.querySelector('.chat-calendar')?.remove();
+        });
+    }
+
+    const handleUserMessage = async (msg) => {
+        appendMessage(msg, 'user');
+
+        if (lastBotResponse && lastBotResponse.expected_confirmations && lastBotResponse.next_available_date) {
+            const positiveWords = lastBotResponse.expected_confirmations.map(w => w.toLowerCase());
+            if (positiveWords.some(w => msg.toLowerCase().includes(w))) {
+                showReservationCalendar(lastBotResponse.next_available_date);
+                return;
+            }
+        }
+
+        await sendMessage({
+            message: msg
+        });
     }
 
     chatInput.addEventListener('keypress', async e => {
         if (e.key === 'Enter' && chatInput.value.trim() !== '') {
             const msg = chatInput.value.trim();
-            appendMessage(msg, 'user');
             chatInput.value = '';
-            try {
-                const res = await fetch('/new_project_bk/helper/chatHandler.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: msg
-                    })
-                });
-                const data = await res.json();
-                appendMessage(data.reply || 'Gabim gjatë marrjes së përgjigjes', 'bot');
-            } catch (err) {
-                console.error(err);
-                appendMessage('Gabim gjatë komunikimit me serverin', 'bot');
-            }
+            await handleUserMessage(msg);
         }
     });
+
+    chatSendBtn?.addEventListener('click', async () => {
+        const msg = chatInput.value.trim();
+        if (!msg) return;
+        chatInput.value = '';
+        await handleUserMessage(msg);
+    });
+
+    chatRobot.addEventListener('click', async () => {
+        if (chatWidget.style.display !== 'flex') {
+            chatWidget.style.display = 'flex';
+            chatInput.focus();
+            await greetOnOpen();
+        } else {
+            chatWidget.style.display = 'none';
+        }
+    });
+
+    chatClose.addEventListener('click', () => chatWidget.style.display = 'none');
 </script>
+
+
+
 </body>
 
 </html>
