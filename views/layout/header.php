@@ -494,7 +494,6 @@ if (session_status() === PHP_SESSION_NONE) {
                             <div id="suggestions" style="position: absolute; top: 100%; left: 0; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; 
                             background: #fff;  z-index: 1000; width: 100%; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.1);   border-radius: 4px;"></div>
                         </form>
-                        <script src="helper/search_live.js"></script>
 
                     </div>
 

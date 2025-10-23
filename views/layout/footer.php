@@ -19,9 +19,24 @@
 </div>
 
 <style>
+    #chatRobot {
+        position: fixed;
+        bottom: 30px;
+        right: 16px;
+        z-index: 3002;
+        cursor: pointer;
+    }
+
+    #chatRobot img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s;
+    }
+
     #chatRobot img:hover {
         transform: scale(1.2);
-        transition: 0.1s;
     }
 
     #chatWidget {
@@ -29,9 +44,9 @@
         flex-direction: column;
         position: fixed;
         bottom: 100px;
-        right: 20px;
-        width: 320px;
-        max-height: 420px;
+        right: 90px;
+        width: 360px;
+        height: 520px;
         background: #fff;
         border-radius: 12px;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
@@ -40,10 +55,18 @@
     }
 
     #chatHeader {
-        background: #1E40AF;
+        background: #075E54;
         color: #fff;
         padding: 10px;
         font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    #chatHeader span.close-chat {
+        font-size: 18px;
         cursor: pointer;
     }
 
@@ -54,39 +77,232 @@
         display: flex;
         flex-direction: column;
         gap: 6px;
-    }
-
-    #chatInput {
-        width: 100%;
-        padding: 8px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
+        background: #e5ddd5;
     }
 
     .chat-message {
         padding: 6px 10px;
-        border-radius: 8px;
+        border-radius: 12px;
         max-width: 85%;
+        word-break: break-word;
     }
 
     .chat-user {
-        background: #032c69ff;
+        background: #34b7f1;
         color: #fff;
         align-self: flex-end;
     }
 
     .chat-bot {
-        background: #df4646ff;
-        color: #fff;
+        background: #fff;
+        color: #000;
         align-self: flex-start;
     }
 
-    #chatRobot {
+    #chatInputWrapper {
+        display: flex;
+        align-items: center;
+        padding: 5px;
+        border-top: 1px solid #ddd;
+        background: #fff;
+    }
+
+    #chatInput {
+        flex: 1;
+        padding: 8px 40px 8px 35px;
+        border-radius: 18px;
+        border: 1px solid #ccc;
+        position: relative;
+        outline: none;
+        background: url('data:image/svg+xml;utf8,<svg fill="%23999" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5C3.895 3 3 3.895 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-2-9l-5 6-3-4-4 5h12z"/></svg>') no-repeat 10px center;
+        background-size: 20px 20px;
+    }
+
+    #chatUserIcon {
         position: fixed;
-        bottom: 30px;
-        right: 16px;
-        z-index: 3002;
+        bottom: 95px;
+        right: 15px;
+        z-index: 3003;
         cursor: pointer;
+    }
+
+    #chatUserIcon .chat-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s;
+    }
+
+    #chatUserIcon .chat-icon:hover {
+        transform: scale(1.2);
+    }
+
+    #chatUserWidget {
+        display: none;
+        position: fixed;
+        bottom: 120px;
+        right: 90px;
+        width: 550px;
+        height: 650px;
+        background: #f0f2f5;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        display: flex;
+        flex-direction: row;
+        overflow: hidden;
+        z-index: 3002;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    #chatSidebar {
+        width: 150px;
+        background: #fff;
+        border-right: 1px solid #ccc;
+        overflow-y: auto;
+    }
+
+    #chatSidebarHeader {
+        padding: 16px;
+        font-weight: bold;
+        background: #075E54;
+        color: #fff;
+        text-align: center;
+        font-size: 18px;
+    }
+
+    .contact-item {
+        padding: 10px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #eee;
+        flex-direction: column;
+    }
+
+    .contact-item:hover {
+        background: #f0f0f0;
+    }
+
+    .contact-item.active {
+        background: #dcf8c6;
+    }
+
+    .unread-count {
+        background: red;
+        color: #fff;
+        padding: 2px 6px;
+        border-radius: 12px;
+        font-size: 12px;
+        align-self: flex-end;
+    }
+
+    #chatArea {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    #chatUserHeader {
+        background: #075E54;
+        color: #fff;
+        padding: 16px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 18px;
+    }
+
+    #chatUserHeader .close-chat {
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    #chatUserBody,
+    #chatBody {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        background-color: #e5ddd5;
+        background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"%3E%3Ccircle cx="12" cy="12" r="3" fill="%23666" opacity="0.05"/%3E%3Ccircle cx="36" cy="36" r="3" fill="%23666" opacity="0.05"/%3E%3Ccircle cx="36" cy="12" r="3" fill="%23666" opacity="0.05"/%3E%3Ccircle cx="12" cy="36" r="3" fill="%23666" opacity="0.05"/%3E%3C/svg%3E');
+        background-repeat: repeat;
+        background-size: 48px 48px;
+    }
+
+
+
+
+    .chat-bubble {
+        padding: 10px 14px;
+        border-radius: 20px;
+        max-width: 75%;
+        word-break: break-word;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .my-message {
+        background-color: #dcf8c6;
+        color: #000;
+        align-self: flex-end;
+    }
+
+    .their-message {
+        background-color: #fff;
+        color: #000;
+        align-self: flex-start;
+    }
+
+    #chatInputWrapper {
+        display: flex;
+        gap: 8px;
+        padding: 10px;
+        border-top: 1px solid #ccc;
+        background: #fff;
+    }
+
+    #chatInputWrapper input[type="text"] {
+        flex: 1;
+        padding: 10px 14px 10px 40px;
+        border-radius: 25px;
+        border: 1px solid #ccc;
+        outline: none;
+        background: url('data:image/svg+xml;utf8,<svg fill="%23999" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5C3.895 3 3 3.895 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-2-9l-5 6-3-4-4 5h12z"/></svg>') no-repeat 10px center;
+        background-size: 20px 20px;
+    }
+
+    #chatInputWrapper input[type="file"] {
+        display: none;
+    }
+
+    #chatInputWrapper button {
+        padding: 10px 14px;
+        border-radius: 50%;
+        border: none;
+        background: #075E54;
+        color: #fff;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    #chatInputWrapper button:hover {
+        background: #064d46;
+    }
+
+    #chatUserBody::-webkit-scrollbar,
+    #chatContacts::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    #chatUserBody::-webkit-scrollbar-thumb,
+    #chatContacts::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
     }
 
     .chat-calendar {
@@ -116,6 +332,45 @@
     .chat-calendar button:hover {
         background: #0056b3;
     }
+
+    #back-to-top {
+        position: fixed;
+        bottom: 170px;
+        right: 23px;
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 60px;
+        height: 55px;
+        border-radius: 50%;
+        background-color: #dc3545;
+        color: #fff;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s;
+    }
+
+    #back-to-top:hover {
+        transform: translateY(-5px);
+    }
+
+    #back-to-top i {
+        font-size: 20px;
+    }
+
+    #chatBody::-webkit-scrollbar,
+    #chatUserBody::-webkit-scrollbar,
+    #chatContacts::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    #chatBody::-webkit-scrollbar-thumb,
+    #chatUserBody::-webkit-scrollbar-thumb,
+    #chatContacts::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+    }
 </style>
 
 <div id="chatRobot">
@@ -133,21 +388,51 @@
     </div>
 </div>
 
+<div id="chatUserIcon">
+    <img src="/new_project_bk/uploads/chat.robot/mm.jpg" class="chat-icon" alt="Chat">
+</div>
+<div id="chatUserWidget">
+    <div id="chatSidebar">
+        <div id="chatSidebarHeader">Kontakti</div>
+        <div id="chatContacts"></div>
+    </div>
+    <div id="chatArea">
+        <div id="chatUserHeader">
+            <span id="chatUserTitle">Biseda</span>
+            <span id="chatUserClose" class="close-chat">✖</span>
+        </div>
+        <div id="chatUserBody"></div>
+        <form id="chatUserForm">
+            <input type="hidden" id="receiver_id" name="receiver_id">
+            <input type="hidden" id="receiver_type" name="receiver_type">
+
+            <div id="chatInputWrapper">
+                <span id="chatFileIcon" style="cursor:pointer; font-size:20px; margin-right:8px;">📷</span>
+                <input type="file" id="chatUserFile" name="file" style="display:none;">
+                <input type="text" id="chatUserInput" name="message" placeholder="Shkruaj mesazhin...">
+                <button type="submit">➤</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <button onclick="topFunction()" class="btn btn-danger btn-icon" id="back-to-top">
     <i class="ri-arrow-up-line"></i>
 </button>
 
+<link rel="stylesheet" href="/new_project_bk/public/assets/libs/flatpickr/flatpickr.min.css">
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="/new_project_bk/public/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/new_project_bk/public/assets/libs/simplebar/simplebar.min.js"></script>
 <script src="/new_project_bk/public/assets/libs/node-waves/waves.min.js"></script>
 <script src="/new_project_bk/public/assets/libs/feather-icons/feather.min.js"></script>
-<script src="/new_project_bk/public/assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
-<script src="/new_project_bk/public/assets/js/plugins.js"></script>
-<script src="/new_project_bk/public/assets/js/app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<script src="/new_project_bk/public/assets/libs/flatpickr/flatpickr.min.js"></script>
 
-
+<script>
+    const BASE_URL = "<?php echo BASE_URL; ?>";
+    const UPLOADS_URL = "<?php echo UPLOADS_URL; ?>";
+</script>
 
 <script>
     const chatRobot = document.getElementById('chatRobot');
@@ -277,7 +562,164 @@
     chatClose.addEventListener('click', () => chatWidget.style.display = 'none');
 </script>
 
+<script>
+    const USER_ID = <?php echo $_SESSION['user_id'] ?? 0; ?>;
+    const IS_ADMIN = <?php echo $_SESSION['is_admin'] ?? 0; ?>;
 
+    let selectedContact = null;
+    let pollInterval = null;
+    let lastMessageId = 0;
+    let lastDate = '';
+
+    function formatTime(dateStr) {
+        const d = new Date(dateStr);
+        return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+    }
+
+    function formatDateSeparator(dateStr) {
+        const d = new Date(dateStr);
+        const dateKey = d.toDateString();
+        if (dateKey !== lastDate) {
+            lastDate = dateKey;
+            const options = {
+                weekday: 'long',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            };
+            return `<div class="chat-date-separator">${d.toLocaleDateString('sq-AL', options)}</div>`;
+        }
+        return '';
+    }
+
+    function fetchContacts() {
+        $.post('../../../helper/send_message.php', {
+            action: 'fetch_contacts'
+        }, function(resp) {
+            if (!resp.success) return;
+            const $list = $('#chatContacts').empty();
+            resp.contacts.forEach(c => {
+                const unread = c.unread_count > 0 ? `<span class="unread-count">${c.unread_count}</span>` : '';
+                const $item = $(`
+                    <div class="contact-item" data-id="${c.contact_id}" data-type="${IS_ADMIN ? 'user' : 'admin'}">
+                        <div style="display:flex; flex-direction:column;">
+                            <strong>${c.contact_name}</strong>
+                            <small>${c.last_message ?? ''}</small>
+                        </div>
+                        ${unread}
+                    </div>
+                `);
+                $item.on('click', () => selectContact({
+                    contact_id: c.contact_id,
+                    contact_name: c.contact_name,
+                    contact_type: IS_ADMIN ? 'user' : 'admin'
+                }));
+                $list.append($item);
+            });
+            if (resp.contacts.length > 0 && !selectedContact) $list.children().first().click();
+        }, 'json');
+    }
+
+    function selectContact(contact) {
+        selectedContact = contact;
+        $('#receiver_id').val(contact.contact_id);
+        $('#receiver_type').val(contact.contact_type);
+        $('#chatUserTitle').text('Biseda me: ' + contact.contact_name);
+        lastMessageId = 0;
+        lastDate = '';
+        $('#chatUserBody').empty();
+        fetchMessages(true);
+        if (pollInterval) clearInterval(pollInterval);
+        pollInterval = setInterval(fetchMessages, 2000);
+    }
+
+    function fetchMessages(initial = false) {
+        if (!selectedContact) return;
+        console.log(selectedContact)
+        $.post('../../../helper/send_message.php', {
+            action: 'fetch_messages',
+            receiver_id: selectedContact.contact_id,
+            receiver_type: selectedContact.contact_type
+        }, function(resp) {
+            if (!resp.success) return;
+            const $body = $('#chatUserBody');
+            resp.messages.forEach(m => {
+                if (m.id <= lastMessageId) return;
+                lastMessageId = m.id;
+                const isMine = (m.sender_id == USER_ID);
+                const $msg = $('<div class="chat-bubble">').addClass(isMine ? 'my-message' : 'their-message');
+                let content = m.message ? $('<div>').text(m.message).html() : '';
+                if (m.file_path) content += `<br><a href="/new_project_bk/uploads/chat_files/${m.file_path}" target="_blank">📎 Shiko/merr file</a>`;
+                const dateSeparator = formatDateSeparator(m.created_at);
+                if (dateSeparator) $body.append(dateSeparator);
+                $msg.html(content + `<div class="msg-time">${formatTime(m.created_at)}</div>`);
+                $body.append($msg);
+            });
+            $body.scrollTop($body[0].scrollHeight);
+            if (initial) fetchContacts();
+        }, 'json');
+    }
+
+    $('#chatUserForm').on('submit', function(e) {
+        e.preventDefault();
+        if (!selectedContact) {
+            alert('Zgjidhni nje kontakt');
+            return;
+        }
+        const fd = new FormData(this);
+        fd.append('action', 'send');
+
+        const messageText = $('#chatUserInput').val().trim();
+        const fileInput = $('#chatUserFile')[0];
+        let fileName = '';
+        if (messageText || (fileInput && fileInput.files.length > 0)) {
+            if (fileInput && fileInput.files.length > 0) fileName = fileInput.files[0].name;
+            appendMessageToChat(messageText, fileName);
+        }
+
+        $.ajax({
+            url: '../../../helper/send_message.php',
+            method: 'POST',
+            data: fd,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function(resp) {
+                if (!resp.success) alert(resp.message || 'Gabim gjate dergimit');
+                $('#chatUserInput').val('');
+                $('#chatUserFile').val('');
+            }
+        });
+    });
+
+    function appendMessageToChat(message, file_path = '') {
+        const $body = $('#chatUserBody');
+        const $msg = $('<div class="chat-bubble my-message">');
+        let content = message ? $('<div>').text(message).html() : '';
+        if (file_path) content += `<br><a href="/new_project_bk/uploads/chat_files/${file_path}" target="_blank">📎 Shiko/merr file</a>`;
+        const now = new Date();
+        const dateSeparator = formatDateSeparator(now);
+        if (dateSeparator) $body.append(dateSeparator);
+        $msg.html(content + `<div class="msg-time">${formatTime(now)}</div>`);
+        $body.append($msg);
+        $body.scrollTop($body[0].scrollHeight);
+    }
+
+    $('#chatUserIcon').on('click', () => {
+        $('#chatUserWidget').fadeToggle(150);
+        fetchContacts();
+    });
+    $('#chatUserClose').on('click', () => {
+        $('#chatUserWidget').fadeOut(100);
+        if (pollInterval) clearInterval(pollInterval);
+    });
+
+    $('#chatUserInput').on('keypress', function(e) {
+        if (e.key === 'Enter' && $(this).val().trim() !== '') $('#chatUserForm').submit();
+    });
+
+    fetchContacts();
+</script>
 
 </body>
 
