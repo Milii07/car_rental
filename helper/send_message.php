@@ -27,34 +27,24 @@ if ($action === 'send') {
             if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
             $fileName = time() . '_' . basename($_FILES['file']['name']);
             $filePath = $uploadDir . $fileName;
-            if (move_uploaded_file($_FILES['file']['tmp_name'], $filePath)) {
-                $file_path = $fileName;
-            }
+            if (move_uploaded_file($_FILES['file']['tmp_name'], $filePath)) $file_path = $fileName;
         } else {
-            echo json_encode(['success' => false, 'message' => 'File tip i pa lejuar']);
+            echo json_encode(['success' => false, 'message' => 'File i palejuar']);
             exit;
         }
     }
 
     if ($message !== '' || $file_path !== '') {
-        $stmt = $mysqli->prepare("
-            INSERT INTO messages 
-            (sender_id, sender_type, receiver_id, receiver_type, message, file_path, is_read, created_at)
-            VALUES (?,?,?,?,?,?,0,NOW())
-        ");
-        if (!$stmt) {
-            echo json_encode(['success' => false, 'message' => 'Gabim ne prepare: ' . $mysqli->error]);
-            exit;
-        }
+        $stmt = $mysqli->prepare("INSERT INTO messages (sender_id,sender_type,receiver_id,receiver_type,message,file_path,is_read,created_at) VALUES (?,?,?,?,?,?,0,NOW())");
         $stmt->bind_param("isssss", $user_id, $user_type, $receiver_id, $receiver_type, $message, $file_path);
         $stmt->execute();
         $stmt->close();
-
         echo json_encode(['success' => true]);
+        exit;
     } else {
-        echo json_encode(['success' => false, 'message' => 'Mesazhi eshte bosh']);
+        echo json_encode(['success' => false, 'message' => 'Mesazhi është bosh']);
+        exit;
     }
-    exit;
 }
 
 if ($action === 'fetch_contacts') {
@@ -62,12 +52,9 @@ if ($action === 'fetch_contacts') {
     if ($is_admin) {
         $stmt = $mysqli->prepare("
             SELECT u.id AS contact_id, u.username AS contact_name,
-                (SELECT message FROM messages WHERE sender_id=u.id AND sender_type='user' ORDER BY created_at DESC LIMIT 1) AS last_message,
-                (SELECT COUNT(*) FROM messages m2 
-                 WHERE m2.receiver_id=? AND m2.receiver_type='admin' 
-                   AND m2.sender_id=u.id AND m2.sender_type='user' AND m2.is_read=0) AS unread_count
-            FROM users u
-            WHERE u.is_admin=0
+            (SELECT message FROM messages WHERE (sender_id=u.id AND sender_type='user') OR (receiver_id=u.id AND receiver_type='user') ORDER BY created_at DESC LIMIT 1) AS last_message,
+            (SELECT COUNT(*) FROM messages m2 WHERE m2.receiver_id=? AND m2.receiver_type='admin' AND m2.sender_id=u.id AND m2.sender_type='user' AND m2.is_read=0) AS unread_count
+            FROM users u WHERE u.is_admin=0
         ");
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
@@ -88,24 +75,36 @@ if ($action === 'fetch_contacts') {
 if ($action === 'fetch_messages') {
     $receiver_id = intval($_POST['receiver_id'] ?? 0);
     $receiver_type = $_POST['receiver_type'] ?? 'user';
+    $last_id = intval($_POST['last_id'] ?? 0);
 
     $sender_type = $user_type === 'admin' ? 'user' : 'admin';
-    $stmt = $mysqli->prepare("UPDATE messages SET is_read=1 WHERE sender_id=? AND sender_type=? AND receiver_id=? AND receiver_type=?");
+
+    $stmt = $mysqli->prepare("UPDATE messages SET is_read=1 WHERE sender_id=? AND sender_type=? AND receiver_id=? AND receiver_type=? AND is_read=0");
     $stmt->bind_param("isis", $receiver_id, $sender_type, $user_id, $user_type);
     $stmt->execute();
     $stmt->close();
 
-    $messages = [];
-    $stmt = $mysqli->prepare("
-        SELECT * FROM messages 
-        WHERE (sender_id=? AND sender_type=? AND receiver_id=? AND receiver_type=?) OR
-              (sender_id=? AND sender_type=? AND receiver_id=? AND receiver_type=?)
-        ORDER BY created_at ASC
-    ");
+    $query = "
+        SELECT * FROM messages
+        WHERE
+        (sender_id=? AND sender_type=? AND receiver_id=? AND receiver_type=?) OR
+        (sender_id=? AND sender_type=? AND receiver_id=? AND receiver_type=?)
+    ";
+    if ($last_id > 0) $query .= " AND id > " . intval($last_id);
+    $query .= " ORDER BY created_at ASC";
 
-    $stmt->bind_param("isssisss", $user_id, $user_type, $receiver_id, $receiver_type, $receiver_id, $receiver_type, $user_id, $user_type);
+    $stmt = $mysqli->prepare($query);
+
+    if ($user_type === 'admin') {
+        $stmt->bind_param("issiisss", $receiver_id, $receiver_type, $user_id, $user_type, $user_id, $user_type, $receiver_id, $receiver_type);
+    } else {
+        $stmt->bind_param("issiisss", $user_id, $user_type, $receiver_id, $receiver_type, $receiver_id, $receiver_type, $user_id, $user_type);
+    }
+
     $stmt->execute();
     $res = $stmt->get_result();
+
+    $messages = [];
     while ($row = $res->fetch_assoc()) {
         $row['message'] = htmlspecialchars_decode($row['message']);
         $messages[] = $row;
@@ -115,5 +114,6 @@ if ($action === 'fetch_messages') {
     echo json_encode(['success' => true, 'messages' => $messages]);
     exit;
 }
+
 
 echo json_encode(['success' => false, 'message' => 'Veprim i panjohur']);

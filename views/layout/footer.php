@@ -581,13 +581,7 @@
         const dateKey = d.toDateString();
         if (dateKey !== lastDate) {
             lastDate = dateKey;
-            const options = {
-                weekday: 'long',
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            };
-            return `<div class="chat-date-separator">${d.toLocaleDateString('sq-AL', options)}</div>`;
+            return `<div class="chat-date-separator">${d.toLocaleDateString('sq-AL', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })}</div>`;
         }
         return '';
     }
@@ -598,80 +592,114 @@
         }, function(resp) {
             if (!resp.success) return;
             const $list = $('#chatContacts').empty();
+
             resp.contacts.forEach(c => {
                 const unread = c.unread_count > 0 ? `<span class="unread-count">${c.unread_count}</span>` : '';
                 const $item = $(`
-                    <div class="contact-item" data-id="${c.contact_id}" data-type="${IS_ADMIN ? 'user' : 'admin'}">
-                        <div style="display:flex; flex-direction:column;">
-                            <strong>${c.contact_name}</strong>
-                            <small>${c.last_message ?? ''}</small>
-                        </div>
-                        ${unread}
+                <div class="contact-item" data-id="${c.contact_id}" data-type="${IS_ADMIN ? 'user' : 'admin'}">
+                    <div style="display:flex;flex-direction:column;">
+                        <strong>${c.contact_name}</strong>
+                        <small>${c.last_message ?? ''}</small>
                     </div>
-                `);
-                $item.on('click', () => selectContact({
-                    contact_id: c.contact_id,
-                    contact_name: c.contact_name,
-                    contact_type: IS_ADMIN ? 'user' : 'admin'
-                }));
+                    ${unread}
+                </div>`);
+
+                $item.on('click', () => {
+                    selectContact({
+                        contact_id: c.contact_id,
+                        contact_name: c.contact_name,
+                        contact_type: IS_ADMIN ? 'user' : 'admin'
+                    });
+                });
+
                 $list.append($item);
             });
-            if (resp.contacts.length > 0 && !selectedContact) $list.children().first().click();
+
+            // Nëse ka kontakt të ruajtur, e hap automatikisht
+            const lastContact = localStorage.getItem('lastContact');
+            if (lastContact) {
+                selectContact(JSON.parse(lastContact));
+            } else if (!IS_ADMIN && resp.contacts.length > 0) {
+                selectContact({
+                    contact_id: resp.contacts[0].contact_id,
+                    contact_name: resp.contacts[0].contact_name,
+                    contact_type: 'admin'
+                });
+            } else if (IS_ADMIN && !selectedContact && resp.contacts.length > 0) {
+                $list.children().first().click();
+            }
         }, 'json');
     }
 
     function selectContact(contact) {
         selectedContact = contact;
+        localStorage.setItem('lastContact', JSON.stringify(contact));
+
         $('#receiver_id').val(contact.contact_id);
         $('#receiver_type').val(contact.contact_type);
         $('#chatUserTitle').text('Biseda me: ' + contact.contact_name);
-        lastMessageId = 0;
+
         lastDate = '';
+        lastMessageId = 0;
         $('#chatUserBody').empty();
+
         fetchMessages(true);
-        if (pollInterval) clearInterval(pollInterval);
-        pollInterval = setInterval(fetchMessages, 2000);
+
+        // if (pollInterval) clearInterval(pollInterval);
+        // pollInterval = setInterval(fetchMessages, 2000);
     }
 
     function fetchMessages(initial = false) {
         if (!selectedContact) return;
-        console.log(selectedContact)
+
         $.post('../../../helper/send_message.php', {
             action: 'fetch_messages',
             receiver_id: selectedContact.contact_id,
             receiver_type: selectedContact.contact_type
         }, function(resp) {
             if (!resp.success) return;
+
             const $body = $('#chatUserBody');
+            if (initial) $body.empty();
+
+            console.log(resp.messages);
             resp.messages.forEach(m => {
+                // Shmang dublikimet
                 if (m.id <= lastMessageId) return;
                 lastMessageId = m.id;
-                const isMine = (m.sender_id == USER_ID);
+
+                const isMine = m.sender_id == USER_ID && m.sender_type == (IS_ADMIN ? 'admin' : 'user');
                 const $msg = $('<div class="chat-bubble">').addClass(isMine ? 'my-message' : 'their-message');
+
                 let content = m.message ? $('<div>').text(m.message).html() : '';
-                if (m.file_path) content += `<br><a href="/new_project_bk/uploads/chat_files/${m.file_path}" target="_blank">📎 Shiko/merr file</a>`;
-                const dateSeparator = formatDateSeparator(m.created_at);
-                if (dateSeparator) $body.append(dateSeparator);
+                if (m.file_path)
+                    content += `<br><a href="/new_project_bk/uploads/chat_files/${m.file_path}" target="_blank">📎 Shiko/merr file</a>`;
+
+                const sep = formatDateSeparator(m.created_at);
+                if (sep) $body.append(sep);
+
                 $msg.html(content + `<div class="msg-time">${formatTime(m.created_at)}</div>`);
                 $body.append($msg);
             });
+
             $body.scrollTop($body[0].scrollHeight);
-            if (initial) fetchContacts();
         }, 'json');
     }
 
     $('#chatUserForm').on('submit', function(e) {
         e.preventDefault();
         if (!selectedContact) {
-            alert('Zgjidhni nje kontakt');
+            alert('Zgjidhni një kontakt!');
             return;
         }
+
         const fd = new FormData(this);
         fd.append('action', 'send');
 
         const messageText = $('#chatUserInput').val().trim();
         const fileInput = $('#chatUserFile')[0];
         let fileName = '';
+
         if (messageText || (fileInput && fileInput.files.length > 0)) {
             if (fileInput && fileInput.files.length > 0) fileName = fileInput.files[0].name;
             appendMessageToChat(messageText, fileName);
@@ -685,7 +713,7 @@
             contentType: false,
             dataType: 'json',
             success: function(resp) {
-                if (!resp.success) alert(resp.message || 'Gabim gjate dergimit');
+                if (!resp.success) alert(resp.message || 'Gabim gjatë dërgimit');
                 $('#chatUserInput').val('');
                 $('#chatUserFile').val('');
             }
@@ -696,10 +724,13 @@
         const $body = $('#chatUserBody');
         const $msg = $('<div class="chat-bubble my-message">');
         let content = message ? $('<div>').text(message).html() : '';
-        if (file_path) content += `<br><a href="/new_project_bk/uploads/chat_files/${file_path}" target="_blank">📎 Shiko/merr file</a>`;
+        if (file_path)
+            content += `<br><a href="/new_project_bk/uploads/chat_files/${file_path}" target="_blank">📎 Shiko/merr file</a>`;
+
         const now = new Date();
         const dateSeparator = formatDateSeparator(now);
         if (dateSeparator) $body.append(dateSeparator);
+
         $msg.html(content + `<div class="msg-time">${formatTime(now)}</div>`);
         $body.append($msg);
         $body.scrollTop($body[0].scrollHeight);
@@ -713,13 +744,15 @@
         $('#chatUserWidget').fadeOut(100);
         if (pollInterval) clearInterval(pollInterval);
     });
-
     $('#chatUserInput').on('keypress', function(e) {
         if (e.key === 'Enter' && $(this).val().trim() !== '') $('#chatUserForm').submit();
     });
 
-    fetchContacts();
+    $(document).ready(() => {
+        fetchContacts();
+    });
 </script>
+
 
 </body>
 

@@ -731,34 +731,45 @@ if (session_status() === PHP_SESSION_NONE) {
             var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
             dropdownElementList.map(el => new bootstrap.Dropdown(el));
 
-            const ctx = document.getElementById('salesChart')?.getContext('2d');
-            if (ctx) {
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                        datasets: [{
-                            label: 'Shitjet e Makinave',
-                            data: [12, 19, 14, 18, 22, 20, 25, 30, 28, 26, 32, 35],
-                            backgroundColor: '#032c69ff',
-                            borderRadius: 8
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
+
+            document.addEventListener("DOMContentLoaded", function() {
+                const canvas = document.getElementById("salesChart");
+
+                if (canvas) {
+                    const existingChart = Chart.getChart(canvas);
+                    if (existingChart) {
+                        existingChart.destroy();
+                    }
+
+                    new Chart(canvas, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                            datasets: [{
+                                label: 'Shitjet e Makinave',
+                                data: [12, 19, 14, 18, 22, 20, 25, 30, 28, 26, 32, 35],
+                                backgroundColor: '#032c69ff',
+                                borderRadius: 8
+                            }]
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
                             }
                         }
-                    }
-                });
-            }
+                    });
+                }
+            });
+
 
             const counters = document.querySelectorAll('.counter');
             counters.forEach(counter => {
