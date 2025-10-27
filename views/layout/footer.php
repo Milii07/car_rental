@@ -19,6 +19,47 @@
 </div>
 
 <style>
+    .chat-image-wrapper {
+        margin: 8px 0;
+        max-width: 100%;
+    }
+
+    .chat-image {
+        max-width: 250px;
+        max-height: 300px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.2s;
+        display: block;
+    }
+
+    .chat-image:hover {
+        transform: scale(1.02);
+    }
+
+    .chat-file-link {
+        display: inline-block;
+        padding: 8px 12px;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 6px;
+        text-decoration: none;
+        color: inherit;
+        margin: 4px 0;
+        transition: background 0.2s;
+    }
+
+    .chat-file-link:hover {
+        background: rgba(0, 0, 0, 0.15);
+    }
+
+    .my-message .chat-image-wrapper {
+        text-align: right;
+    }
+
+    .their-message .chat-image-wrapper {
+        text-align: left;
+    }
+
     #chatRobot {
         position: fixed;
         bottom: 30px;
@@ -229,7 +270,7 @@
         flex-direction: column;
         gap: 8px;
         background-color: #e5ddd5;
-        background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"%3E%3Ccircle cx="12" cy="12" r="3" fill="%23666" opacity="0.05"/%3E%3Ccircle cx="36" cy="36" r="3" fill="%23666" opacity="0.05"/%3E%3Ccircle cx="36" cy="12" r="3" fill="%23666" opacity="0.05"/%3E%3Ccircle cx="12" cy="36" r="3" fill="%23666" opacity="0.05"/%3E%3C/svg%3E');
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ccircle cx='12' cy='12' r='3' fill='%23666' opacity='0.05'/%3E%3Ccircle cx='36' cy='36' r='3' fill='%23666' opacity='0.05'/%3E%3Ccircle cx='36' cy='12' r='3' fill='%23666' opacity='0.05'/%3E%3Ccircle cx='12' cy='36' r='3' fill='%23666' opacity='0.05'/%3E%3C/svg%3E");
         background-repeat: repeat;
         background-size: 48px 48px;
     }
@@ -376,7 +417,6 @@
 <div id="chatRobot">
     <img src="/new_project_bk/uploads/chat.robot/Chat.jpg" alt="Chat Robot" style="width:60px; height:60px; border-radius:50%; box-shadow:0 4px 15px rgba(0,0,0,0.3);">
 </div>
-
 <div id="chatWidget">
     <div id="chatHeader">
         Chat Auto Future Block
@@ -569,10 +609,14 @@
     let selectedContact = null;
     let lastMessageId = 0;
     let lastDate = '';
+    let pollInterval = null;
+    let isFetching = false;
+    let isSending = false;
 
     function formatTime(dateStr) {
         const d = new Date(dateStr);
-        return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+        return d.getHours().toString().padStart(2, '0') + ':' +
+            d.getMinutes().toString().padStart(2, '0');
     }
 
     function formatDateSeparator(dateStr) {
@@ -580,9 +624,38 @@
         const dateKey = d.toDateString();
         if (dateKey !== lastDate) {
             lastDate = dateKey;
-            return `<div class="chat-date-separator">${d.toLocaleDateString('sq-AL', { weekday: 'long', day: '2-digit', month:'2-digit', year:'numeric' })}</div>`;
+            return `<div class="chat-date-separator">
+            ${d.toLocaleDateString('sq-AL', { weekday:'long', day:'2-digit', month:'2-digit', year:'numeric'})}
+        </div>`;
         }
         return '';
+    }
+
+    // Funksion i ri për të kontrolluar nëse file është imazh
+    function isImageFile(filename) {
+        if (!filename) return false;
+        const ext = filename.toLowerCase().split('.').pop();
+        return ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(ext);
+    }
+
+    // Funksion i ri për të formatuar file attachment
+    function formatFileAttachment(filePath) {
+        const fullPath = `/new_project_bk/uploads/chat_files/${filePath}`;
+
+        if (isImageFile(filePath)) {
+            // Shfaq imazhin direkt
+            return `<div class="chat-image-wrapper">
+                <a href="${fullPath}" target="_blank">
+                    <img src="${fullPath}" alt="Image" class="chat-image" />
+                </a>
+            </div>`;
+        } else {
+            // Për file tjera, shfaq link
+            const fileName = filePath.split('/').pop();
+            return `<a href="${fullPath}" target="_blank" class="chat-file-link">
+                📎 ${fileName}
+            </a>`;
+        }
     }
 
     function fetchContacts() {
@@ -596,6 +669,7 @@
             resp.contacts.forEach(c => {
                 const unread = c.unread_count > 0 ? `<span class="unread-count">${c.unread_count}</span>` : '';
                 const contactType = IS_ADMIN ? 'user' : 'admin';
+
                 const $item = $(`
                 <div class="contact-item" data-id="${c.contact_id}" data-type="${contactType}">
                     <div style="display:flex;flex-direction:column;">
@@ -614,15 +688,6 @@
 
                 $list.append($item);
             });
-
-            // Zgjidh kontaktin e fundit nga localStorage
-            const lastContact = localStorage.getItem('lastContact');
-            if (lastContact) selectContact(JSON.parse(lastContact));
-            else if (resp.contacts.length > 0) selectContact({
-                contact_id: resp.contacts[0].contact_id,
-                contact_name: resp.contacts[0].contact_name,
-                contact_type: IS_ADMIN ? 'user' : 'admin'
-            });
         }, 'json');
     }
 
@@ -638,37 +703,57 @@
         lastDate = '';
         $('#chatUserBody').empty();
 
-        fetchMessages(true);
+        $('.contact-item').removeClass('active');
+        $(`.contact-item[data-id="${contact.contact_id}"]`).addClass('active');
 
-        // Poll për mesazhet e reja çdo 2 sekonda
-        if (window.pollInterval) clearInterval(window.pollInterval);
-        window.pollInterval = setInterval(() => fetchMessages(), 2000);
+        if (pollInterval) clearInterval(pollInterval);
+        fetchMessages(true);
+        pollInterval = setInterval(() => fetchMessages(false), 2000);
     }
 
     function fetchMessages(initial = false) {
-        if (!selectedContact) return;
+        if (!selectedContact || isFetching || isSending) return;
+        isFetching = true;
 
-        $.post('../../../helper/send_message.php', {
+        const payload = {
             action: 'fetch_messages',
             receiver_id: selectedContact.contact_id,
-            receiver_type: selectedContact.contact_type,
-            last_id: lastMessageId
-        }, function(resp) {
-            if (!resp.success) return;
+            receiver_type: selectedContact.contact_type
+        };
+
+        if (!initial && lastMessageId > 0) payload.last_id = lastMessageId;
+
+        $.post('../../../helper/send_message.php', payload, function(resp) {
+            isFetching = false;
+            if (!resp.success || !resp.messages) return;
 
             const $body = $('#chatUserBody');
-            if (initial) $body.empty();
+            if (initial) {
+                $body.empty();
+                lastMessageId = 0;
+                lastDate = '';
+            }
 
-            resp.messages.forEach(m => {
-                if (m.id <= lastMessageId) return;
-                lastMessageId = m.id;
+            let newMessages = resp.messages.filter(m => m.id > lastMessageId);
+            if (newMessages.length === 0) return;
 
-                const isMine = m.sender_id == USER_ID && m.sender_type == (IS_ADMIN ? 'admin' : 'user');
+            newMessages.forEach(m => {
+                lastMessageId = Math.max(lastMessageId, m.id);
+                const isMine = (m.sender_id == USER_ID && m.sender_type == (IS_ADMIN ? 'admin' : 'user'));
+
                 const $msg = $('<div class="chat-bubble">').addClass(isMine ? 'my-message' : 'their-message');
 
-                let content = m.message ? $('<div>').text(m.message).html() : '';
-                if (m.file_path)
-                    content += `<br><a href="/new_project_bk/uploads/chat_files/${m.file_path}" target="_blank">📎 Shiko/merr file</a>`;
+                // Krijon content
+                let content = '';
+                if (m.message) {
+                    content = $('<div>').text(m.message).html();
+                }
+
+                // Shton file (imazh ose link)
+                if (m.file_path) {
+                    if (content) content += '<br>';
+                    content += formatFileAttachment(m.file_path);
+                }
 
                 const sep = formatDateSeparator(m.created_at);
                 if (sep) $body.append(sep);
@@ -678,7 +763,9 @@
             });
 
             $body.scrollTop($body[0].scrollHeight);
-        }, 'json');
+        }, 'json').fail(() => {
+            isFetching = false;
+        });
     }
 
     $('#chatUserForm').on('submit', function(e) {
@@ -688,17 +775,21 @@
             return;
         }
 
+        const messageText = $('#chatUserInput').val().trim();
+        const fileInput = $('#chatUserFile')[0];
+
+        if (!messageText && (!fileInput || fileInput.files.length === 0)) {
+            return;
+        }
+
+        if (isSending) return;
+        isSending = true;
+
         const fd = new FormData(this);
         fd.append('action', 'send');
 
-        const messageText = $('#chatUserInput').val().trim();
-        const fileInput = $('#chatUserFile')[0];
-        let fileName = '';
-
-        if (messageText || (fileInput && fileInput.files.length > 0)) {
-            if (fileInput && fileInput.files.length > 0) fileName = fileInput.files[0].name;
-            appendMessageToChat(messageText, fileName);
-        }
+        $('#chatUserInput').val('');
+        $('#chatUserFile').val('');
 
         $.ajax({
             url: '../../../helper/send_message.php',
@@ -708,39 +799,46 @@
             contentType: false,
             dataType: 'json',
             success: function(resp) {
-                if (!resp.success) alert(resp.message || 'Gabim gjatë dërgimit');
-                $('#chatUserInput').val('');
-                $('#chatUserFile').val('');
+                if (resp.success) {
+                    setTimeout(() => {
+                        isSending = false;
+                        fetchMessages(false);
+                    }, 300);
+                } else {
+                    isSending = false;
+                    alert(resp.message || 'Gabim gjatë dërgimit');
+                }
+            },
+            error: function() {
+                isSending = false;
+                alert('Gabim në lidhje me serverin');
             }
         });
     });
 
-    function appendMessageToChat(message, file_path = '') {
-        const $body = $('#chatUserBody');
-        const $msg = $('<div class="chat-bubble my-message">');
-        let content = message ? $('<div>').text(message).html() : '';
-        if (file_path)
-            content += `<br><a href="/new_project_bk/uploads/chat_files/${file_path}" target="_blank">📎 Shiko/merr file</a>`;
-
-        const now = new Date();
-        const dateSeparator = formatDateSeparator(now);
-        if (dateSeparator) $body.append(dateSeparator);
-
-        $msg.html(content + `<div class="msg-time">${formatTime(now)}</div>`);
-        $body.append($msg);
-        $body.scrollTop($body[0].scrollHeight);
-    }
+    $('#chatFileIcon').on('click', () => $('#chatUserFile').click());
 
     $('#chatUserIcon').on('click', () => {
         $('#chatUserWidget').fadeToggle(150);
         fetchContacts();
     });
+
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#chatUserWidget, #chatUserIcon').length) {
+            $('#chatUserWidget').fadeOut(100);
+            if (pollInterval) clearInterval(pollInterval);
+        }
+    });
+
     $('#chatUserClose').on('click', () => {
         $('#chatUserWidget').fadeOut(100);
-        if (window.pollInterval) clearInterval(window.pollInterval);
+        if (pollInterval) clearInterval(pollInterval);
     });
+
     $('#chatUserInput').on('keypress', function(e) {
-        if (e.key === 'Enter' && $(this).val().trim() !== '') $('#chatUserForm').submit();
+        if (e.key === 'Enter' && $(this).val().trim() !== '') {
+            $('#chatUserForm').submit();
+        }
     });
 
     $(document).ready(() => {
