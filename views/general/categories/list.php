@@ -6,6 +6,21 @@ include_once HELPER_PATH . 'category.php';
 include_once LAYOUT_PATH . 'header.php';
 ?>
 
+<style>
+    .table tbody tr:nth-child(odd) {
+        background-color: #f9f9f9;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: #ffffff;
+    }
+
+    .table tbody tr:hover {
+        background-color: #e6f7ff;
+        transition: background 0.2s ease-in-out;
+    }
+</style>
+
 <div class="main-content">
     <div class="page-content">
         <div class="container-fluid">

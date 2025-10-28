@@ -3,7 +3,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-
 ?>
 
 <!doctype html>
@@ -27,6 +26,11 @@ if (session_status() === PHP_SESSION_NONE) {
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
     <style>
+        .highlight {
+            background-color: #ffd54f;
+            font-weight: bold;
+        }
+
         body,
         body * {
             transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
@@ -490,10 +494,20 @@ if (session_status() === PHP_SESSION_NONE) {
                     <div class="d-flex align-items-center">
                         <button type="button" id="sidebar-toggle-btn"><i class="ri-arrow-right-line"></i> <span>Menu</span></button>
                         <form class="d-flex ms-2 position-relative" id="searchForm" method="GET" action="#">
-                            <input type="text" id="search" name="q" placeholder="Kërko në katalog..." autocomplete="off" style="width:200px; padding:5px;">
-                            <div id="suggestions" style="position: absolute; top: 100%; left: 0; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; 
-                            background: #fff;  z-index: 1000; width: 100%; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.1);   border-radius: 4px;"></div>
+                            <input type="text" id="search" name="q" placeholder="Kërko në katalog..." autocomplete="off"
+                                style="width:240px; padding:12px 19px; border-radius:30px; border:1px solid rgba(0,0,0,0.15); outline:none; 
+               box-shadow: inset 0 3px 6px rgba(0,0,0,0.1); font-size:14px; transition: all 0.25s; 
+               background: #f5f7ff; color:#032c69;">
+                            <div id="suggestions"
+                                style="position:absolute; top:120%; left:0; border:1px solid rgba(0,0,0,0.15); max-height:250px; overflow-y:auto;
+               background:#f5f7ff; z-index:1000; width:100%; display:none; box-shadow:0 8px 16px rgba(0,0,0,0.15); 
+               border-radius:30px; font-size:14px; color:#032c69;">
+                            </div>
                         </form>
+
+
+
+
 
                     </div>
 
@@ -545,9 +559,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 </div>
             </div>
         </header>
-        <button onclick="topFunction()" class="btn btn-danger btn-icon" id="back-to-top" style="display: block;">
-            <i class="ri-arrow-up-line"></i>
-        </button>
+
     </div>
 
     <script src="/new_project_bk/public/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -847,7 +859,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
         });
     </script>
-
 
 </body>
 
