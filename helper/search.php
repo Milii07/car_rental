@@ -112,7 +112,7 @@ if ($q !== '') {
         $results[] = [
             'columns' => ['name' => $row['name']],
             'table' => 'Menu',
-            'url' => BASE_URL . "views/general/menu_items/list.php?id=" . $row['id'],
+            'url' => GENERAL_URL . "cars/list.php?id=" . $row['id'],
             'id' => $row['id']
         ];
     }

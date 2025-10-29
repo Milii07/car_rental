@@ -20,7 +20,6 @@ if ($action === 'send') {
     $message = trim($_POST['message'] ?? '');
     $file_path = '';
 
-    // Validimi i file-ve
     $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
     if (isset($_FILES['file']) && $_FILES['file']['error'] === 0) {
         if (in_array($_FILES['file']['type'], $allowedTypes)) {

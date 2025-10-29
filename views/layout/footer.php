@@ -155,7 +155,6 @@
         border: 1px solid #ccc;
         position: relative;
         outline: none;
-        background: url('data:image/svg+xml;utf8,<svg fill="%23999" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5C3.895 3 3 3.895 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-2-9l-5 6-3-4-4 5h12z"/></svg>') no-repeat 10px center;
         background-size: 20px 20px;
     }
 
@@ -289,11 +288,10 @@
 
     #chatInputWrapper input[type="text"] {
         flex: 1;
-        padding: 10px 14px 10px 40px;
+        padding: 10px 14px 10px 18px;
         border-radius: 25px;
         border: 1px solid #ccc;
         outline: none;
-        background: url('data:image/svg+xml;utf8,<svg fill="%23999" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5C3.895 3 3 3.895 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-2-9l-5 6-3-4-4 5h12z"/></svg>') no-repeat 10px center;
         background-size: 20px 20px;
     }
 
@@ -415,8 +413,7 @@
     <div id="chatBody"></div>
     <div style="padding:10px; border-top:1px solid #ddd; display:flex; gap:10px; align-items:center;">
         <input id="chatInput" type="text" placeholder="Shkruaj mesazhin..."
-            style="flex:1; padding:10px 13px; font-size:12px; border-radius:23px; border:1px solid #ccc; outline:none;">
-        <button type="submit" style="padding:10px 16px; border-radius:50%; border:none; background:#075E54; color:#fff; cursor:pointer; font-size:16px;">➤</button>
+            style="flex:1; padding:10px 13px; font-size:14px; border-radius:23px; border:1px solid #ccc; outline:none;">
     </div>
 
 </div>
@@ -440,7 +437,7 @@
             <input type="hidden" id="receiver_type" name="receiver_type">
 
             <div id="chatInputWrapper">
-                <span id="chatFileIcon" style="cursor:pointer; font-size:20px; margin-right:8px;">📷</span>
+                <span id="chatFileIcon" style="cursor:pointer; font-size:24px; margin-right:8px;">📷</span>
                 <input type="file" id="chatUserFile" name="file" style="display:none;">
                 <input type="text" id="chatUserInput" name="message" placeholder="Shkruaj mesazhin...">
                 <button type="submit">➤</button>
@@ -603,11 +600,11 @@
     let isSending = false;
     let unreadCheckInterval = null;
     let totalUnreadCount = 0;
+    let totalUnreadContacts = 0;
 
     function formatTime(dateStr) {
         const d = new Date(dateStr);
-        return d.getHours().toString().padStart(2, '0') + ':' +
-            d.getMinutes().toString().padStart(2, '0');
+        return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
     }
 
     function formatDateSeparator(dateStr) {
@@ -615,9 +612,7 @@
         const dateKey = d.toDateString();
         if (dateKey !== lastDate) {
             lastDate = dateKey;
-            return `<div class="chat-date-separator">
-            ${d.toLocaleDateString('sq-AL', { weekday:'long', day:'2-digit', month:'2-digit', year:'numeric'})}
-        </div>`;
+            return `<div class="chat-date-separator">${d.toLocaleDateString('sq-AL',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'})}</div>`;
         }
         return '';
     }
@@ -630,31 +625,27 @@
 
     function formatFileAttachment(filePath) {
         const fullPath = `/new_project_bk/uploads/chat_files/${filePath}`;
-
         if (isImageFile(filePath)) {
-            return `<div class="chat-image-wrapper">
-                <a href="${fullPath}" target="_blank">
-                    <img src="${fullPath}" alt="Image" class="chat-image" />
-                </a>
-            </div>`;
+            return `<div class="chat-image-wrapper"><a href="${fullPath}" target="_blank"><img src="${fullPath}" alt="Image" class="chat-image" style="max-width:200px;border-radius:6px;"/></a></div>`;
         } else {
             const fileName = filePath.split('/').pop();
-            return `<a href="${fullPath}" target="_blank" class="chat-file-link">
-                📎 ${fileName}
-            </a>`;
+            return `<a href="${fullPath}" target="_blank" class="chat-file-link">📎 ${fileName}</a>`;
         }
     }
 
     function updateUnreadBadge() {
         let $badge = $('#chatUnreadBadge');
-
         if ($badge.length === 0) {
-            $('#chatUserIcon').append('<span id="chatUnreadBadge" style="position:absolute;top:-5px;right:-5px;background:#ff4444;color:white;border-radius:50%;min-width:20px;height:20px;display:none;align-items:center;justify-content:center;font-size:11px;font-weight:bold;padding:2px 5px;box-shadow:0 2px 4px rgba(0,0,0,0.2);z-index:1000;"></span>');
+            $('#chatUserIcon').append('<span id="chatUnreadBadge" style="position:absolute;top:-6px;right:-6px;background:#ff4444;color:white;border-radius:50%;min-width:20px;height:20px;display:none;align-items:center;justify-content:center;font-size:11px;font-weight:bold;padding:2px 6px;box-shadow:0 2px 4px rgba(0,0,0,0.2);z-index:1001;"></span>');
             $badge = $('#chatUnreadBadge');
         }
-
-        if (totalUnreadCount > 0) {
-            $badge.text(totalUnreadCount).css('display', 'flex');
+        const isChatOpen = $('#chatUserWidget').is(':visible');
+        if (isChatOpen) {
+            $badge.hide();
+            return;
+        }
+        if (totalUnreadContacts > 0) {
+            $badge.text(totalUnreadContacts).css('display', 'flex');
         } else {
             $badge.hide();
         }
@@ -662,12 +653,18 @@
 
     function checkUnreadMessages() {
         $.post('../../../helper/send_message.php', {
-            action: 'get_unread_count'
+            action: 'fetch_contacts'
         }, function(resp) {
-            if (resp.success) {
-                totalUnreadCount = resp.unread_count || 0;
-                updateUnreadBadge();
-            }
+            if (!resp.success) return;
+            totalUnreadCount = 0;
+            totalUnreadContacts = 0;
+            resp.contacts.forEach(c => {
+                if (c.unread_count > 0) {
+                    totalUnreadCount += c.unread_count;
+                    totalUnreadContacts++;
+                }
+            });
+            updateUnreadBadge();
         }, 'json');
     }
 
@@ -681,7 +678,6 @@
                 $(`.contact-item[data-id="${contactId}"] .unread-count`).fadeOut(200, function() {
                     $(this).remove();
                 });
-
                 checkUnreadMessages();
             }
         }, 'json');
@@ -692,35 +688,25 @@
             action: 'fetch_contacts'
         }, function(resp) {
             if (!resp.success) return;
-
             const $list = $('#chatContacts').empty();
-
             totalUnreadCount = 0;
+            totalUnreadContacts = 0;
             resp.contacts.forEach(c => {
-                totalUnreadCount += (c.unread_count || 0);
+                if (c.unread_count > 0) {
+                    totalUnreadCount += c.unread_count;
+                    totalUnreadContacts++;
+                }
             });
             updateUnreadBadge();
-
             resp.contacts.forEach(c => {
                 const unread = c.unread_count > 0 ? `<span class="unread-count">${c.unread_count}</span>` : '';
                 const contactType = IS_ADMIN ? 'user' : 'admin';
-
-                const $item = $(`
-                <div class="contact-item" data-id="${c.contact_id}" data-type="${contactType}">
-                    <div style="display:flex;flex-direction:column;">
-                        <strong>${c.contact_name}</strong>
-                        <small>${c.last_message ?? ''}</small>
-                    </div>
-                    ${unread}
-                </div>
-            `);
-
+                const $item = $(`<div class="contact-item" data-id="${c.contact_id}" data-type="${contactType}"><div style="display:flex;flex-direction:column;"><strong>${c.contact_name}</strong><small style="color:#666">${c.last_message??''}</small></div>${unread}</div>`);
                 $item.on('click', () => selectContact({
                     contact_id: c.contact_id,
                     contact_name: c.contact_name,
                     contact_type: contactType
                 }));
-
                 $list.append($item);
             });
         }, 'json');
@@ -728,79 +714,59 @@
 
     function selectContact(contact) {
         selectedContact = contact;
-
         $('#receiver_id').val(contact.contact_id);
         $('#receiver_type').val(contact.contact_type);
         $('#chatUserTitle').text('Biseda me: ' + contact.contact_name);
-
         lastMessageId = 0;
         lastDate = '';
         $('#chatUserBody').empty();
-
         $('.contact-item').removeClass('active');
         $(`.contact-item[data-id="${contact.contact_id}"]`).addClass('active');
-
         markMessagesAsRead(contact.contact_id, contact.contact_type);
-
         if (pollInterval) clearInterval(pollInterval);
         fetchMessages(true);
         pollInterval = setInterval(() => fetchMessages(false), 2000);
+        updateUnreadBadge();
     }
 
     function fetchMessages(initial = false) {
         if (!selectedContact || isFetching || isSending) return;
         isFetching = true;
-
         const payload = {
             action: 'fetch_messages',
             receiver_id: selectedContact.contact_id,
             receiver_type: selectedContact.contact_type
         };
-
         if (!initial && lastMessageId > 0) payload.last_id = lastMessageId;
-
         $.post('../../../helper/send_message.php', payload, function(resp) {
             isFetching = false;
             if (!resp.success || !resp.messages) return;
-
             const $body = $('#chatUserBody');
             if (initial) {
                 $body.empty();
                 lastMessageId = 0;
                 lastDate = '';
             }
-
             let newMessages = resp.messages.filter(m => m.id > lastMessageId);
             if (newMessages.length === 0) return;
-
-            if (newMessages.length > 0 && !initial) {
-                markMessagesAsRead(selectedContact.contact_id, selectedContact.contact_type);
-            }
-
+            if (newMessages.length > 0 && !initial) markMessagesAsRead(selectedContact.contact_id, selectedContact.contact_type);
             newMessages.forEach(m => {
                 lastMessageId = Math.max(lastMessageId, m.id);
                 const isMine = (m.sender_id == USER_ID && m.sender_type == (IS_ADMIN ? 'admin' : 'user'));
-
                 const $msg = $('<div class="chat-bubble">').addClass(isMine ? 'my-message' : 'their-message');
-
                 let content = '';
-                if (m.message) {
-                    content = $('<div>').text(m.message).html();
-                }
-
+                if (m.message) content = $('<div>').text(m.message).html();
                 if (m.file_path) {
                     if (content) content += '<br>';
                     content += formatFileAttachment(m.file_path);
                 }
-
                 const sep = formatDateSeparator(m.created_at);
                 if (sep) $body.append(sep);
-
                 $msg.html(content + `<div class="msg-time">${formatTime(m.created_at)}</div>`);
                 $body.append($msg);
             });
-
             $body.scrollTop($body[0].scrollHeight);
+            fetchContacts();
         }, 'json').fail(() => {
             isFetching = false;
         });
@@ -812,23 +778,17 @@
             alert('Zgjidhni një kontakt!');
             return;
         }
-
         const messageText = $('#chatUserInput').val().trim();
         const fileInput = $('#chatUserFile')[0];
-
-        if (!messageText && (!fileInput || fileInput.files.length === 0)) {
-            return;
-        }
-
+        if (!messageText && (!fileInput || fileInput.files.length === 0)) return;
         if (isSending) return;
         isSending = true;
-
         const fd = new FormData(this);
         fd.append('action', 'send');
-
+        fd.set('receiver_id', selectedContact.contact_id);
+        fd.set('receiver_type', selectedContact.contact_type);
         $('#chatUserInput').val('');
         $('#chatUserFile').val('');
-
         $.ajax({
             url: '../../../helper/send_message.php',
             method: 'POST',
@@ -841,6 +801,7 @@
                     setTimeout(() => {
                         isSending = false;
                         fetchMessages(false);
+                        checkUnreadMessages();
                     }, 300);
                 } else {
                     isSending = false;
@@ -855,10 +816,8 @@
     });
 
     $('#chatFileIcon').on('click', () => $('#chatUserFile').click());
-
     $('#chatUserIcon').on('click', () => {
         const isVisible = $('#chatUserWidget').is(':visible');
-
         if (isVisible) {
             $('#chatUserWidget').fadeOut(150);
             if (pollInterval) clearInterval(pollInterval);
@@ -866,14 +825,14 @@
         } else {
             $('#chatUserWidget').fadeIn(150);
             fetchContacts();
-
             if (unreadCheckInterval) clearInterval(unreadCheckInterval);
             unreadCheckInterval = setInterval(() => checkUnreadMessages(), 5000);
+            updateUnreadBadge();
         }
     });
 
     $(document).on('click', function(e) {
-        if (!$(e.target).closest('#chatUserWidget, #chatUserIcon').length) {
+        if (!$(e.target).closest('#chatUserWidget,#chatUserIcon').length) {
             $('#chatUserWidget').fadeOut(100);
             if (pollInterval) clearInterval(pollInterval);
             if (unreadCheckInterval) clearInterval(unreadCheckInterval);
@@ -887,16 +846,12 @@
     });
 
     $('#chatUserInput').on('keypress', function(e) {
-        if (e.key === 'Enter' && $(this).val().trim() !== '') {
-            $('#chatUserForm').submit();
-        }
+        if (e.key === 'Enter' && $(this).val().trim() !== '') $('#chatUserForm').submit();
     });
 
     $(document).ready(() => {
         checkUnreadMessages();
-
         setInterval(() => checkUnreadMessages(), 10000);
-
         $('#chatUserWidget').hide();
     });
 </script>

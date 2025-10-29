@@ -156,3 +156,61 @@ if (isset($_GET['delete'])) {
     header("Location: " . BASE_URL . "views/general/reservations/list.php");
     exit;
 }
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'search_cars') {
+    include DB_PATH . 'db.php';
+
+    $pickup_date = $_POST['pickup_date'] ?? '';
+    $pickup_time = $_POST['pickup_time'] ?? '';
+    $dropoff_date = $_POST['dropoff_date'] ?? '';
+    $dropoff_time = $_POST['dropoff_time'] ?? '';
+
+    function getAvailableCars($pickup_date, $pickup_time, $dropoff_date, $dropoff_time, $mysqli)
+    {
+        $availableCars = [];
+        $carsResult = $mysqli->query("SELECT * FROM cars");
+        $uploadDir = '/new_project_bk/uploads/cars/';
+
+        while ($car = $carsResult->fetch_assoc()) {
+            $car_id = $car['id'];
+
+            $stmt = $mysqli->prepare("
+                SELECT id FROM reservations
+                WHERE car_id = ?
+                AND status != 'cancelled'
+                AND NOT (
+                    CONCAT(end_date,' ',time) <= CONCAT(?, ' ', ?)
+                    OR CONCAT(start_date,' ',time) >= CONCAT(?, ' ', ?)
+                )
+                LIMIT 1
+            ");
+            $stmt->bind_param("issss", $car_id, $pickup_date, $pickup_time, $dropoff_date, $dropoff_time);
+            $stmt->execute();
+            $res = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+
+            if (!$res) {
+                $firstImage = '';
+                if (!empty($car['images'])) {
+                    $imagesArray = explode(',', $car['images']);
+                    $firstImage = trim($imagesArray[0]);
+                }
+                $availableCars[] = [
+                    'id' => $car['id'],
+                    'brand' => $car['brand_id'],
+                    'category' => $car['category_id'],
+                    'model' => $car['model'],
+                    'price_per_day' => $car['price_per_day'],
+                    'image' => $uploadDir . $firstImage
+                ];
+            }
+        }
+        return $availableCars;
+    }
+
+    $cars = getAvailableCars($pickup_date, $pickup_time, $dropoff_date, $dropoff_time, $mysqli);
+    header('Content-Type: application/json');
+    echo json_encode($cars);
+    exit;
+}
