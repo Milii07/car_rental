@@ -157,60 +157,81 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'search_cars') {
-    include DB_PATH . 'db.php';
-
     $pickup_date = $_POST['pickup_date'] ?? '';
     $pickup_time = $_POST['pickup_time'] ?? '';
     $dropoff_date = $_POST['dropoff_date'] ?? '';
     $dropoff_time = $_POST['dropoff_time'] ?? '';
 
-    function getAvailableCars($pickup_date, $pickup_time, $dropoff_date, $dropoff_time, $mysqli)
-    {
-        $availableCars = [];
-        $carsResult = $mysqli->query("SELECT * FROM cars");
-        $uploadDir = '/new_project_bk/uploads/cars/';
-
-        while ($car = $carsResult->fetch_assoc()) {
-            $car_id = $car['id'];
-
-            $stmt = $mysqli->prepare("
-                SELECT id FROM reservations
-                WHERE car_id = ?
-                AND status != 'cancelled'
-                AND NOT (
-                    CONCAT(end_date,' ',time) <= CONCAT(?, ' ', ?)
-                    OR CONCAT(start_date,' ',time) >= CONCAT(?, ' ', ?)
-                )
-                LIMIT 1
-            ");
-            $stmt->bind_param("issss", $car_id, $pickup_date, $pickup_time, $dropoff_date, $dropoff_time);
-            $stmt->execute();
-            $res = $stmt->get_result()->fetch_assoc();
-            $stmt->close();
-
-            if (!$res) {
-                $firstImage = '';
-                if (!empty($car['images'])) {
-                    $imagesArray = explode(',', $car['images']);
-                    $firstImage = trim($imagesArray[0]);
-                }
-                $availableCars[] = [
-                    'id' => $car['id'],
-                    'brand' => $car['brand_id'],
-                    'category' => $car['category_id'],
-                    'model' => $car['model'],
-                    'price_per_day' => $car['price_per_day'],
-                    'image' => $uploadDir . $firstImage
-                ];
-            }
-        }
-        return $availableCars;
+    if (!$pickup_date || !$pickup_time || !$dropoff_date || !$dropoff_time) {
+        echo json_encode(['error' => 'Të gjitha fushat janë të detyrueshme']);
+        exit;
     }
 
-    $cars = getAvailableCars($pickup_date, $pickup_time, $dropoff_date, $dropoff_time, $mysqli);
-    header('Content-Type: application/json');
-    echo json_encode($cars);
+    if (!$mysqli) {
+        echo json_encode(['error' => 'Lidhja me bazën e të dhënave dështoi']);
+        exit;
+    }
+
+    $availableCars = [];
+    $uploadDir = '/new_project_bk/uploads/cars/';
+
+    $carsResult = $mysqli->query("SELECT * FROM cars");
+    if (!$carsResult) {
+        echo json_encode(['error' => $mysqli->error]);
+        exit;
+    }
+
+    $pickup_datetime = $pickup_date . ' ' . $pickup_time;
+    $dropoff_datetime = $dropoff_date . ' ' . $dropoff_time;
+
+    while ($car = $carsResult->fetch_assoc()) {
+        $car_id = $car['id'];
+
+        $stmt = $mysqli->prepare("
+            SELECT id
+            FROM reservations
+            WHERE car_id = ?
+            AND status != 'cancelled'
+            AND NOT (
+                CONCAT(end_date, ' ', time) <= ? 
+                OR CONCAT(start_date, ' ', time) >= ?
+            )
+            LIMIT 1
+        ");
+
+        if (!$stmt) {
+            echo json_encode(['error' => $mysqli->error]);
+            exit;
+        }
+
+        $stmt->bind_param("iss", $car_id, $pickup_datetime, $dropoff_datetime);
+        $stmt->execute();
+        $conflict = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        if (!$conflict) {
+            $firstImage = '';
+            if (!empty($car['images'])) {
+                $imagesArray = array_filter(explode(',', $car['images']), fn($img) => trim($img) !== '');
+                $firstImage = trim(reset($imagesArray));
+            }
+
+            $availableCars[] = [
+                'id' => $car['id'],
+                'brand' => $car['brand_id'],
+                'category' => $car['category_id'],
+                'model' => $car['model'],
+                'price_per_day' => $car['price_per_day'],
+                'image' => $uploadDir . $firstImage,
+                'rating' => $car['rating'] ?? '4.5',
+                'seats' => $car['seats'] ?? '5',
+                'transmission' => $car['transmission'] ?? 'Manual',
+                'type' => $car['type'] ?? 'Sedan'
+            ];
+        }
+    }
+
+    echo json_encode($availableCars);
     exit;
 }
