@@ -157,11 +157,15 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'search_cars') {
+    header('Content-Type: application/json; charset=utf-8');
+
     $pickup_date = $_POST['pickup_date'] ?? '';
     $pickup_time = $_POST['pickup_time'] ?? '';
     $dropoff_date = $_POST['dropoff_date'] ?? '';
     $dropoff_time = $_POST['dropoff_time'] ?? '';
+    $service_type = $_POST['service_type'] ?? 'all';
 
     if (!$pickup_date || !$pickup_time || !$dropoff_date || !$dropoff_time) {
         echo json_encode(['error' => 'Të gjitha fushat janë të detyrueshme']);
@@ -173,63 +177,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         exit;
     }
 
-    $availableCars = [];
+    $pickup_datetime = $pickup_date . ' ' . $pickup_time;
+    $dropoff_datetime = $dropoff_date . ' ' . $dropoff_time;
     $uploadDir = '/new_project_bk/uploads/cars/';
 
-    $carsResult = $mysqli->query("SELECT * FROM cars");
-    if (!$carsResult) {
+    $query = "
+        SELECT *
+        FROM cars c
+        WHERE (? = 'all' OR c.service_type = ?)
+        AND c.id NOT IN (
+            SELECT r.car_id
+            FROM reservations r
+            WHERE r.status != 'cancelled'
+            AND NOT (
+                CONCAT(r.end_date, ' ', r.time) <= ?
+                OR CONCAT(r.start_date, ' ', r.time) >= ?
+            )
+        )
+        ORDER BY c.id DESC
+    ";
+
+    $stmt = $mysqli->prepare($query);
+    if (!$stmt) {
         echo json_encode(['error' => $mysqli->error]);
         exit;
     }
 
-    $pickup_datetime = $pickup_date . ' ' . $pickup_time;
-    $dropoff_datetime = $dropoff_date . ' ' . $dropoff_time;
+    $stmt->bind_param("ssss", $service_type, $service_type, $pickup_datetime, $dropoff_datetime);
+    $stmt->execute();
+    $carsResult = $stmt->get_result();
 
+    $availableCars = [];
     while ($car = $carsResult->fetch_assoc()) {
-        $car_id = $car['id'];
-
-        $stmt = $mysqli->prepare("
-            SELECT id
-            FROM reservations
-            WHERE car_id = ?
-            AND status != 'cancelled'
-            AND NOT (
-                CONCAT(end_date, ' ', time) <= ? 
-                OR CONCAT(start_date, ' ', time) >= ?
-            )
-            LIMIT 1
-        ");
-
-        if (!$stmt) {
-            echo json_encode(['error' => $mysqli->error]);
-            exit;
+        $firstImage = '';
+        if (!empty($car['images'])) {
+            $imagesArray = array_filter(explode(',', $car['images']), fn($img) => trim($img) !== '');
+            $firstImage = trim(reset($imagesArray));
         }
 
-        $stmt->bind_param("iss", $car_id, $pickup_datetime, $dropoff_datetime);
-        $stmt->execute();
-        $conflict = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
-
-        if (!$conflict) {
-            $firstImage = '';
-            if (!empty($car['images'])) {
-                $imagesArray = array_filter(explode(',', $car['images']), fn($img) => trim($img) !== '');
-                $firstImage = trim(reset($imagesArray));
-            }
-
-            $availableCars[] = [
-                'id' => $car['id'],
-                'brand' => $car['brand_id'],
-                'category' => $car['category_id'],
-                'model' => $car['model'],
-                'price_per_day' => $car['price_per_day'],
-                'image' => $uploadDir . $firstImage,
-                'rating' => $car['rating'] ?? '4.5',
-                'seats' => $car['seats'] ?? '5',
-                'transmission' => $car['transmission'] ?? 'Manual',
-                'type' => $car['type'] ?? 'Sedan'
-            ];
-        }
+        $availableCars[] = [
+            'id' => $car['id'],
+            'brand' => $car['brand_id'],
+            'category' => $car['category_id'],
+            'model' => $car['model'],
+            'price_per_day' => $car['price_per_day'],
+            'image' => $uploadDir . $firstImage,
+            'rating' => $car['rating'] ?? '4.5',
+            'seats' => $car['seating_capacity'] ?? $car['seats'] ?? '5',
+            'transmission' => $car['transmission'] ?? 'Manual',
+            'type' => $car['body_type'] ?? $car['type'] ?? 'Sedan',
+            'service_type' => $car['service_type'] ?? 'all'
+        ];
     }
 
     echo json_encode($availableCars);

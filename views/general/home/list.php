@@ -26,6 +26,10 @@ if ($result) {
 include_once LAYOUT_PATH . 'header.php';
 ?>
 
+
+
+
+
 <style>
     .booking-section {
         position: relative;
@@ -97,6 +101,7 @@ include_once LAYOUT_PATH . 'header.php';
         color: #e5e7eb;
     }
 
+    .form-group select,
     .form-group input {
         padding: 8px 10px;
         border-radius: 10px;
@@ -508,7 +513,6 @@ include_once LAYOUT_PATH . 'header.php';
     }
 </style>
 
-
 <div class="main-content">
     <div class="page-content">
         <div class="container-fluid">
@@ -565,11 +569,27 @@ include_once LAYOUT_PATH . 'header.php';
                                             <input type="text" name="country" value="Albania" required>
                                         </div>
 
+
                                         <div class="form-group">
                                             <label>Driver's age</label>
                                             <input type="text" name="age" placeholder="18 - 65" required>
                                         </div>
+
+                                        <div class="form-group">
+                                            <label>Service Type</label>
+                                            <select name="service_type" required>
+                                                <option value="all">Të gjitha</option>
+                                                <option value="Weddings">Dasmë</option>
+                                                <option value="Night Parties">Night Party</option>
+                                                <option value="Airport Transfers">Transfer Aeroporti</option>
+                                                <option value="Casinos">Kazino</option>
+                                                <option value="Birthdays">Ditëlindje</option>
+                                                <option value="business">Biznes</option>
+                                            </select>
+                                        </div>
+
                                     </div>
+
 
                                     <button type="submit" class="search-btn">Search</button>
                                 </form>
@@ -649,7 +669,7 @@ include_once LAYOUT_PATH . 'header.php';
                                 <span class="spec">🚗 <?= htmlspecialchars($carData['type']) ?></span>
                             </div>
                             <div class="car-footer d-flex justify-content-between align-items-center">
-                                <div class="car-price-clean">💰 <span class="price-value"><?= $carData['price'] ?>€</span> <span class="price-label">/ditë</span></div>
+                                <div class="car-price-clean"> <span class="price-value"><?= $carData['price'] ?>€</span> <span class="price-label">/ditë</span></div>
                                 <?php if (!empty($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
                                     <button class="btn btn-sm btn-outline-primary edit-btn"
                                         data-id="<?= $carData['id'] ?>"
@@ -673,7 +693,7 @@ include_once LAYOUT_PATH . 'header.php';
                                     <img src="<?= htmlspecialchars($carData['image']) ?>" class="img-fluid rounded mb-3" style="max-height:400px; object-fit:cover;">
                                     <h5 class="fw-semibold"><?= htmlspecialchars($carData['name']) ?></h5>
                                     <p class="text-muted mb-1"><?= htmlspecialchars($carData['type']) ?> | <?= htmlspecialchars($carData['transmission']) ?></p>
-                                    <p class="fs-5 fw-bold text-success">💰 <?= $carData['price'] ?> €/ditë</p>
+                                    <p class="fs-5 fw-bold text-success"> <?= $carData['price'] ?> €/ditë</p>
                                     <p class="text-muted small">⭐ <?= $carData['rating'] ?> | 💺 <?= $carData['seats'] ?> vende</p>
                                     <hr class="my-3">
                                     <p>Ky model makine ofron një eksperiencë të jashtëzakonshme udhëtimi. Sediljet janë të rehatshme dhe të rregullueshme sipas preferencave.</p>
@@ -704,6 +724,18 @@ include_once LAYOUT_PATH . 'header.php';
                                 <div class="mb-3"><label class="form-label">Transmetimi</label><input type="text" id="editCarTransmission" name="transmission" class="form-control" required></div>
                                 <div class="mb-3"><label class="form-label">Tipi i makinës</label><input type="text" id="editCarType" name="type" class="form-control" required></div>
                                 <div class="mb-3"><label class="form-label">Rating</label><input type="number" step="0.1" id="editCarRating" name="rating" class="form-control" required></div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Service Type</label>
+                                    <select name="service_type" class="form-select" required>
+                                        <option value="Weddings">Dasmë</option>
+                                        <option value="Night Parties">Night Party</option>
+                                        <option value="Airport Transfers">Transfer Aeroporti</option>
+                                        <option value="Casinos">Kazino</option>
+                                        <option value="birthday">Ditëlindje</option>
+                                        <option value="Birthdays">Biznes</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulo</button>
@@ -749,6 +781,12 @@ include_once LAYOUT_PATH . 'header.php';
                                             <option value="<?= $car['id'] ?>"><?= htmlspecialchars($car['name'] . ' | ' . $car['price'] . '€/ditë') ?></option>
                                         <?php endforeach; ?>
                                     </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Service Type</label>
+                                    <input type="text" name="service_type" class="form-control" readonly style="background-color: #e9ecef;">
+                                    <small class="text-muted">Service type është vendosur automatikisht nga kërkimi.</small>
                                 </div>
 
                                 <div class="row">
@@ -931,11 +969,12 @@ include_once LAYOUT_PATH . 'header.php';
                     <div class="footer-column services">
                         <h3>Services</h3>
                         <ul>
-                            <li><a href="<?= BASE_URL ?>views/general/order_status/list.php#nightparties">Rent For Night Parties</a></li>
-                            <li><a href="<?= BASE_URL ?>views/general/order_status/list.php#weddings">Rent For Weddings</a></li>
-                            <li><a href="<?= BASE_URL ?>views/general/order_status/list.php#airport">Rent For Airport Transfers</a></li>
-                            <li><a href="<?= BASE_URL ?>views/general/order_status/list.php#casinos">Rent For Casinos</a></li>
-                            <li><a href="<?= BASE_URL ?>views/general/order_status/list.php#birthdays">Rent For Birthdays</a></li>
+                            <li><a href="...#nightparties">Rent For Night Parties</a></li>
+                            <li><a href="...#weddings">Rent For Weddings</a></li>
+                            <li><a href="...#airport">Rent For Airport Transfers</a></li>
+                            <li><a href="...#casinos">Rent For Casinos</a></li>
+                            <li><a href="...#birthdays">Rent For Birthdays</a></li>
+
                         </ul>
                     </div>
 
@@ -960,6 +999,45 @@ include_once LAYOUT_PATH . 'header.php';
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script>
                 $(document).ready(function() {
+                    let today = new Date().toISOString().split('T')[0];
+                    $('[name="pickup_date"]').val(today);
+
+                    let tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    let tomorrowDate = tomorrow.toISOString().split('T')[0];
+                    $('[name="dropoff_date"]').val(tomorrowDate);
+
+                    $('.footer-section .services a').on('click', function(e) {
+                        e.preventDefault();
+
+                        let href = $(this).attr('href');
+
+                        let serviceType = 'all';
+                        if (href.includes('#nightparties')) {
+                            serviceType = 'Night Parties';
+                        } else if (href.includes('#weddings')) {
+                            serviceType = 'Weddings';
+                        } else if (href.includes('#airport')) {
+                            serviceType = 'Airport Transfers';
+                        } else if (href.includes('#casinos')) {
+                            serviceType = 'Casinos';
+                        } else if (href.includes('#birthdays')) {
+                            serviceType = 'Birthdays';
+                        } else if (href.includes('#business')) {
+                            serviceType = 'Business';
+                        }
+
+                        $('[name="service_type"]').val(serviceType);
+
+                        $('html, body').animate({
+                            scrollTop: $('.booking-section').offset().top - 100
+                        }, 800);
+
+                        setTimeout(function() {
+                            $('#bookingForm').submit();
+                        }, 500);
+                    });
+
                     $('#bookingForm').on('submit', function(e) {
                         e.preventDefault();
 
@@ -967,16 +1045,20 @@ include_once LAYOUT_PATH . 'header.php';
                         let pickup_time = $('[name="pickup_time"]').val();
                         let dropoff_date = $('[name="dropoff_date"]').val();
                         let dropoff_time = $('[name="dropoff_time"]').val();
+                        let service_type = $('[name="service_type"]').val();
 
-                        if (!pickup_date || !pickup_time || !dropoff_date || !dropoff_time) {
+                        if (!pickup_date || !pickup_time || !dropoff_date || !dropoff_time || !service_type) {
                             alert('Plotëso të gjitha fushat!');
                             return;
                         }
 
-                        let loadingHtml = '<div style="text-align: center; padding: 5px;"></div>';
+                        let loadingHtml = '<div style="text-align: center; padding: 15px; display: block;"><div class="text-primary" role="status"><span class="visually-hidden"></span></div><p class="mt-3"></p></div>';
+
                         if ($('.car-grid').length > 0) {
                             $('.car-grid').html(loadingHtml);
                         }
+
+
 
                         $.ajax({
                             url: '/new_project_bk/helper/reservations.php',
@@ -986,7 +1068,8 @@ include_once LAYOUT_PATH . 'header.php';
                                 pickup_date: pickup_date,
                                 pickup_time: pickup_time,
                                 dropoff_date: dropoff_date,
-                                dropoff_time: dropoff_time
+                                dropoff_time: dropoff_time,
+                                service_type: service_type
                             },
                             dataType: 'json',
                             success: function(response) {
@@ -1000,81 +1083,98 @@ include_once LAYOUT_PATH . 'header.php';
                                 let cars = response;
                                 let html = '';
 
+                                let serviceLabels = {
+                                    'all': 'Të gjitha shërbimet',
+                                    'Weddings': 'Dasmë',
+                                    'Night Parties': 'Night Party',
+                                    'Airport Transfers': 'Transfer Aeroporti',
+                                    'Casinos': 'Kazino',
+                                    'Birthdays': 'Ditëlindje',
+                                    'Business': 'Biznes'
+                                };
+
                                 if (cars.length > 0) {
-                                    html += '<h3 style="margin-bottom: 20px; text-align: center;">Makinat e lira për zgjedhjet tuaja: ' + cars.length + ' makina</h3><div class="car-grid">';
+                                    let serviceLabel = serviceLabels[service_type] || service_type;
+                                    html += '<h3 style="margin-bottom: 20px; text-align: center;">Makinat e lira për: <strong>' + serviceLabel + '</strong> (' + cars.length + ' makina)</h3><div class="car-grid">';
 
                                     cars.forEach(function(car) {
                                         let modalId = 'carModalAvailable' + car.id;
-
                                         let rating = car.rating || '4.5';
                                         let seats = car.seats || '5';
                                         let transmission = car.transmission || 'Manual';
                                         let type = car.type || 'Sedan';
+                                        let carServiceType = car.service_type || 'N/A';
 
                                         html += `
-                        <div class="car-card">
-                            <img src="${car.image}" alt="${car.model}" class="car-image" style="cursor: pointer;" onclick="openCarModal('${modalId}')">
-                            <div class="car-rating">⭐ ${rating}</div>
-                            <div class="car-content">
-                                <h3 class="car-name">${car.model}</h3>
-                                <div class="car-specs">
-                                    <span class="spec">👥 ${seats} vende</span>
-                                    <span class="spec">⚙️ ${transmission}</span>
-                                    <span class="spec">🚗 ${type}</span>
-                                </div>
-                                <div class="car-footer">
-                                    <div class="car-price-clean">💰 <span class="price-value">${car.price_per_day}€</span> <span class="price-label">/ditë</span></div>
-                                    <button class="btn btn-success btn-sm reserve-btn" 
-                                        data-car-id="${car.id}"
-                                        data-car-name="${car.model}"
-                                        data-pickup-date="${pickup_date}"
-                                        data-pickup-time="${pickup_time}"
-                                        data-dropoff-date="${dropoff_date}"
-                                        data-dropoff-time="${dropoff_time}">
-                                        Rezervo
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+        <div class="car-card">
+            <img src="${car.image}" alt="${car.model}" class="car-image" style="cursor: pointer;" onclick="openCarModal('${modalId}')">
+            <div class="car-rating">⭐ ${rating}</div>
+            <div class="car-content">
+                <h3 class="car-name">${car.model}</h3>
+                <div class="car-specs">
+                    <span class="spec">👥 ${seats} vende</span>
+                    <span class="spec">⚙️ ${transmission}</span>
+                    <span class="spec">🚗 ${type}</span>
+                </div>
+                <div class="car-specs" style="margin-top: 8px;">
+                    <span class="spec" style="background: #e3f2fd; color: #1976d2; font-weight: 600;">🎯 ${serviceLabels[carServiceType] || carServiceType}</span>
+                </div>
+                <div class="car-footer">
+                    <div class="car-price-clean"> <span class="price-value">${car.price_per_day}€</span> <span class="price-label">/ditë</span></div>
+                    <button class="btn btn-success btn-sm reserve-btn" 
+                        data-car-id="${car.id}"
+                        data-car-name="${car.model}"
+                        data-pickup-date="${pickup_date}"
+                        data-pickup-time="${pickup_time}"
+                        data-dropoff-date="${dropoff_date}"
+                        data-dropoff-time="${dropoff_time}"
+                        data-service-type="${carServiceType}">
+                        Rezervo
+                    </button>
+                </div>
+            </div>
+        </div>
 
-                        <div class="modal fade" id="${modalId}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">${car.model}</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body text-center p-4">
-                                        <img src="${car.image}" class="img-fluid rounded mb-3" style="max-height:400px; object-fit:cover;">
-                                        <p class="text-muted mb-1">${type} | ${transmission}</p>
-                                        <p class="fs-5 fw-bold text-success">💰 ${car.price_per_day} €/ditë</p>
-                                        <p class="text-muted small">⭐ ${rating} | 💺 ${seats} vende</p>
-                                        <hr class="my-3">
-                                        <p>Ky model makine ofron një eksperiencë të jashtëzakonshme udhëtimi. Sediljet janë të rehatshme dhe të rregullueshme sipas preferencave.</p>
-                                        <p>Pajisjet teknologjike, përfshirë navigacionin, sistemin e ndihmës për parkim dhe asistencën e vozitjes, garantojnë një eksperiencë të sigurt.</p>
-                                        <p>Pajisjet moderne të sigurisë, si airbag-et, ABS, kontrolli i stabilitetit dhe sistemi i paralajmërimit për rrezik.</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button class="btn btn-success reserve-btn-modal"
-                                            data-car-id="${car.id}"
-                                            data-car-name="${car.model}"
-                                            data-pickup-date="${pickup_date}"
-                                            data-pickup-time="${pickup_time}"
-                                            data-dropoff-date="${dropoff_date}"
-                                            data-dropoff-time="${dropoff_time}">
-                                            Rezervo Këtë Makinë
-                                        </button>
-                                        <button class="btn btn-secondary" data-bs-dismiss="modal">Mbyll</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        `;
+        <div class="modal fade" id="${modalId}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">${car.model}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center p-4">
+                        <img src="${car.image}" class="img-fluid rounded mb-3" style="max-height:400px; object-fit:cover;">
+                        <p class="text-muted mb-1">${type} | ${transmission}</p>
+                        <p class="fs-5 fw-bold text-success"> ${car.price_per_day} €/ditë</p>
+                        <p class="text-muted small">⭐ ${rating} | 💺 ${seats} vende |  ${serviceLabels[carServiceType] || carServiceType}</p>
+                        <hr class="my-3">
+                        <p>Ky model makine ofron një eksperiencë të jashtëzakonshme udhëtimi. Sediljet janë të rehatshme dhe të rregullueshme sipas preferencave.</p>
+                        <p>Pajisjet teknologjike, përfshirë navigacionin, sistemin e ndihmës për parkim dhe asistencën e vozitjes, garantojnë një eksperiencë të sigurt.</p>
+                        <p>Pajisjet moderne të sigurisë, si airbag-et, ABS, kontrolli i stabilitetit dhe sistemi i paralajmërimit për rrezik.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-success reserve-btn-modal"
+                            data-car-id="${car.id}"
+                            data-car-name="${car.model}"
+                            data-pickup-date="${pickup_date}"
+                            data-pickup-time="${pickup_time}"
+                            data-dropoff-date="${dropoff_date}"
+                            data-dropoff-time="${dropoff_time}"
+                            data-service-type="${carServiceType}">
+                            Rezervo Këtë Makinë
+                        </button>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Mbyll</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
                                     });
 
                                     html += '</div>';
                                 } else {
-                                    html = '<div style="text-align: center; padding: 40px;"><h3>Nuk ka makina të lira për këto data.</h3><p>Ju lutem zgjidhni data të tjera.</p></div>';
+                                    let serviceLabel = serviceLabels[service_type] || service_type;
+                                    html = '<div style="text-align: center; padding: 40px;"><h3>Nuk ka makina të lira për: <strong>' + serviceLabel + '</strong></h3><p>Ju lutem zgjidhni një opsion tjetër ose data të tjera.</p></div>';
                                 }
 
                                 if ($('#availableCars').length > 0) {
@@ -1082,7 +1182,7 @@ include_once LAYOUT_PATH . 'header.php';
                                 } else if ($('.car-grid').length > 0) {
                                     $('.car-grid').replaceWith(html);
                                 } else {
-                                    $(this).after('<div id="availableCars">' + html + '</div>');
+                                    $('#bookingForm').after('<div id="availableCars">' + html + '</div>');
                                 }
 
                                 $('.dashboard-cards').hide();
@@ -1115,6 +1215,7 @@ include_once LAYOUT_PATH . 'header.php';
                             let pickupTime = $(this).data('pickup-time');
                             let dropoffDate = $(this).data('dropoff-date');
                             let dropoffTime = $(this).data('dropoff-time');
+                            let serviceType = $(this).data('service-type');
 
                             console.log('Reserve clicked:', {
                                 carId,
@@ -1122,30 +1223,37 @@ include_once LAYOUT_PATH . 'header.php';
                                 pickupDate,
                                 pickupTime,
                                 dropoffDate,
-                                dropoffTime
+                                dropoffTime,
+                                serviceType
                             });
 
                             $('.modal').modal('hide');
 
                             setTimeout(function() {
                                 $('#addReservationModal select[name="car_id"]').val(carId);
-
                                 $('#addReservationModal input[name="start_date"]').val(pickupDate);
                                 $('#addReservationModal input[name="time"]').val(pickupTime);
                                 $('#addReservationModal input[name="end_date"]').val(dropoffDate);
 
-                                console.log('Opening reservation modal');
+                                if ($('#addReservationModal input[name="service_type"]').length) {
+                                    $('#addReservationModal input[name="service_type"]').val(serviceType);
+                                }
+
+                                console.log('Opening reservation modal with service type:', serviceType);
 
                                 $('#addReservationModal').modal('show');
                             }, 500);
                         });
                     }
 
+                    let currentReservationModalId = null;
+
                     $(document).on('click', '[data-bs-target="#addClientModal"]', function() {
-                        let currentModal = $(this).data('current-reserve-modal');
-                        if (currentModal) {
-                            $('#' + currentModal).modal('hide');
-                            $('#addClientModal').data('return-to-modal', currentModal);
+                        currentReservationModalId = $(this).data('current-reserve-modal');
+                        console.log('Opening client modal from:', currentReservationModalId);
+
+                        if (currentReservationModalId) {
+                            $('#' + currentReservationModalId).modal('hide');
                         }
                     });
 
@@ -1153,40 +1261,52 @@ include_once LAYOUT_PATH . 'header.php';
                         e.preventDefault();
 
                         let formData = $(this).serialize();
+                        let submitBtn = $(this).find('button[type="submit"]');
+                        submitBtn.prop('disabled', true);
 
                         $.ajax({
-                            url: '/new_project_bk/helper/clients.php',
+                            url: '/new_project_bk/helper/save_client_ajax.php',
                             type: 'POST',
-                            data: formData + '&create=1',
+                            data: formData,
                             dataType: 'json',
                             success: function(response) {
+                                submitBtn.prop('disabled', false);
+
                                 if (response.success) {
                                     $('#clientFormMessage').html('<div class="alert alert-success">Klienti u shtua me sukses!</div>');
 
                                     let newOption = new Option(response.client_name, response.client_id, true, true);
+
                                     $('#clientSelect').append(newOption).trigger('change');
+                                    $('#addReservationModal select[name="client_id"]').append(newOption.cloneNode(true)).val(response.client_id);
 
                                     setTimeout(function() {
                                         $('#addClientModal').modal('hide');
 
-                                        let returnModal = $('#addClientModal').data('return-to-modal');
-                                        if (returnModal) {
-                                            $('#' + returnModal).modal('show');
-                                            $('#addClientModal').data('return-to-modal', null);
+                                        if (currentReservationModalId) {
+                                            setTimeout(function() {
+                                                $('#' + currentReservationModalId).modal('show');
+                                                currentReservationModalId = null;
+                                            }, 300);
                                         }
 
                                         $('#addClientForm')[0].reset();
                                         $('#clientFormMessage').html('');
                                     }, 1000);
                                 } else {
-                                    $('#clientFormMessage').html('<div class="alert alert-danger">' + (response.message || 'Gabim gjatë shtimit të klientit!') + '</div>');
+                                    $('#clientFormMessage').html('<div class="alert alert-danger">' + (response.message || response.error || 'Gabim gjatë shtimit të klientit!') + '</div>');
                                 }
                             },
-                            error: function(err) {
-                                console.log(err);
-                                $('#clientFormMessage').html('<div class="alert alert-danger">Ka ndodhur një gabim!</div>');
+                            error: function(xhr, status, error) {
+                                submitBtn.prop('disabled', false);
+                                console.error('Error:', xhr.responseText);
+                                $('#clientFormMessage').html('<div class="alert alert-danger">Ka ndodhur një gabim në server!</div>');
                             }
                         });
+                    });
+
+                    $('#addClientModal').on('hidden.bs.modal', function() {
+                        $('#clientFormMessage').html('');
                     });
                 });
             </script>
