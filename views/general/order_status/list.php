@@ -231,7 +231,7 @@ Mbetur: <?= $remaining_days ?> ditë, <?= $remaining_hours ?> orë, <?= $remaini
                                             <p><strong>Gjendja:</strong> <?= htmlspecialchars($status_info['status']) ?></p>
 
                                             <?php if ($status_info['status'] == 'E zënë'): ?>
-                                                <p><strong>Klienti:</strong> <?= htmlspecialchars($status_info['client_name']) ?></p>
+                                                <p><strong>Klienti:</strong> <?= htmlspecialchars($status_info['client_name'] ?? '') ?></p>
                                                 <p><strong>Periudha:</strong> <?= $status_info['start_date'] ?> - <?= $status_info['end_date'] ?></p>
                                                 <p><strong>Kohezgjatja:</strong> <?= $days_reserved ?> ditë, <?= $hours_reserved ?> orë, <?= $minutes_reserved ?> min</p>
                                                 <p><strong>Dite të mbetura:</strong> <?= $remaining_days ?> ditë, <?= $remaining_hours ?> orë, <?= $remaining_minutes ?> min</p>

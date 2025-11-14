@@ -14,22 +14,25 @@ include '../layout/layout.php';
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kyçu - FutureBlock</title>
 
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f5;
     }
 
     .login-card {
       background: #ffffff;
       border-radius: 20px;
-      padding: 100px 70px;
+      padding: 60px 40px;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-      width: 520px;
+      width: 400px;
       max-width: 95vw;
       text-align: center;
+      margin-top: 50px;
     }
 
     .form-control {
@@ -47,6 +50,8 @@ include '../layout/layout.php';
       z-index: 2;
       color: #2575fc;
       font-size: 1.5rem;
+      background: transparent;
+      border: none;
     }
 
     .rounded-input {
@@ -61,30 +66,49 @@ include '../layout/layout.php';
       text-transform: uppercase;
       cursor: pointer;
     }
+
+    .btn-guest {
+      background-color: #FFB800;
+      color: white;
+      border: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-guest:hover {
+      background-color: #FFA000;
+      transform: translateY(-2px) scale(1.03);
+    }
+
+    .separator {
+      color: #888;
+      margin: 20px 0;
+    }
   </style>
 </head>
 
 <body>
   <?php showFutureBlockBackground(); ?>
 
+
   <?php if (isset($_SESSION['error'])): ?>
     <div class="alert alert-danger w-50 mx-auto mt-3"><?= htmlspecialchars($_SESSION['error']);
                                                       unset($_SESSION['error']); ?></div>
   <?php endif; ?>
 
-  <div class="login-card mx-auto mt-5">
-    <h3>Kyçu në llogari</h3>
+  <div class="login-card mx-auto">
+    <h3 class="mb-4">Kyçu në llogari</h3>
+
 
     <form action="../../controllers/login_progress.php" method="POST">
       <div class="input-group mb-4 position-relative">
-        <span class="input-group-text position-absolute top-50 translate-middle-y" style="left: 15px; background: transparent; border: none; color: #2575fc;">
+        <span class="input-group-text">
           <i class="bi bi-person-circle fs-4"></i>
         </span>
         <input type="email" class="form-control rounded-input ps-6" name="email" placeholder="Email" required autofocus />
       </div>
 
       <div class="input-group mb-3 position-relative">
-        <span class="input-group-text position-absolute top-50 translate-middle-y" style="left: 15px; background: transparent; border: none; color: #2575fc;">
+        <span class="input-group-text">
           <i class="bi bi-lock-fill fs-4"></i>
         </span>
         <input type="password" class="form-control rounded-input ps-6" name="password" placeholder="Fjalëkalimi" required />
@@ -102,7 +126,17 @@ include '../layout/layout.php';
       <button type="submit" class="btn btn-primary w-100 mb-3">Kyçu</button>
     </form>
 
-    <p class="mt-3">Nuk ke llogari? <a href="register.php">Regjistrohu</a></p>
+
+    <div class="separator">— OSE —</div>
+
+
+    <a href="/new_project_bk/views/general/main_page/our_fleet.php" class="btn btn-guest w-100 mb-3">
+      Kyçu si Guest
+    </a>
+
+    <p class="mt-3 text-center">
+      Nuk ke llogari? <a href="register.php">Regjistrohu</a>
+    </p>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

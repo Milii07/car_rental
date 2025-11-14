@@ -6,6 +6,16 @@ if (session_status() === PHP_SESSION_NONE) {
 include_once $_SERVER['DOCUMENT_ROOT'] . '/new_project_bk/index.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // Guest login
+    if (isset($_POST['guest_login'])) {
+        $_SESSION['user_id'] = 0; // ID 0 për guest
+        $_SESSION['username'] = 'Guest';
+        $_SESSION['is_admin'] = 0;
+        header("Location: " . BASE_URL . "views/general/home/list.php");
+        exit;
+    }
+
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     $remember = isset($_POST['remember']);
@@ -38,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['is_admin'] = $user['is_admin'];
-
 
             if ($remember) {
                 $token = bin2hex(random_bytes(16));

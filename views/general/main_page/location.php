@@ -41,6 +41,7 @@ if ($result) {
     }
 }
 
+
 ?>
 
 <html lang="en">
@@ -53,6 +54,9 @@ if ($result) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <link rel="shortcut icon" href="<?= BASE_URL ?>public/assets/images/favicon.ico">
     <link href="<?= BASE_URL ?>public/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+
+
+
 </head>
 
 <body>
@@ -65,42 +69,6 @@ if ($result) {
             margin: 0;
             padding: 0;
             background: #f5f5f5;
-        }
-
-        .booking-section {
-            position: relative;
-            background-image: url("/new_project_bk/uploads/chat.robot/background.jpg");
-            height: 90vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            margin-bottom: 50px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-        }
-
-        .booking-overlay {
-            position: absolute;
-            inset: 0;
-            left: 0;
-            background: rgba(0, 0, 0, 0.55);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-        }
-
-
-        @keyframes fadeInUp {
-            0% {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-
-            100% {
-                transform: translateY(0);
-                opacity: 1;
-            }
         }
 
         .footer-section {
@@ -205,192 +173,7 @@ if ($result) {
             }
         }
 
-        .modal {
-            z-index: 2000 !important;
-            transition: transform 0.5s ease, opacity 0.5s ease;
-        }
 
-        .modal.fade .modal-dialog {
-            transform: translateY(-50px);
-            opacity: 0;
-        }
-
-        .modal.show .modal-dialog {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .modal-backdrop {
-            z-index: 1990 !important;
-            background: rgba(0, 0, 0, 0.45);
-        }
-
-        .modal-dialog {
-            margin-top: 50px;
-        }
-
-
-
-        .car-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 20px;
-            justify-content: center;
-
-        }
-
-        .car-card {
-            display: flex;
-            flex-direction: column;
-            background: #fff;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-            height: 450px;
-        }
-
-        .car-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .car-image {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            flex-shrink: 0;
-            transition: transform 0.3s ease;
-        }
-
-        .car-card:hover .car-image {
-            transform: scale(1.05);
-        }
-
-        .car-content-wrapper {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            justify-content: space-between;
-            padding: 15px;
-        }
-
-        .car-name {
-            font-weight: bold;
-            font-size: 1rem;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            color: #333;
-            text-align: center;
-        }
-
-        .car-specs {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 6px;
-            margin: 8px 0;
-            color: #6c757d;
-            font-size: 0.85rem;
-        }
-
-        .spec {
-            background: #f8f9fa;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
-
-        .car-footer {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            margin-top: 10px;
-        }
-
-        .car-price-clean {
-            color: #0d8d62ff;
-            font-weight: 700;
-            font-size: 1.6rem;
-            letter-spacing: 0.5px;
-        }
-
-        .car-price-clean .price-label {
-            font-size: 0.9rem;
-            color: #777;
-            font-weight: 400;
-        }
-
-        .car-rating {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: #f98125;
-            color: #000;
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 5px 8px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .car-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            flex-grow: 1;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .car-specs {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 6px;
-            margin: 8px 0;
-            color: #6c757d;
-            font-size: 0.85rem;
-        }
-
-        .spec {
-            background: #f8f9fa;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
-
-        .car-footer {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .car-price-clean {
-            color: #2c599d;
-            font-weight: 700;
-            font-size: 1.6rem;
-        }
-
-        .car-price-clean .price-label {
-            font-size: 0.9rem;
-            color: #777;
-            font-weight: 400;
-        }
-
-        .spinner-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-        }
-
-        .spinner-container .spinner-border {
-            width: 3rem;
-            height: 3rem;
-        }
 
 
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
@@ -489,27 +272,7 @@ if ($result) {
             box-shadow: 0 0 8px rgba(255, 213, 79, 0.4);
         }
 
-        .location-btn {
-            padding: 14px 28px;
-            margin-bottom: 30px;
-            font-size: 18px;
-            font-weight: 600;
-            background-color: #fd903dff;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            border: 2px solid #fb9b50;
-            transition: all 0.3s ease;
 
-        }
-
-        .location-btn:hover {
-            background: transparent;
-            color: #fb9b50;
-            transform: translateY(-2px);
-            box-shadow: 0 0 8px rgba(255, 213, 79, 0.4);
-        }
 
         .hamburger {
             display: none;
@@ -652,6 +415,26 @@ if ($result) {
                 font-size: 1.2rem;
                 line-height: 1.2;
             }
+        }
+
+        .location-btn {
+            padding: 14px 28px;
+            margin-bottom: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            background-color: #fd903dff;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+        }
+
+        .location-btn:hover {
+            background-color: #fd903dff;
+            transform: translateY(-3px) scale(1.05);
+
         }
     </style>
 
@@ -1083,7 +866,6 @@ if ($result) {
         </div>
     </div>
 
-
     <div class="main-content">
         <nav class="navbar">
             <div class="container">
@@ -1136,284 +918,16 @@ if ($result) {
                 </div>
             </div>
         </nav>
+
+
+
         <div class="page-content">
-
-
-
-
-
-            <div class="row mb-3">
-                <div class="col-12">
-
-                    <section class="fleet-section">
-                        <div class="fleet-overlay"></div>
-                        <div class="fleet-content">
-                            <h1 class="fleet-title">Our Fleet</h1>
-                            <p class="fleet-subtitle">
-                                Explore our diverse fleet,<br>
-                                where quality meets choice<br>
-                                for every journey and style.
-                            </p>
-                        </div>
-                    </section>
-
-
-                </div>
-            </div>
-
-            <div id="availableCars" style="margin-top:30px;"></div>
-
-
-            <?php
-            $allCars = [];
-            $newCars = 0;
-            $usedCars = 0;
-            $uploadDir = '/new_project_bk/uploads/cars/';
-            $query = "SELECT * FROM cars ORDER BY id DESC";
-            $result = $mysqli->query($query);
-            if ($result) {
-                while ($row = $result->fetch_assoc()) {
-                    if (isset($row['category_id'])) {
-                        if ($row['category_id'] == 1) $newCars++;
-                        elseif ($row['category_id'] == 2) $usedCars++;
-                    }
-                    $firstImage = '';
-                    if (!empty($row['images'])) {
-                        $imagesArray = explode(',', $row['images']);
-                        $firstImage = trim($imagesArray[0]);
-                    }
-                    $allCars[] = [
-                        'id' => $row['id'],
-                        'name' => $row['model'],
-                        'image' => $uploadDir . $firstImage,
-                        'rating' => $row['rating'] ?? (rand(3, 10) . '.' . rand(0, 9)),
-                        'seats' => $row['seating_capacity'],
-                        'transmission' => $row['transmission'],
-                        'type' => $row['body_type'],
-                        'price' => $row['price_per_day'],
-                        'category_id' => $row['category_id'] ?? 0
-                    ];
-                }
-            }
-            $totalCars = count($allCars);
-            ?>
-
-
-
-            <div class="car-grid">
-                <?php foreach ($allCars as $carData):
-                    $modalId = "carModal" . $carData['id'];
-                ?>
-                    <div class="car-card">
-                        <img src="<?= htmlspecialchars($carData['image']) ?>" alt="<?= htmlspecialchars($carData['name']) ?>"
-                            class="car-image" data-bs-toggle="modal" data-bs-target="#<?= $modalId ?>">
-                        <div class="car-rating">⭐ <?= $carData['rating'] ?></div>
-                        <div class="car-content">
-                            <h3 class="car-name"><?= htmlspecialchars($carData['name']) ?></h3>
-                            <div class="car-specs">
-                                <span class="spec">👥 <?= $carData['seats'] ?> vende</span>
-                                <span class="spec">⚙️ <?= htmlspecialchars($carData['transmission']) ?></span>
-                                <span class="spec">🚗 <?= htmlspecialchars($carData['type']) ?></span>
-                            </div>
-                            <div class="car-footer d-flex justify-content-between align-items-center">
-                                <div class="car-price-clean"> <span class="price-value"><?= $carData['price'] ?>€</span> <span class="price-label">/ditë</span></div>
-                                <?php if (!empty($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
-                                    <button class="btn btn-sm btn-outline-primary edit-btn"
-                                        data-id="<?= $carData['id'] ?>"
-                                        data-name="<?= htmlspecialchars($carData['name']) ?>"
-                                        data-price="<?= $carData['price'] ?>"
-                                        data-seats="<?= $carData['seats'] ?>"
-                                        data-transmission="<?= htmlspecialchars($carData['transmission']) ?>"
-                                        data-type="<?= htmlspecialchars($carData['type']) ?>"
-                                        data-rating="<?= $carData['rating'] ?>">
-                                        Edito
-                                    </button>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal fade" id="<?= $modalId ?>" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-body text-center p-4">
-                                    <img src="<?= htmlspecialchars($carData['image']) ?>" class="img-fluid rounded mb-3" style="max-height:400px; object-fit:cover;">
-                                    <h5 class="fw-semibold"><?= htmlspecialchars($carData['name']) ?></h5>
-                                    <p class="text-muted mb-1"><?= htmlspecialchars($carData['type']) ?> | <?= htmlspecialchars($carData['transmission']) ?></p>
-                                    <p class="fs-5 fw-bold " style="color: #2c599d;"> <?= $carData['price'] ?> €/ditë</p>
-                                    <p class="text-muted small">⭐ <?= $carData['rating'] ?> | 💺 <?= $carData['seats'] ?> vende</p>
-                                    <hr class="my-3">
-                                    <p>Ky model makine ofron një eksperiencë të jashtëzakonshme udhëtimi. Sediljet janë të rehatshme dhe të rregullueshme sipas preferencave.</p>
-                                    <p>Pajisjet teknologjike, përfshirë navigacionin, sistemin e ndihmës për parkim dhe asistencën e vozitjes, garantojnë një eksperiencë të sigurt.</p>
-                                    <p>Pajisjet moderne të sigurisë, si airbag-et, ABS, kontrolli i stabilitetit dhe sistemi i paralajmërimit për rrezik.</p>
-                                    <button class="btn btn-secondary mt-3" data-bs-dismiss="modal">Mbyll</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-
-
-            <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <form id="editCarForm">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Ndrysho të dhënat e makinës</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <input type="hidden" id="editCarId" name="id">
-                                <div class="mb-3"><label class="form-label">Emri i makinës</label><input type="text" id="editCarName" name="name" class="form-control" required></div>
-                                <div class="mb-3"><label class="form-label">Çmimi (€ / ditë)</label><input type="number" id="editCarPrice" name="price" class="form-control" required></div>
-                                <div class="mb-3"><label class="form-label">Vende</label><input type="number" id="editCarSeats" name="seats" class="form-control" required></div>
-                                <div class="mb-3"><label class="form-label">Transmetimi</label><input type="text" id="editCarTransmission" name="transmission" class="form-control" required></div>
-                                <div class="mb-3"><label class="form-label">Tipi i makinës</label><input type="text" id="editCarType" name="type" class="form-control" required></div>
-                                <div class="mb-3"><label class="form-label">Rating</label><input type="number" step="0.1" id="editCarRating" name="rating" class="form-control" required></div>
-
-                                <div class="mb-3">
-                                    <label class="form-label">Service Type</label>
-                                    <select name="service_type" class="form-select" required>
-                                        <option value="Weddings">Dasmë</option>
-                                        <option value="Night Parties">Night Party</option>
-                                        <option value="Airport Transfers">Transfer Aeroporti</option>
-                                        <option value="Casinos">Kazino</option>
-                                        <option value="birthday">Ditëlindje</option>
-                                        <option value="Birthdays">Biznes</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulo</button>
-                                <button type="submit" class="btn btn-primary">Ruaj Ndryshimet</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="modal fade" id="addReservationModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content p-4">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Shto Rezervim</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <form method="POST" action="<?= BASE_URL ?>helper/reservations.php" id="reservationForm">
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label class="form-label">Klienti</label>
-                                    <div class="input-group">
-                                        <select name="client_id" id="clientSelect" class="form-select" required>
-                                            <option value="">Zgjidh klientin</option>
-                                            <?php foreach ($clients as $cl): ?>
-                                                <option value="<?= $cl['id'] ?>"><?= htmlspecialchars($cl['full_name']) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <button type="button" class="btn btn-outline-primary"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#addClientModal"
-                                            data-current-reserve-modal="addReservationModal">
-                                            + Shto Klient
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Makina</label>
-                                    <select name="car_id" id="carSelect" class="form-select" required>
-                                        <option value="">Zgjidh makinen</option>
-                                        <?php foreach ($allCars as $car): ?>
-                                            <option value="<?= $car['id'] ?>"><?= htmlspecialchars($car['name'] . ' | ' . $car['price'] . '€/ditë') ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label">Service Type</label>
-                                    <input type="text" name="service_type" class="form-control" readonly style="background-color: #e9ecef;">
-                                    <small class="text-muted">Service type është vendosur automatikisht nga kërkimi.</small>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col mb-3">
-                                        <label class="form-label">Data Fillimit</label>
-                                        <input type="date" name="start_date" class="form-control" required>
-                                    </div>
-                                    <div class="col mb-3">
-                                        <label class="form-label">Ora Fillimit</label>
-                                        <input type="time" name="time" class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Data Mbarimit</label>
-                                    <input type="date" name="end_date" class="form-control" required>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" name="create" class="btn btn-success w-30">Krijo Rezervim</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal fade" id="addClientModal" tabindex="-1">
-                <div class="modal-dialog modal-xl">
-                    <div class="modal-content p-4">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Shto Klient</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <form id="addClientForm">
-                            <input type="hidden" name="from" value="reservation_modal">
-                            <div class="modal-body row">
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Profile Type</label>
-                                    <input type="text" class="form-control" name="profile_type" value="client" readonly>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Partner Type</label>
-                                    <select class="form-control" name="partner_type" required>
-                                        <option value="business">Business</option>
-                                        <option value="individual" selected>Individual</option>
-                                    </select>
-                                </div>
-                                <?php
-                                $clientFields = ['full_name', 'company_name', 'nipt', 'email', 'phone', 'birthday', 'country', 'city', 'zip', 'reference', 'address', 'payment_terms', 'remarks'];
-                                foreach ($clientFields as $field) {
-                                    $label = ucwords(str_replace('_', ' ', $field));
-                                    echo '<div class="col-md-3 mb-3">
-                                        <label class="form-label">' . $label . '</label>
-                                        <input type="text" class="form-control" name="' . $field . '">
-                                    </div>';
-                                }
-                                ?>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" name="save_client" class="btn btn-success">Save Client</button>
-                            </div>
-                        </form>
-                        <div id="clientFormMessage" class="mt-2"></div>
-                    </div>
-                </div>
-            </div>
-
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
             <h1 style=" padding: 5px 10px; 
-             border-radius: 5px; text-align: center;">
-                Browse All cars and choose what fits You best!
+             border-radius: 5px; text-align: center; margin-top: 130px;">
+                Book with us for a seamless journey, where convenience <br>meets reliability in every rental.
             </h1>
-
-            <hr style="width: 65%; margin: 30px auto 40px auto; height: 2px;">
-            <div class="row justify-content-center">
-                <div class="col-auto">
-                    <a href="<?= GENERAL_URL ?>main_page/location.php"><button class="location-btn">Our Location</button></a>
-                </div>
+            <div style="width: 100%; display: flex; justify-content: center; margin-top: 30px; margin-bottom: 30px;">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2996.852531726948!2d19.805350276461905!3d41.31207160066284!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x135031293aa19c85%3A0xbd392fe96905553a!2sFuture%20Block%20Group!5e0!3m2!1sen!2s!4v1763128719276!5m2!1sen!2s" width="100%" height="650" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
 
             <footer class="footer-section">
@@ -1423,17 +937,6 @@ if ($result) {
                         <p>Tirana International Airport, Uzina, Tirana 1504, Albania</p>
                         <p><a href="mailto:info@faverent.al">info@faverent.al</a></p>
                         <p class="phone-number">+355 69 55 55 556</p>
-                    </div>
-
-                    <div class="footer-column services">
-                        <h3>Services</h3>
-                        <ul class="services">
-                            <li><a href="#nightparties">Rent For Night Parties</a></li>
-                            <li><a href="#weddings">Rent For Weddings</a></li>
-                            <li><a href="#airport">Rent For Airport Transfers</a></li>
-                            <li><a href="#casinos">Rent For Casinos</a></li>
-                            <li><a href="#birthdays">Rent For Birthdays</a></li>
-                        </ul>
                     </div>
 
                     <div class="footer-column cta">
