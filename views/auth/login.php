@@ -130,9 +130,13 @@ include '../layout/layout.php';
     <div class="separator">— OSE —</div>
 
 
-    <a href="/new_project_bk/views/general/main_page/our_fleet.php" class="btn btn-guest w-100 mb-3">
-      Kyçu si Guest
-    </a>
+    <form action="../../controllers/login_progress.php" method="POST">
+      <input type="hidden" name="guest_login" value="1">
+      <button type="submit" class="btn btn-guest w-100 mb-3">
+        Kyçu si Guest
+      </button>
+    </form>
+
 
     <p class="mt-3 text-center">
       Nuk ke llogari? <a href="register.php">Regjistrohu</a>

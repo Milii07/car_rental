@@ -1115,13 +1115,8 @@ if ($result) {
         </nav>
         <div class="page-content">
 
-
-
-
-
             <div class="row mb-3">
                 <div class="col-12">
-
 
                     <section class="booking-section">
                         <div class="booking-overlay">
@@ -1186,7 +1181,6 @@ if ($result) {
 
                                     </div>
 
-
                                     <button type="submit" class="search-btn">Search</button>
                                 </form>
                             </div>
@@ -1195,9 +1189,7 @@ if ($result) {
 
                 </div>
 
-
                 <div id="availableCars" style="margin-top:30px;"></div>
-
 
                 <?php
                 $allCars = [];
@@ -1232,9 +1224,6 @@ if ($result) {
                 }
                 $totalCars = count($allCars);
                 ?>
-
-
-
 
                 <div class="car-grid">
                     <?php foreach ($allCars as $carData):
@@ -1956,16 +1945,17 @@ if ($result) {
 <script>
     const USER_ID = <?php echo $_SESSION['user_id'] ?? 0; ?>;
     const IS_ADMIN = <?php echo $_SESSION['is_admin'] ?? 0; ?>;
+    const GUEST_ID = <?php echo $_SESSION['guest_id'] ?? 0; ?>;
 
     let selectedContact = null;
-    let lastMessageId = 0;
+    let lastMessageId = 0; // për të mos dublikuar mesazhet
     let lastDate = '';
     let pollInterval = null;
     let isFetching = false;
     let isSending = false;
-    let unreadCheckInterval = null;
-    let totalUnreadCount = 0;
-    let totalUnreadContacts = 0;
+
+    const CURRENT_USER_TYPE = USER_ID > 0 ? (IS_ADMIN ? 'admin' : 'user') : 'guest';
+    const CURRENT_USER_ID = USER_ID > 0 ? USER_ID : GUEST_ID;
 
     function formatTime(dateStr) {
         const d = new Date(dateStr);
@@ -1977,7 +1967,7 @@ if ($result) {
         const dateKey = d.toDateString();
         if (dateKey !== lastDate) {
             lastDate = dateKey;
-            return `<div class="chat-date-separator">${d.toLocaleDateString('sq-AL',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'})}</div>`;
+            return `<div class="chat-date-separator">${d.toLocaleDateString('sq-AL', {weekday:'long', day:'2-digit', month:'2-digit', year:'numeric'})}</div>`;
         }
         return '';
     }
@@ -1989,171 +1979,156 @@ if ($result) {
     }
 
     function formatFileAttachment(filePath) {
+        if (!filePath) return '';
         const fullPath = `/new_project_bk/uploads/chat_files/${filePath}`;
         if (isImageFile(filePath)) {
-            return `<div class="chat-image-wrapper"><a href="${fullPath}" target="_blank"><img src="${fullPath}" alt="Image" class="chat-image" style="max-width:200px;border-radius:6px;"/></a></div>`;
+            return `<div class="chat-image-wrapper"><a href="${fullPath}" target="_blank"><img src="${fullPath}" class="chat-image" style="max-width:200px;border-radius:6px;"></a></div>`;
         } else {
             const fileName = filePath.split('/').pop();
             return `<a href="${fullPath}" target="_blank" class="chat-file-link">📎 ${fileName}</a>`;
         }
     }
 
-    function updateUnreadBadge() {
-        let $badge = $('#chatUnreadBadge');
-        if ($badge.length === 0) {
-            $('#chatUserIcon').append('<span id="chatUnreadBadge" style="position:absolute;top:-6px;right:-6px;background:#ff4444;color:white;border-radius:50%;min-width:20px;height:20px;display:none;align-items:center;justify-content:center;font-size:11px;font-weight:bold;padding:2px 6px;box-shadow:0 2px 4px rgba(0,0,0,0.2);z-index:1001;"></span>');
-            $badge = $('#chatUnreadBadge');
-        }
-        const isChatOpen = $('#chatUserWidget').is(':visible');
-        if (isChatOpen) {
-            $badge.hide();
-            return;
-        }
-        if (totalUnreadContacts > 0) {
-            $badge.text(totalUnreadContacts).css('display', 'flex');
-        } else {
-            $badge.hide();
-        }
-    }
-
-    function checkUnreadMessages() {
-        $.post('../../../helper/send_message.php', {
-            action: 'fetch_contacts'
-        }, function(resp) {
-            if (!resp.success) return;
-            totalUnreadCount = 0;
-            totalUnreadContacts = 0;
-            resp.contacts.forEach(c => {
-                if (c.unread_count > 0) {
-                    totalUnreadCount += c.unread_count;
-                    totalUnreadContacts++;
-                }
-            });
-            updateUnreadBadge();
-        }, 'json');
-    }
-
-    function markMessagesAsRead(contactId, contactType) {
-        $.post('../../../helper/send_message.php', {
-            action: 'mark_as_read',
-            contact_id: contactId,
-            contact_type: contactType
-        }, function(resp) {
-            if (resp.success) {
-                $(`.contact-item[data-id="${contactId}"] .unread-count`).fadeOut(200, function() {
-                    $(this).remove();
-                });
-                checkUnreadMessages();
-            }
-        }, 'json');
-    }
-
     function fetchContacts() {
         $.post('../../../helper/send_message.php', {
             action: 'fetch_contacts'
         }, function(resp) {
-            if (!resp.success) return;
+            if (!resp.success) {
+                $('#chatContacts').html('<div style="padding:15px;text-align:center;color:red;">Gabim: ' + (resp.message || 'Unknown') + '</div>');
+                return;
+            }
+
             const $list = $('#chatContacts').empty();
-            totalUnreadCount = 0;
-            totalUnreadContacts = 0;
+            if (!resp.contacts || resp.contacts.length === 0) {
+                $list.html('<div style="padding:15px;text-align:center;color:#999;">Nuk ka kontakte</div>');
+                return;
+            }
+
             resp.contacts.forEach(c => {
-                if (c.unread_count > 0) {
-                    totalUnreadCount += c.unread_count;
-                    totalUnreadContacts++;
-                }
-            });
-            updateUnreadBadge();
-            resp.contacts.forEach(c => {
+                const contactId = c.contact_id ?? 0;
+                const contactType = c.contact_type ?? 'admin';
+                const contactName = c.contact_name ?? 'N/A';
                 const unread = c.unread_count > 0 ? `<span class="unread-count">${c.unread_count}</span>` : '';
-                const contactType = IS_ADMIN ? 'user' : 'admin';
-                const $item = $(`<div class="contact-item" data-id="${c.contact_id}" data-type="${contactType}"><div style="display:flex;flex-direction:column;"><strong>${c.contact_name}</strong><small style="color:#666">${c.last_message??''}</small></div>${unread}</div>`);
+
+                const $item = $(`
+                <div class="contact-item" data-id="${contactId}" data-type="${contactType}">
+                    <div style="display:flex;flex-direction:column;">
+                        <strong>${contactName}</strong>
+                        <small style="color:#666">${c.last_message ?? ''}</small>
+                    </div>
+                    ${unread}
+                </div>
+            `);
+
                 $item.on('click', () => selectContact({
-                    contact_id: c.contact_id,
-                    contact_name: c.contact_name,
+                    contact_id: contactId,
+                    contact_name: contactName,
                     contact_type: contactType
                 }));
                 $list.append($item);
             });
+
+            const saved = localStorage.getItem('selectedContact');
+            if (saved) {
+                selectContact(JSON.parse(saved));
+            } else {
+                const first = resp.contacts[0];
+                if (first) selectContact({
+                    contact_id: first.contact_id,
+                    contact_name: first.contact_name,
+                    contact_type: first.contact_type
+                });
+            }
         }, 'json');
     }
 
     function selectContact(contact) {
         selectedContact = contact;
+        localStorage.setItem('selectedContact', JSON.stringify(contact));
         $('#receiver_id').val(contact.contact_id);
         $('#receiver_type').val(contact.contact_type);
-        $('#chatUserTitle').text('Biseda me: ' + contact.contact_name);
-        lastMessageId = 0;
+
+        let displayName = contact.contact_name;
+        if (contact.contact_type === 'guest') displayName = `Guest #${contact.contact_id}`;
+        $('#chatUserTitle').text('Biseda me: ' + displayName);
+
         lastDate = '';
+        lastMessageId = 0; // reset per reload
         $('#chatUserBody').empty();
+
         $('.contact-item').removeClass('active');
-        $(`.contact-item[data-id="${contact.contact_id}"]`).addClass('active');
-        markMessagesAsRead(contact.contact_id, contact.contact_type);
-        if (pollInterval) clearInterval(pollInterval);
+        $(`.contact-item[data-id="${contact.contact_id}"][data-type="${contact.contact_type}"]`).addClass('active');
+
         fetchMessages(true);
+
+        if (pollInterval) clearInterval(pollInterval);
         pollInterval = setInterval(() => fetchMessages(false), 2000);
-        updateUnreadBadge();
     }
 
     function fetchMessages(initial = false) {
         if (!selectedContact || isFetching || isSending) return;
         isFetching = true;
+
         const payload = {
             action: 'fetch_messages',
             receiver_id: selectedContact.contact_id,
             receiver_type: selectedContact.contact_type
         };
-        if (!initial && lastMessageId > 0) payload.last_id = lastMessageId;
+
         $.post('../../../helper/send_message.php', payload, function(resp) {
             isFetching = false;
             if (!resp.success || !resp.messages) return;
+
             const $body = $('#chatUserBody');
-            if (initial) {
-                $body.empty();
-                lastMessageId = 0;
-                lastDate = '';
-            }
-            let newMessages = resp.messages.filter(m => m.id > lastMessageId);
-            if (newMessages.length === 0) return;
-            if (newMessages.length > 0 && !initial) markMessagesAsRead(selectedContact.contact_id, selectedContact.contact_type);
-            newMessages.forEach(m => {
-                lastMessageId = Math.max(lastMessageId, m.id);
-                const isMine = (m.sender_id == USER_ID && m.sender_type == (IS_ADMIN ? 'admin' : 'user'));
+            $body.empty();
+            lastMessageId = 0;
+            lastDate = '';
+
+            resp.messages.forEach(m => {
+                if (m.id <= lastMessageId) return; // mos i shto dy here
+
+                lastMessageId = m.id;
+
+                const isMine = (m.sender_id == CURRENT_USER_ID && m.sender_type == CURRENT_USER_TYPE);
                 const $msg = $('<div class="chat-bubble">').addClass(isMine ? 'my-message' : 'their-message');
+
                 let content = '';
                 if (m.message) content = $('<div>').text(m.message).html();
-                if (m.file_path) {
-                    if (content) content += '<br>';
-                    content += formatFileAttachment(m.file_path);
-                }
+                if (m.file_path) content += (content ? '<br>' : '') + formatFileAttachment(m.file_path);
+
                 const sep = formatDateSeparator(m.created_at);
                 if (sep) $body.append(sep);
+
                 $msg.html(content + `<div class="msg-time">${formatTime(m.created_at)}</div>`);
                 $body.append($msg);
             });
+
             $body.scrollTop($body[0].scrollHeight);
-            fetchContacts();
-        }, 'json').fail(() => {
-            isFetching = false;
-        });
+
+        }, 'json').fail(() => isFetching = false);
     }
 
     $('#chatUserForm').on('submit', function(e) {
         e.preventDefault();
         if (!selectedContact) {
-            alert('Zgjidhni një kontakt!');
-            return;
+            fetchContacts();
+            return false;
         }
-        const messageText = $('#chatUserInput').val().trim();
-        const fileInput = $('#chatUserFile')[0];
-        if (!messageText && (!fileInput || fileInput.files.length === 0)) return;
         if (isSending) return;
+
+        const messageText = $('#chatUserInput').val().trim();
+        const hasFile = $('#chatUserFile')[0].files.length > 0;
+        if (!messageText && !hasFile) return;
+
         isSending = true;
         const fd = new FormData(this);
         fd.append('action', 'send');
         fd.set('receiver_id', selectedContact.contact_id);
         fd.set('receiver_type', selectedContact.contact_type);
+
         $('#chatUserInput').val('');
         $('#chatUserFile').val('');
+
         $.ajax({
             url: '../../../helper/send_message.php',
             method: 'POST',
@@ -2162,16 +2137,11 @@ if ($result) {
             contentType: false,
             dataType: 'json',
             success: function(resp) {
+                isSending = false;
                 if (resp.success) {
-                    setTimeout(() => {
-                        isSending = false;
-                        fetchMessages(false);
-                        checkUnreadMessages();
-                    }, 300);
-                } else {
-                    isSending = false;
-                    alert(resp.message || 'Gabim gjatë dërgimit');
-                }
+                    fetchMessages(false);
+                    fetchContacts();
+                } else alert(resp.message || 'Gabim gjatë dërgimit');
             },
             error: function() {
                 isSending = false;
@@ -2182,41 +2152,37 @@ if ($result) {
 
     $('#chatFileIcon').on('click', () => $('#chatUserFile').click());
     $('#chatUserIcon').on('click', () => {
-        const isVisible = $('#chatUserWidget').is(':visible');
-        if (isVisible) {
+        const visible = $('#chatUserWidget').is(':visible');
+        if (visible) {
             $('#chatUserWidget').fadeOut(150);
             if (pollInterval) clearInterval(pollInterval);
-            if (unreadCheckInterval) clearInterval(unreadCheckInterval);
         } else {
             $('#chatUserWidget').fadeIn(150);
             fetchContacts();
-            if (unreadCheckInterval) clearInterval(unreadCheckInterval);
-            unreadCheckInterval = setInterval(() => checkUnreadMessages(), 5000);
-            updateUnreadBadge();
-        }
-    });
-
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('#chatUserWidget,#chatUserIcon').length) {
-            $('#chatUserWidget').fadeOut(100);
-            if (pollInterval) clearInterval(pollInterval);
-            if (unreadCheckInterval) clearInterval(unreadCheckInterval);
         }
     });
 
     $('#chatUserClose').on('click', () => {
         $('#chatUserWidget').fadeOut(100);
         if (pollInterval) clearInterval(pollInterval);
-        if (unreadCheckInterval) clearInterval(unreadCheckInterval);
+    });
+
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#chatUserWidget,#chatUserIcon').length) {
+            $('#chatUserWidget').fadeOut(100);
+            if (pollInterval) clearInterval(pollInterval);
+        }
     });
 
     $('#chatUserInput').on('keypress', function(e) {
-        if (e.key === 'Enter' && $(this).val().trim() !== '') $('#chatUserForm').submit();
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if ($(this).val().trim() !== '') $('#chatUserForm').submit();
+        }
     });
 
     $(document).ready(() => {
-        checkUnreadMessages();
-        setInterval(() => checkUnreadMessages(), 10000);
         $('#chatUserWidget').hide();
+        fetchContacts();
     });
 </script>

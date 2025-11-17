@@ -400,8 +400,6 @@ if (session_status() === PHP_SESSION_NONE) {
             background: rgba(0, 0, 0, 0.75);
         }
 
-
-
         body.dark-mode span.spec {
             color: #c8c8c8 !important;
         }
@@ -504,11 +502,6 @@ if (session_status() === PHP_SESSION_NONE) {
                border-radius:30px; font-size:14px; color:#032c69;">
                             </div>
                         </form>
-
-
-
-
-
                     </div>
 
                     <div class="d-flex align-items-center">
@@ -517,6 +510,7 @@ if (session_status() === PHP_SESSION_NONE) {
                                 <i class='bx bx-fullscreen fs-22' id="fullscreen-icon"></i>
                             </button>
                         </div>
+
                         <div class="ms-1 header-item d-none d-sm-flex">
                             <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle light-dark-mode" id="darkModeToggle">
                                 <i class='bx bx-moon fs-22'></i>
