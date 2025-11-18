@@ -1083,7 +1083,6 @@ if ($result) {
         </div>
     </div>
 
-
     <div class="main-content">
         <nav class="navbar">
             <div class="container">
@@ -1138,10 +1137,6 @@ if ($result) {
         </nav>
         <div class="page-content">
 
-
-
-
-
             <div class="row mb-3">
                 <div class="col-12">
 
@@ -1162,7 +1157,6 @@ if ($result) {
             </div>
 
             <div id="availableCars" style="margin-top:30px;"></div>
-
 
             <?php
             $allCars = [];
@@ -1197,8 +1191,6 @@ if ($result) {
             }
             $totalCars = count($allCars);
             ?>
-
-
 
             <div class="car-grid">
                 <?php foreach ($allCars as $carData):
@@ -1253,7 +1245,6 @@ if ($result) {
                     </div>
                 <?php endforeach; ?>
             </div>
-
 
             <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
@@ -1467,7 +1458,7 @@ if ($result) {
 </body>
 
 </html>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
