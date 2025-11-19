@@ -589,375 +589,175 @@
     chatClose.addEventListener('click', () => chatWidget.style.display = 'none');
 </script>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
 <script>
-    const USER_ID = <?php echo $_SESSION['user_id'] ?? 0; ?>;
-    const IS_ADMIN = <?php echo $_SESSION['is_admin'] ?? 0; ?>;
-    const GUEST_ID = <?php echo $_SESSION['guest_id'] ?? 0; ?>;
+    $(function() {
+        const USER_ID = <?php echo $_SESSION['user_id'] ?? 0; ?>;
+        const IS_ADMIN = <?php echo $_SESSION['is_admin'] ?? 0; ?>;
+        const GUEST_ID = <?php echo $_SESSION['guest_id'] ?? 0; ?>;
 
-    let selectedContact = null;
-    let lastMessageId = 0;
-    let lastDate = '';
-    let pollInterval = null;
-    let isFetching = false;
-    let isSending = false;
-    let unreadCheckInterval = null;
-    let totalUnreadCount = 0;
-    let totalUnreadContacts = 0;
-    let loadedMessageIds = new Set();
+        const CURRENT_USER_TYPE = USER_ID > 0 ? (IS_ADMIN ? 'admin' : 'user') : 'guest';
+        const CURRENT_USER_ID = USER_ID > 0 ? USER_ID : GUEST_ID;
 
-    const CURRENT_USER_TYPE = USER_ID > 0 ? (IS_ADMIN ? 'admin' : 'user') : 'guest';
-    const CURRENT_USER_ID = USER_ID > 0 ? USER_ID : GUEST_ID;
+        let selectedContact = null;
+        let loadedMessageIds = new Set();
+        let pollInterval = null;
+        let activeChannel = null;
 
-    console.log('Chat initialized:', {
-        CURRENT_USER_ID,
-        CURRENT_USER_TYPE,
-        USER_ID,
-        IS_ADMIN,
-        GUEST_ID
-    });
+        Pusher.logToConsole = true;
+        const pusher = new Pusher('d0652d5ed102a0e6056c', {
+            cluster: 'eu',
+            useTLS: true
+        });
 
-    function formatTime(dateStr) {
-        const d = new Date(dateStr);
-        return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
-    }
+        const myChannelName = `chat-${CURRENT_USER_TYPE}-${CURRENT_USER_ID}`;
+        console.log('Subscribing to my channel:', myChannelName);
 
-    function formatDateSeparator(dateStr) {
-        const d = new Date(dateStr);
-        const dateKey = d.toDateString();
-        if (dateKey !== lastDate) {
-            lastDate = dateKey;
-            return `<div class="chat-date-separator">${d.toLocaleDateString('sq-AL',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'})}</div>`;
-        }
-        return '';
-    }
+        const myChannel = pusher.subscribe(myChannelName);
 
-    function isImageFile(filename) {
-        if (!filename) return false;
-        const ext = filename.toLowerCase().split('.').pop();
-        return ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(ext);
-    }
+        myChannel.bind('pusher:subscription_succeeded', function() {
+            console.log('Successfully subscribed to:', myChannelName);
+        });
 
-    function formatFileAttachment(filePath) {
-        if (!filePath) return '';
-        const fullPath = `/new_project_bk/uploads/chat_files/${filePath}`;
-        if (isImageFile(filePath)) {
-            return `<div class="chat-image-wrapper"><a href="${fullPath}" target="_blank"><img src="${fullPath}" alt="Image" class="chat-image" style="max-width:200px;border-radius:6px;"/></a></div>`;
-        } else {
-            const fileName = filePath.split('/').pop();
-            return `<a href="${fullPath}" target="_blank" class="chat-file-link">📎 ${fileName}</a>`;
-        }
-    }
+        myChannel.bind('pusher:subscription_error', function(status) {
+            console.error('Subscription error:', status);
+        });
 
-    function updateUnreadBadge() {
-        let $badge = $('#chatUnreadBadge');
-        if ($badge.length === 0) {
-            $('#chatUserIcon').append('<span id="chatUnreadBadge" style="position:absolute;top:-6px;right:-6px;background:#ff4444;color:white;border-radius:50%;min-width:20px;height:20px;display:none;align-items:center;justify-content:center;font-size:11px;font-weight:bold;padding:2px 6px;box-shadow:0 2px 4px rgba(0,0,0,0.2);z-index:1001;"></span>');
-            $badge = $('#chatUnreadBadge');
-        }
-        const isChatOpen = $('#chatUserWidget').is(':visible');
-        if (isChatOpen) {
-            $badge.hide();
-            return;
-        }
-        if (totalUnreadContacts > 0) {
-            $badge.text(totalUnreadContacts).css('display', 'flex');
-        } else {
-            $badge.hide();
-        }
-    }
+        myChannel.bind('new-message', function(data) {
+            console.log('Received message on my channel:', data);
 
-    function checkUnreadMessages() {
-        $.post('../../../helper/send_message.php', {
-            action: 'fetch_contacts'
-        }, function(resp) {
-            if (!resp.success) return;
-            totalUnreadCount = 0;
-            totalUnreadContacts = 0;
-            resp.contacts.forEach(c => {
-                if (c.unread_count > 0) {
-                    totalUnreadCount += c.unread_count;
-                    totalUnreadContacts++;
+            if (selectedContact) {
+                const isFromSelectedContact =
+                    (data.sender_type === selectedContact.contact_type &&
+                        String(data.sender_id) === String(selectedContact.contact_id)) ||
+                    (data.receiver_type === selectedContact.contact_type &&
+                        String(data.receiver_id) === String(selectedContact.contact_id));
+
+                if (isFromSelectedContact) {
+                    appendMessage(data);
                 }
-            });
-            updateUnreadBadge();
-        }, 'json');
-    }
+            }
+        });
 
-    function markMessagesAsRead(contactId, contactType) {
-        $.post('../../../helper/send_message.php', {
-            action: 'mark_as_read',
-            contact_id: contactId,
-            contact_type: contactType
-        }, function(resp) {
-            if (resp.success) {
-                $(`.contact-item[data-id="${contactId}"][data-type="${contactType}"] .unread-count`).fadeOut(200, function() {
-                    $(this).remove();
+        function appendMessage(msg, scroll = true) {
+            if (loadedMessageIds.has(msg.id)) {
+                console.log('Message already displayed:', msg.id);
+                return;
+            }
+
+            loadedMessageIds.add(msg.id);
+            const body = $('#chatUserBody');
+            const isMine = String(msg.sender_id) === String(CURRENT_USER_ID) && msg.sender_type === CURRENT_USER_TYPE;
+
+            const bubble = $('<div>').addClass('chat-bubble').addClass(isMine ? 'my-message' : 'their-message');
+            let content = '';
+            if (msg.message) content += $('<div>').text(msg.message).html();
+            if (msg.file_path) content += '<br><a href="/new_project_bk/uploads/chat_files/' + msg.file_path + '" target="_blank">📎 File</a>';
+
+            bubble.html(content + '<div class="msg-time">' + new Date(msg.created_at).toLocaleTimeString() + '</div>');
+            body.append(bubble);
+
+            if (scroll) body.scrollTop(body[0].scrollHeight);
+
+            console.log('Message appended:', msg.id, 'isMine:', isMine);
+        }
+
+        function fetchContacts() {
+            $.post('../../../helper/send_message.php', {
+                action: 'fetch_contacts'
+            }, function(resp) {
+                if (!resp.success) return;
+                const $list = $('#chatContacts').empty();
+                resp.contacts.forEach(c => {
+                    const unread = c.unread_count > 0 ? `<span class="unread-count">${c.unread_count}</span>` : '';
+                    const $item = $(`<div class="contact-item" data-id="${c.contact_id}" data-type="${c.contact_type}">
+                    <div><strong>${c.contact_name}</strong><small>${c.last_message ?? ''}</small></div>${unread}</div>`);
+                    $item.off('click').on('click', () => selectContact(c));
+                    $list.append($item);
                 });
-                checkUnreadMessages();
-            }
-        }, 'json');
-    }
-
-    function fetchContacts() {
-        $.post('../../../helper/send_message.php', {
-            action: 'fetch_contacts'
-        }, function(resp) {
-            if (!resp.success) {
-                $('#chatContacts').html('<div style="padding:15px;text-align:center;color:red;">Gabim: ' + (resp.message || 'Unknown') + '</div>');
-                return;
-            }
-
-            const $list = $('#chatContacts').empty();
-            if (!resp.contacts || resp.contacts.length === 0) {
-                $list.html('<div style="padding:15px;text-align:center;color:#999;">Nuk ka kontakte</div>');
-                return;
-            }
-
-            totalUnreadCount = 0;
-            totalUnreadContacts = 0;
-
-            resp.contacts.forEach(c => {
-                const contactId = c.contact_id ?? 0;
-                const contactType = c.contact_type ?? '';
-                const contactName = c.contact_name ?? 'N/A';
-
-                if (c.unread_count > 0) {
-                    totalUnreadCount += c.unread_count;
-                    totalUnreadContacts++;
-                }
-
-                const unread = c.unread_count > 0 ? `<span class="unread-count">${c.unread_count}</span>` : '';
-
-                const $item = $(`
-                <div class="contact-item" data-id="${contactId}" data-type="${contactType}">
-                    <div style="display:flex;flex-direction:column;">
-                        <strong>${contactName}</strong>
-                        <small style="color:#666">${c.last_message ?? ''}</small>
-                    </div>
-                    ${unread}
-                </div>
-            `);
-
-                $item.on('click', () => selectContact({
-                    contact_id: contactId,
-                    contact_name: contactName,
-                    contact_type: contactType
-                }));
-
-                $list.append($item);
-            });
-
-            updateUnreadBadge();
-        }, 'json');
-    }
-
-    function selectContact(contact) {
-        console.log('Selected contact:', contact);
-        selectedContact = contact;
-        $('#receiver_id').val(contact.contact_id);
-        $('#receiver_type').val(contact.contact_type);
-
-        let displayName = contact.contact_name;
-        if (contact.contact_type === 'guest') {
-            displayName = `Guest #${contact.contact_id}`;
-        }
-        $('#chatUserTitle').text('Biseda me: ' + displayName);
-
-        lastMessageId = 0;
-        lastDate = '';
-        loadedMessageIds.clear();
-        $('#chatUserBody').empty();
-
-        $('.contact-item').removeClass('active');
-        $(`.contact-item[data-id="${contact.contact_id}"][data-type="${contact.contact_type}"]`).addClass('active');
-
-        markMessagesAsRead(contact.contact_id, contact.contact_type);
-
-        if (pollInterval) clearInterval(pollInterval);
-
-        fetchMessages(true);
-        pollInterval = setInterval(() => fetchMessages(false), 2000);
-
-        updateUnreadBadge();
-    }
-
-    function fetchMessages(initial = false) {
-        if (!selectedContact || isFetching) return;
-
-        isFetching = true;
-
-        const payload = {
-            action: 'fetch_messages',
-            receiver_id: selectedContact.contact_id,
-            receiver_type: selectedContact.contact_type
-        };
-
-        console.log('Fetching messages with payload:', payload);
-
-        $.post('../../../helper/send_message.php', payload, function(resp) {
-            isFetching = false;
-
-            console.log('Fetch response:', resp);
-            console.log('Messages count:', resp.messages ? resp.messages.length : 0);
-            if (resp.debug) console.log('Debug info:', resp.debug);
-
-            if (!resp.success || !resp.messages) {
-                console.warn('No messages or request failed');
-                return;
-            }
-
-            const $body = $('#chatUserBody');
-
-            if (initial) {
-                $body.empty();
-                loadedMessageIds.clear();
-                lastDate = '';
-            }
-
-            let hasNewMessages = false;
-
-            resp.messages.forEach(m => {
-                if (loadedMessageIds.has(m.id)) return;
-
-                loadedMessageIds.add(m.id);
-                lastMessageId = Math.max(lastMessageId, m.id);
-                hasNewMessages = true;
-
-                const isMine = (String(m.sender_id) === String(CURRENT_USER_ID) && m.sender_type === CURRENT_USER_TYPE);
-
-                const $msg = $('<div class="chat-bubble">').addClass(isMine ? 'my-message' : 'their-message');
-
-                let content = '';
-                if (m.message) {
-                    content = $('<div>').text(m.message).html();
-                }
-                if (m.file_path) {
-                    if (content) content += '<br>';
-                    content += formatFileAttachment(m.file_path);
-                }
-
-                const sep = formatDateSeparator(m.created_at);
-                if (sep) $body.append(sep);
-
-                $msg.html(content + `<div class="msg-time">${formatTime(m.created_at)}</div>`);
-                $body.append($msg);
-            });
-
-            if (hasNewMessages) {
-                $body.scrollTop($body[0].scrollHeight);
-            }
-
-        }, 'json').fail((xhr, status, error) => {
-            console.error('Fetch error:', status, error, xhr.responseText);
-            isFetching = false;
-        });
-    }
-
-    $('#chatUserForm').on('submit', function(e) {
-        e.preventDefault();
-
-        if (!selectedContact) {
-            alert('Zgjidhni një kontakt!');
-            return;
+            }, 'json');
         }
 
-        const messageText = $('#chatUserInput').val().trim();
-        const fileInput = $('#chatUserFile')[0];
+        function selectContact(contact) {
+            selectedContact = contact;
+            $('#receiver_id').val(contact.contact_id);
+            $('#receiver_type').val(contact.contact_type);
+            $('#chatUserTitle').text('Biseda me: ' + (contact.contact_type === 'guest' ? `Guest #${contact.contact_id}` : contact.contact_name));
+            $('#chatUserBody').empty();
+            loadedMessageIds.clear();
+            $('.contact-item').removeClass('active');
+            $(`.contact-item[data-id="${contact.contact_id}"][data-type="${contact.contact_type}"]`).addClass('active');
 
-        if (!messageText && (!fileInput || fileInput.files.length === 0)) return;
-        if (isSending) return;
+            console.log('Selected contact:', contact.contact_type, contact.contact_id);
 
-        isSending = true;
-
-        const fd = new FormData();
-        fd.append('action', 'send');
-        fd.append('receiver_id', selectedContact.contact_id);
-        fd.append('receiver_type', selectedContact.contact_type);
-        fd.append('message', messageText);
-
-        if (fileInput && fileInput.files.length > 0) {
-            fd.append('file', fileInput.files[0]);
-        }
-
-        console.log('Sending message:', {
-            receiver_id: selectedContact.contact_id,
-            receiver_type: selectedContact.contact_type,
-            message: messageText,
-            sender_type: CURRENT_USER_TYPE,
-            sender_id: CURRENT_USER_ID
-        });
-
-        $('#chatUserInput').val('');
-        $('#chatUserFile').val('');
-
-        $.ajax({
-            url: '../../../helper/send_message.php',
-            method: 'POST',
-            data: fd,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function(resp) {
-                console.log('Send response:', resp);
-                isSending = false;
-                if (resp.success) {
-                    setTimeout(() => fetchMessages(false), 400);
-                } else {
-                    alert(resp.message || 'Gabim gjatë dërgimit');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Send error:', status, error, xhr.responseText);
-                isSending = false;
-                alert('Gabim në lidhje me serverin');
-            }
-        });
-    });
-
-    $('#chatFileIcon').on('click', () => $('#chatUserFile').click());
-
-    $('#chatUserIcon').on('click', () => {
-        const isVisible = $('#chatUserWidget').is(':visible');
-        if (isVisible) {
-            $('#chatUserWidget').fadeOut(150);
+            fetchMessages();
             if (pollInterval) clearInterval(pollInterval);
-            if (unreadCheckInterval) clearInterval(unreadCheckInterval);
-        } else {
-            $('#chatUserWidget').fadeIn(150);
-            fetchContacts();
-            if (unreadCheckInterval) clearInterval(unreadCheckInterval);
-            unreadCheckInterval = setInterval(() => checkUnreadMessages(), 5000);
-            updateUnreadBadge();
+            pollInterval = setInterval(fetchMessages, 3000);
         }
-    });
 
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('#chatUserWidget,#chatUserIcon').length) {
-            $('#chatUserWidget').fadeOut(100);
-            if (pollInterval) clearInterval(pollInterval);
-            if (unreadCheckInterval) clearInterval(unreadCheckInterval);
+        function fetchMessages() {
+            if (!selectedContact) return;
+            $.post('../../../helper/send_message.php', {
+                action: 'fetch_messages',
+                receiver_id: selectedContact.contact_id,
+                receiver_type: selectedContact.contact_type
+            }, function(resp) {
+                if (!resp.success) return;
+                resp.messages.forEach(m => appendMessage(m, false));
+                $('#chatUserBody').scrollTop($('#chatUserBody')[0].scrollHeight);
+            }, 'json');
         }
-    });
 
-    $('#chatUserClose').on('click', () => {
-        $('#chatUserWidget').fadeOut(100);
-        if (pollInterval) clearInterval(pollInterval);
-        if (unreadCheckInterval) clearInterval(unreadCheckInterval);
-    });
-
-    $('#chatUserInput').on('keypress', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
+        $('#chatUserForm').off('submit').on('submit', function(e) {
             e.preventDefault();
-            if ($(this).val().trim() !== '') {
-                $('#chatUserForm').submit();
-            }
-        }
-    });
+            if (!selectedContact) return alert('Zgjidhni një kontakt!');
 
-    $(document).ready(() => {
-        checkUnreadMessages();
-        setInterval(() => checkUnreadMessages(), 10000);
-        $('#chatUserWidget').hide();
+            const msg = $('#chatUserInput').val().trim();
+            const fileInput = $('#chatUserFile')[0];
+
+            if (!msg && (!fileInput || fileInput.files.length === 0)) return;
+
+            const fd = new FormData();
+            fd.append('action', 'send');
+            fd.append('receiver_id', selectedContact.contact_id);
+            fd.append('receiver_type', selectedContact.contact_type);
+            fd.append('message', msg);
+            if (fileInput && fileInput.files.length > 0) fd.append('file', fileInput.files[0]);
+
+            console.log('Sending message to:', selectedContact.contact_type, selectedContact.contact_id);
+
+            $('#chatUserInput').val('');
+            $('#chatUserFile').val('');
+
+            $.ajax({
+                url: '../../../helper/send_message.php',
+                method: 'POST',
+                data: fd,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Message sent successfully:', response);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error sending message:', error);
+                }
+            });
+        });
+
+        $('#chatFileIcon').on('click', () => $('#chatUserFile').click());
+        $('#chatUserIcon').on('click', () => {
+            $('#chatUserWidget').toggle();
+            if ($('#chatUserWidget').is(':visible')) fetchContacts();
+        });
+        $('#chatUserClose').on('click', () => $('#chatUserWidget').hide());
+
+        $(document).ready(() => {
+            $('#chatUserWidget').hide();
+            fetchContacts();
+            console.log('Chat initialized - User Type:', CURRENT_USER_TYPE, 'User ID:', CURRENT_USER_ID);
+        });
     });
 </script>
 
