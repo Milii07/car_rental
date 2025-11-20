@@ -103,96 +103,6 @@ if ($result) {
             }
         }
 
-        .footer-section {
-            background: #2f3236ff;
-            color: #fff;
-            padding: 50px 20px 20px;
-        }
-
-        .footer-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            max-width: 1200px;
-            margin: 0 auto;
-            gap: 30px;
-        }
-
-        .footer-column {
-            flex: 1 1 250px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 15px;
-        }
-
-        .footer-column h3 {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: #11224d;
-        }
-
-        .footer-column p,
-        .footer-column li {
-            font-size: 0.95rem;
-            color: #f1f1f1;
-            line-height: 1.6;
-        }
-
-        .footer-column ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .footer-column ul li::before {
-            content: "– ";
-            color: #2c599d;
-        }
-
-        .footer-column a {
-            color: #2c599d;
-            text-decoration: none;
-        }
-
-        .footer-column a:hover {
-            text-decoration: underline;
-        }
-
-        .footer-bottom {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 0.9rem;
-            color: #cccccc;
-        }
-
-        .footer-bottom a {
-            color: #11224d;
-            text-decoration: none;
-        }
-
-        .footer-bottom a:hover {
-            text-decoration: underline;
-        }
-
-        .footer-section .services ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .footer-section .services ul li {
-            margin-bottom: 10px;
-        }
-
-        .footer-section .services ul li a {
-            text-decoration: none;
-            color: #ffffff;
-            transition: color 0.3s ease;
-        }
-
-        .footer-section .services ul li a:hover {
-            color: #2c599d;
-        }
-
         @media (max-width: 768px) {
             .footer-container {
                 flex-direction: column;
@@ -249,7 +159,7 @@ if ($result) {
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             cursor: pointer;
-            height: 450px;
+            height: 350px;
         }
 
         .car-card:hover {
@@ -653,6 +563,318 @@ if ($result) {
                 line-height: 1.2;
             }
         }
+
+        .footer-section {
+            font-family: 'Poppins', sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 60px 20px 20px;
+            line-height: 1.6;
+        }
+
+        .footer-top {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-top h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #f1f1f1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-top p {
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .footer-top .change-region {
+            display: inline-block;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #fb9b50;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .footer-top .region-block p::before {
+
+            display: inline-block;
+            width: 20px;
+            height: 14px;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        .footer-top .newsletter-form {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .footer-top .newsletter-form input {
+            flex: 1;
+            padding: 8px 10px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background: #222;
+            color: #fff;
+        }
+
+        .footer-top .newsletter-form input::placeholder {
+            color: #aaa;
+        }
+
+        .footer-top .newsletter-form button {
+            padding: 8px 16px;
+            background: #f37a1dff;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background 0.3s ease;
+        }
+
+        .footer-top .newsletter-form button:hover {
+            background: #f5a160ff;
+        }
+
+        .footer-top .social-icons {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .footer-top .social-icons a {
+            color: #fb9b50;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .footer-top .social-icons a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-top .company-block ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+
+        .footer-top .company-block li {
+            margin-bottom: 6px;
+        }
+
+        .footer-top .company-block a {
+            color: #fb9b50;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .footer-top .company-block a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column {
+            flex: 1 1 250px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .footer-column h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .footer-column p,
+        .footer-column li {
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .footer-column ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-column ul li::before {
+            content: "– ";
+            color: #fb9b50;
+        }
+
+        .footer-column a {
+            color: #fb9b50;
+            text-decoration: none;
+        }
+
+        .footer-column a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-column.cta a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #f37a1dff;
+            color: #fff;
+            border-radius: 25px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .footer-column.cta a:hover {
+            background: #fcab6dff;
+        }
+
+        .footer-column.social-extra a {
+            display: inline-block;
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+
+        .footer-column.social-extra img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .footer-column.social-extra img:hover {
+            transform: scale(1.1);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #333;
+            padding-top: 20px;
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .footer-bottom .copyright {
+            margin-bottom: 10px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .footer-bottom .legal-links {
+            margin-bottom: 10px;
+            line-height: 1.8;
+            text-align: center;
+        }
+
+        .footer-bottom .legal-links a {
+            color: #fb9b50;
+            text-decoration: none;
+        }
+
+        .footer-bottom .legal-links a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-bottom .legal-text p {
+            font-size: 12px;
+            color: #bbb;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        @media (max-width: 1024px) {
+            .footer-top {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .footer-container {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .footer-top {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-top .newsletter-form {
+                flex-direction: column;
+            }
+
+            .footer-top .newsletter-form button {
+                width: 100%;
+            }
+
+            .footer-column {
+                flex: 1 1 100%;
+            }
+
+            .footer-column.social-extra a {
+                margin-right: 15px;
+            }
+
+            .region-block {
+                position: relative;
+                width: 220px;
+                font-family: 'Poppins', sans-serif;
+            }
+
+            #region-list {
+                display: none;
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                position: absolute;
+                width: 100%;
+                background: #fff;
+                border-radius: 10px;
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+                z-index: 1000;
+            }
+
+            #region-list li {
+                padding: 10px 15px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.2s ease;
+            }
+
+            #region-list li:hover {
+                background: #FF7A00;
+                color: #fff;
+            }
+
+            #region-current-region {
+                cursor: pointer;
+                padding: 10px 15px;
+                border-radius: 10px;
+                border: 1px solid #ddd;
+                background: #fff;
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 14px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .arrow {
+                transition: transform 0.3s ease;
+            }
+        }
     </style>
 
     <style>
@@ -855,6 +1077,10 @@ if ($result) {
             align-self: flex-end;
         }
 
+        #chatUserBody::-webkit-scrollbar {
+            display: none;
+        }
+
         #chatArea {
             flex: 1;
             display: flex;
@@ -915,6 +1141,51 @@ if ($result) {
             align-self: flex-start;
         }
 
+        .msg-time {
+            font-size: 10px;
+            color: #666;
+            text-align: right;
+        }
+
+        .chat-img {
+            max-width: 150px;
+            border-radius: 6px;
+        }
+
+        #chatUserForm {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+
+        #chatUserInput {
+            flex: 1;
+            border: none;
+            padding: 6px 10px;
+        }
+
+        #chatUserInput:focus {
+            outline: none;
+        }
+
+        #chatUserSend {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 0 15px;
+            cursor: pointer;
+        }
+
+        #chatUserFile {
+            display: none;
+        }
+
+        #typingIndicator {
+            font-size: 12px;
+            color: #666;
+            margin: 2px 10px;
+            display: none;
+        }
+
         #chatInputWrapper {
             display: flex;
             gap: 8px;
@@ -955,8 +1226,6 @@ if ($result) {
         #chatUserIcon .chat-icon:hover {
             transform: scale(1.2);
         }
-
-
 
         #chatInputWrapper button {
             padding: 10px 14px;
@@ -1408,16 +1677,70 @@ if ($result) {
             </div>
 
             <footer class="footer-section">
+
+                <div class="footer-top">
+                    <div class="region-block">
+                        <h3>Rajoni / Gjuha</h3>
+                        <div class="region-select">
+                            <button id="current-region">🇦🇱 Shqipëri / Shqip ▼</button>
+                            <ul id="region-list">
+                                <li data-flag="🇦🇱" data-country="Shqipëri" data-lang="Shqip">🇦🇱 Shqipëri / Shqip</li>
+                                <li data-flag="🇺🇸" data-country="USA" data-lang="English">🇺🇸 USA / English</li>
+                                <li data-flag="🇬🇧" data-country="UK" data-lang="English">🇬🇧 UK / English</li>
+                                <li data-flag="🇩🇪" data-country="Germany" data-lang="Deutsch">🇩🇪 Gjermani / Deutsch</li>
+                                <li data-flag="🇫🇷" data-country="France" data-lang="Français">🇫🇷 Francë / Français</li>
+                                <li data-flag="🇪🇬" data-country="Egypt" data-lang="English">🇪🇬 Egypt / English</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="newsletter-block">
+                        <h3>Newsletter</h3>
+                        <p>Lajmet më të fundit direkt në email-in tuaj</p>
+                        <form class="newsletter-form">
+                            <input type="email" placeholder="Vendos email-in tuaj">
+                            <button type="submit">Abonohu</button>
+                        </form>
+                    </div>
+
+                    <div class="social-block">
+                        <h3>Rrjetet Sociale</h3>
+                        <p>Na ndiqni në rrjetet sociale.</p>
+
+                        <div class="social-icons">
+                            <a href="https://www.facebook.com/faverent" target="_blank">Facebook</a>
+                            <a href="https://www.instagram.com/emiljano_perhati" target="_blank">Instagram</a>
+                            <a href="https://www.pinterest.com/faverent" target="_blank">Pinterest</a>
+                            <a href="https://www.youtube.com/@faverent" target="_blank">YouTube</a>
+                            <a href="https://twitter.com/faverent" target="_blank">Twitter</a>
+                            <a href="https://www.linkedin.com/company/faverent" target="_blank">LinkedIn</a>
+                        </div>
+                    </div>
+
+                    <div class="company-block">
+                        <h3>Kompania</h3>
+                        <ul>
+                            <li><a href="#">Auto Future Block</a></li>
+                            <li><a href="#">Pikat tona</a></li>
+                            <li><a href="#">Karriera</a></li>
+                            <li><a href="#">Komunikata për shtyp</a></li>
+                            <li><a href="#">Qëndrueshmëria</a></li>
+                            <li><a href="#">Partnerë Globalë</a></li>
+                        </ul>
+                    </div>
+                </div>
+
                 <div class="footer-container">
+
                     <div class="footer-column contact-info">
-                        <h3>Contact</h3>
+                        <h3>Kontakt</h3>
                         <p>Tirana International Airport, Uzina, Tirana 1504, Albania</p>
                         <p><a href="mailto:info@faverent.al">info@faverent.al</a></p>
                         <p class="phone-number">+355 69 55 55 556</p>
                     </div>
 
                     <div class="footer-column services">
-                        <h3>Services</h3>
+                        <h3>Shërbime</h3>
                         <ul class="services">
                             <li><a href="#nightparties">Rent For Night Parties</a></li>
                             <li><a href="#weddings">Rent For Weddings</a></li>
@@ -1428,29 +1751,59 @@ if ($result) {
                     </div>
 
                     <div class="footer-column cta">
-                        <h3>Rent a car now!</h3>
-                        <a href="<?= GENERAL_URL ?>main_page/list.php" target="_blank">Book Now</a>
+                        <h3>Rezervo makinën tënde!</h3>
+                        <a href="<?= GENERAL_URL ?>main_page/list.php" target="_blank">Rezervo Tani</a>
+                    </div>
+
+                    <div class="footer-column social-extra">
+                        <h3>Na kontakto</h3>
+                        <a href="https://www.instagram.com/emiljano_perhati/" target="_blank">
+                            <img src="/new_project_bk/uploads/chat.robot/instagram.png"
+                                style="width:40px; height:40px; object-fit:contain;">
+                        </a>
+
+                        <a href="https://wa.me/355695555556" target="_blank">
+                            <img src="/new_project_bk/uploads/chat.robot/social.png"
+                                style="width:40px; height:40px; object-fit:contain;">
+                        </a>
                     </div>
                 </div>
 
                 <div class="footer-bottom">
-                    <p style="position: relative; padding-right: 80px;">
-                        Copyright © 2025 <strong>Auto Future Block</strong> | Powered by
-                        <a href="<?= BASE_URL ?>views/general/order_status/list.php" target="_blank">FutureBlock.al</a>
 
-                        <span style="position: absolute; right: 600; top: 50%; transform: translateY(-50%); display: flex; gap: 12px;">
-                            <a href="https://www.instagram.com/username/" target="_blank">
-                                <img src="/new_project_bk/uploads/chat.robot/instagram.png"
-                                    style="width:40px; height:40px; object-fit:contain;">
-                            </a>
-
-                            <a href="https://wa.me/355695555556" target="_blank">
-                                <img src="/new_project_bk/uploads/chat.robot/social.png"
-                                    style="width:40px; height:40px; object-fit:contain;">
-                            </a>
-                        </span>
+                    <p class="copyright">
+                        © 2025 Të gjitha të drejtat e rezervuara për Auto Future Block dhe licencuesit e saj.
                     </p>
+
+                    <div class="legal-links">
+                        <a href="#">Kushtet e përdorimit</a> |
+                        <a href="#">Politika e Privatësisë</a> |
+                        <a href="#">Cookies</a> |
+                        <a href="#">Rregulloret</a> |
+                        <a href="#">Markat tregtare</a> |
+                        <a href="#">Deklarata kundër skllavërisë</a> |
+                        <a href="#">Kushtet e UGC</a> |
+                        <a href="#">Strategjia e taksave</a> |
+                        <a href="#">Skema e pensioneve</a> |
+                        <a href="#">Deklarata S172</a> |
+                        <a href="#">Open Source Software Notice</a> |
+                        <a href="#">Sistemi i sinjalizimit</a> |
+                        <a href="#">Kodi i Sjelljes Porsche</a> |
+                        <a href="#">EU Data Act</a>
+                    </div>
+
+                    <div class="legal-text">
+                        <p>
+                            * Të dhënat e performancës janë bazuar në standardin WLTP. Për automjetet hibride,
+                            distanca elektrike varet nga ngarkesa e baterisë dhe kushtet e ngasjes.
+                        </p>
+                        <p>
+                            ** Informacion i rëndësishëm rreth modeleve elektrike mund të gjendet këtu.
+                        </p>
+                    </div>
+
                 </div>
+
             </footer>
         </div>
     </div>
@@ -1460,6 +1813,29 @@ if ($result) {
 </html>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    const currentBtn = document.getElementById('current-region');
+    const regionList = document.getElementById('region-list');
+
+    currentBtn.addEventListener('click', () => {
+        regionList.style.display = regionList.style.display === 'block' ? 'none' : 'block';
+    });
+
+    regionList.querySelectorAll('li').forEach(li => {
+        li.addEventListener('click', () => {
+            currentBtn.textContent = li.textContent;
+            regionList.style.display = 'none';
+        });
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.region-select')) {
+            regionList.style.display = 'none';
+        }
+    });
+</script>
+
 <script>
     $(document).ready(function() {
 
@@ -1786,235 +2162,335 @@ if ($result) {
 
     chatClose.addEventListener('click', () => chatWidget.style.display = 'none');
 </script>
-
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
 <script>
-    const USER_ID = <?php echo $_SESSION['user_id'] ?? 0; ?>;
-    const IS_ADMIN = <?php echo $_SESSION['is_admin'] ?? 0; ?>;
-    const GUEST_ID = <?php echo $_SESSION['guest_id'] ?? 0; ?>;
+    $(function() {
+        const USER_ID = <?php echo $_SESSION['user_id'] ?? 0; ?>;
+        const IS_ADMIN = <?php echo $_SESSION['is_admin'] ?? 0; ?>;
+        const GUEST_ID = <?php echo $_SESSION['guest_id'] ?? 0; ?>;
 
-    let selectedContact = null;
-    let lastDate = '';
-    let pollInterval = null;
-    let isFetching = false;
-    let isSending = false;
+        const CURRENT_USER_TYPE = USER_ID > 0 ? (IS_ADMIN ? 'admin' : 'user') : 'guest';
+        const CURRENT_USER_ID = USER_ID > 0 ? USER_ID : GUEST_ID;
 
-    const CURRENT_USER_TYPE = USER_ID > 0 ? (IS_ADMIN ? 'admin' : 'user') : 'guest';
-    const CURRENT_USER_ID = USER_ID > 0 ? USER_ID : GUEST_ID;
+        let selectedContact = null;
+        let loadedMessageIds = new Set();
+        let contactsData = {};
+        let pollInterval = null;
+        let typingTimeout = null;
+        let lastMessageDates = new Map();
 
-    function formatTime(dateStr) {
-        const d = new Date(dateStr);
-        return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
-    }
+        Pusher.logToConsole = true;
+        const pusher = new Pusher('d0652d5ed102a0e6056c', {
+            cluster: 'eu',
+            useTLS: true
+        });
+        const myChannelName = `chat-${CURRENT_USER_TYPE}-${CURRENT_USER_ID}`;
+        const myChannel = pusher.subscribe(myChannelName);
 
-    function formatDateSeparator(dateStr) {
-        const d = new Date(dateStr);
-        const dateKey = d.toDateString();
-        if (dateKey !== lastDate) {
-            lastDate = dateKey;
-            return `<div class="chat-date-separator">${d.toLocaleDateString('sq-AL', {weekday:'long', day:'2-digit', month:'2-digit', year:'numeric'})}</div>`;
-        }
-        return '';
-    }
+        myChannel.bind('pusher:subscription_succeeded', () => console.log('Subscribed to:', myChannelName));
 
-    function isImageFile(filename) {
-        if (!filename) return false;
-        const ext = filename.toLowerCase().split('.').pop();
-        return ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(ext);
-    }
-
-    function formatFileAttachment(filePath) {
-        if (!filePath) return '';
-        const fullPath = `/new_project_bk/uploads/chat_files/${filePath}`;
-        if (isImageFile(filePath)) {
-            return `<div class="chat-image-wrapper"><a href="${fullPath}" target="_blank"><img src="${fullPath}" class="chat-image" style="max-width:200px;border-radius:6px;"></a></div>`;
-        } else {
-            const fileName = filePath.split('/').pop();
-            return `<a href="${fullPath}" target="_blank" class="chat-file-link">📎 ${fileName}</a>`;
-        }
-    }
-
-    function fetchContacts() {
-        $.post('../../../helper/send_message.php', {
-            action: 'fetch_contacts'
-        }, function(resp) {
-            if (!resp.success) {
-                $('#chatContacts').html('<div style="padding:15px;text-align:center;color:red;">Gabim: ' + (resp.message || 'Unknown') + '</div>');
-                return;
-            }
-
-            const $list = $('#chatContacts').empty();
-            if (!resp.contacts || resp.contacts.length === 0) {
-                $list.html('<div style="padding:15px;text-align:center;color:#999;">Nuk ka kontakte</div>');
-                return;
-            }
-
-            resp.contacts.forEach(c => {
-                const contactId = c.contact_id ?? 0;
-                const contactType = c.contact_type ?? 'admin';
-                const contactName = c.contact_name ?? 'N/A';
-                const unread = c.unread_count > 0 ? `<span class="unread-count">${c.unread_count}</span>` : '';
-
-                const $item = $(`
-                <div class="contact-item" data-id="${contactId}" data-type="${contactType}">
-                    <div style="display:flex;flex-direction:column;">
-                        <strong>${contactName}</strong>
-                        <small style="color:#666">${c.last_message ?? ''}</small>
-                    </div>
-                    ${unread}
-                </div>
-            `);
-
-                $item.on('click', () => selectContact({
-                    contact_id: contactId,
-                    contact_name: contactName,
-                    contact_type: contactType
-                }));
-
-                $list.append($item);
-            });
-
-            const first = resp.contacts[0];
-            if (first) selectContact({
-                contact_id: first.contact_id,
-                contact_name: first.contact_name,
-                contact_type: first.contact_type
-            });
-        }, 'json');
-    }
-
-    function selectContact(contact) {
-        selectedContact = contact;
-        $('#receiver_id').val(contact.contact_id);
-        $('#receiver_type').val(contact.contact_type);
-
-        let displayName = contact.contact_name;
-        if (contact.contact_type === 'guest') displayName = `Guest #${contact.contact_id}`;
-        $('#chatUserTitle').text('Biseda me: ' + displayName);
-
-        lastDate = '';
-        $('#chatUserBody').empty();
-
-        $('.contact-item').removeClass('active');
-        $(`.contact-item[data-id="${contact.contact_id}"][data-type="${contact.contact_type}"]`).addClass('active');
-
-        fetchMessages(true);
-
-        if (pollInterval) clearInterval(pollInterval);
-        pollInterval = setInterval(fetchMessages, 2000);
-    }
-
-    function fetchMessages(initial = false) {
-        if (!selectedContact || isFetching || isSending) return;
-        isFetching = true;
-
-        $.post('../../../helper/send_message.php', {
-            action: 'fetch_messages',
-            receiver_id: selectedContact.contact_id,
-            receiver_type: selectedContact.contact_type
-        }, function(resp) {
-            isFetching = false;
-            if (!resp.success || !resp.messages) return;
-
-            const $body = $('#chatUserBody');
-            if (initial) $body.empty();
-
-            resp.messages.forEach(m => {
-                const isMine = (m.sender_id == CURRENT_USER_ID && m.sender_type == CURRENT_USER_TYPE);
-                const $msg = $('<div class="chat-bubble">').addClass(isMine ? 'my-message' : 'their-message');
-
-                let content = '';
-                if (m.message) content = $('<div>').text(m.message).html();
-                if (m.file_path) {
-                    if (content) content += '<br>';
-                    content += formatFileAttachment(m.file_path);
+        myChannel.bind('new-message', function(msg) {
+            if (!loadedMessageIds.has(msg.id)) {
+                const contactKey = `${msg.sender_type}-${msg.sender_id===CURRENT_USER_ID?msg.receiver_id:msg.sender_id}`;
+                if (contactsData[contactKey]) {
+                    if (!selectedContact || selectedContact.contact_id != msg.sender_id) {
+                        contactsData[contactKey].unread_count++;
+                        updateUnreadBadge();
+                    }
+                    contactsData[contactKey].last_message = msg.message;
+                    contactsData[contactKey].last_message_time = msg.created_at;
+                    contactsData[contactKey].is_mine = msg.sender_id === CURRENT_USER_ID;
+                    renderContacts();
                 }
-
-                const sep = formatDateSeparator(m.created_at);
-                if (sep) $body.append(sep);
-
-                $msg.html(content + `<div class="msg-time">${formatTime(m.created_at)}</div>`);
-                $body.append($msg);
-            });
-
-            $body.scrollTop($body[0].scrollHeight);
-
-        }, 'json').fail(() => isFetching = false);
-    }
-
-    $('#chatUserForm').on('submit', function(e) {
-        e.preventDefault();
-        console.log('sss');
-        if (!selectedContact) {
-            fetchContacts();
-            return false;
-        }
-        if (isSending) return;
-
-        const messageText = $('#chatUserInput').val().trim();
-        const hasFile = $('#chatUserFile')[0].files.length > 0;
-        if (!messageText && !hasFile) return;
-
-        isSending = true;
-        const fd = new FormData(this);
-        fd.append('action', 'send');
-        fd.set('receiver_id', selectedContact.contact_id);
-        fd.set('receiver_type', selectedContact.contact_type);
-
-        $('#chatUserInput').val('');
-        $('#chatUserFile').val('');
-
-        $.ajax({
-            url: '../../../helper/send_message.php',
-            method: 'POST',
-            data: fd,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function(resp) {
-                isSending = false;
-                if (resp.success) {
-                    fetchMessages(false);
-                    fetchContacts();
-                } else alert(resp.message || 'Gabim gjatë dërgimit');
-            },
-            error: function() {
-                isSending = false;
-                alert('Gabim në lidhje me serverin');
+                if (selectedContact && (msg.sender_id == selectedContact.contact_id || msg.receiver_id == selectedContact.contact_id)) {
+                    appendMessage(msg);
+                }
+                if (!selectedContact || msg.sender_id != selectedContact.contact_id) {
+                    if (Notification.permission === "granted") {
+                        new Notification("Mesazh i ri", {
+                            body: msg.message,
+                            icon: '/new_project_bk/uploads/chat.robot/chat-icon.png'
+                        });
+                    }
+                }
             }
         });
-    });
 
-    $('#chatFileIcon').on('click', () => $('#chatUserFile').click());
+        function formatTime(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-    $('#chatUserIcon').on('click', () => {
-        const visible = $('#chatUserWidget').is(':visible');
-        if (visible) {
-            $('#chatUserWidget').fadeOut(150);
-            if (pollInterval) clearInterval(pollInterval);
-        } else {
-            $('#chatUserWidget').fadeIn(150);
-            fetchContacts();
+            if (days === 0) {
+                return date.toLocaleTimeString('sq-AL', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+            if (days === 1) {
+                return 'Dje';
+            }
+            if (days < 7) {
+                return date.toLocaleDateString('sq-AL', {
+                    weekday: 'long'
+                });
+            }
+            return date.toLocaleDateString('sq-AL', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
         }
-    });
 
-    $('#chatUserClose').on('click', () => {
-        $('#chatUserWidget').fadeOut(100);
-        if (pollInterval) clearInterval(pollInterval);
-    });
+        function getDateSeparator(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const msgDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            const diff = today - msgDate;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('#chatUserWidget,#chatUserIcon').length) {
-            $('#chatUserWidget').fadeOut(100);
-            if (pollInterval) clearInterval(pollInterval);
+            if (days === 0) return 'SOT';
+            if (days === 1) return 'DJE';
+            if (days < 7) return date.toLocaleDateString('sq-AL', {
+                weekday: 'long'
+            }).toUpperCase();
+            return date.toLocaleDateString('sq-AL', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
         }
-    });
 
-    $('#chatUserInput').on('keypress', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
+        function needsDateSeparator(msgDate) {
+            const dateKey = new Date(msgDate).toDateString();
+            if (!lastMessageDates.has(dateKey)) {
+                lastMessageDates.set(dateKey, true);
+                return true;
+            }
+            return false;
+        }
+
+        function appendMessage(msg, scroll = true) {
+            if (loadedMessageIds.has(msg.id)) return;
+            loadedMessageIds.add(msg.id);
+
+            const body = $('#chatUserBody');
+
+            if (needsDateSeparator(msg.created_at)) {
+                const separator = $('<div>').addClass('chat-date-separator').text(getDateSeparator(msg.created_at));
+                body.append(separator);
+            }
+
+            const isMine = String(msg.sender_id) === String(CURRENT_USER_ID) && msg.sender_type === CURRENT_USER_TYPE;
+            const bubble = $('<div>').addClass('chat-bubble').addClass(isMine ? 'my-message' : 'their-message');
+
+            let content = '';
+            if (msg.message) {
+                const emojiOnly = /^[\p{Emoji}\s]+$/u.test(msg.message) && msg.message.length <= 6;
+                if (emojiOnly) {
+                    content += `<div class="emoji-large">${$('<div>').text(msg.message).html()}</div>`;
+                } else {
+                    content += $('<div>').text(msg.message).html();
+                }
+            }
+
+            if (msg.file_path) {
+                if (msg.file_path.match(/\.(jpeg|jpg|png|gif|webp)$/i)) {
+                    content += `<div class="chat-image-wrapper"><img src="/new_project_bk/uploads/chat_files/${msg.file_path}" class="chat-image"/></div>`;
+                } else {
+                    content += `<br><a href="/new_project_bk/uploads/chat_files/${msg.file_path}" class="chat-file-link" target="_blank">📎 ${msg.file_path}</a>`;
+                }
+            }
+
+            const time = new Date(msg.created_at).toLocaleTimeString('sq-AL', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            let statusIcon = '';
+            if (isMine) {
+                if (msg.is_seen) {
+                    statusIcon = '<span class="msg-status seen">✓✓</span>';
+                } else if (msg.is_delivered) {
+                    statusIcon = '<span class="msg-status delivered">✓✓</span>';
+                } else {
+                    statusIcon = '<span class="msg-status sent">✓</span>';
+                }
+            }
+
+            content += `<div class="msg-time">${time} ${statusIcon}</div>`;
+            bubble.html(content);
+            body.append(bubble);
+
+            if (scroll) body.scrollTop(body[0].scrollHeight);
+        }
+
+        function updateUnreadBadge() {
+            const totalUnread = Object.values(contactsData).reduce((sum, c) => sum + (c.unread_count || 0), 0);
+            let badge = $('#chatUserIcon .unread-badge');
+
+            if (totalUnread > 0) {
+                if (badge.length === 0) {
+                    badge = $('<span class="unread-badge"></span>');
+                    $('#chatUserIcon').append(badge);
+                }
+                badge.text(totalUnread > 99 ? '99+' : totalUnread);
+            } else {
+                badge.remove();
+            }
+        }
+
+        function fetchContacts() {
+            $.post('/new_project_bk/helper/send_message.php', {
+                action: 'fetch_contacts'
+            }, function(resp) {
+                if (!resp.success) return;
+                contactsData = {};
+                resp.contacts.forEach(c => {
+                    contactsData[`${c.contact_type}-${c.contact_id}`] = c;
+                });
+                renderContacts();
+                updateUnreadBadge();
+            }, 'json');
+        }
+
+        function renderContacts() {
+            const $list = $('#chatContacts').empty();
+            Object.values(contactsData)
+                .sort((a, b) => new Date(b.last_message_time) - new Date(a.last_message_time))
+                .forEach(c => {
+                    const unread = c.unread_count > 0 ? `<span class="unread-count">${c.unread_count}</span>` : '';
+                    const time = c.last_message_time ? formatTime(c.last_message_time) : '';
+                    const lastMsg = c.last_message || 'Nuk ka mesazhe';
+
+                    let msgPreview = lastMsg;
+                    if (c.is_mine) {
+                        const statusIcon = c.is_seen ? '✓✓' : '✓';
+                        msgPreview = `<span class="msg-status ${c.is_seen ? 'seen' : 'delivered'}">${statusIcon}</span> ${lastMsg}`;
+                    }
+
+                    const $item = $(`
+                    <div class="contact-item ${selectedContact && selectedContact.contact_id === c.contact_id ? 'active' : ''}" data-id="${c.contact_id}" data-type="${c.contact_type}">
+                        <div class="contact-header">
+                            <span class="contact-name">${c.contact_name}</span>
+                            <span class="contact-time">${time}</span>
+                        </div>
+                        <div class="contact-preview">
+                            <div class="contact-last-message">${msgPreview}</div>
+                            ${unread}
+                        </div>
+                    </div>
+                `);
+                    $item.off('click').on('click', () => selectContact(c));
+                    $list.append($item);
+                });
+        }
+
+        function selectContact(contact) {
+            selectedContact = contact;
+            $('#receiver_id').val(contact.contact_id);
+            $('#receiver_type').val(contact.contact_type);
+
+            const headerHtml = `
+            <div class="chat-header-info">
+                <div class="chat-header-name">${contact.contact_name}</div>
+                <div class="chat-header-status ${contact.is_online ? 'status-online' : ''}">
+                    ${contact.is_online ? 'online' : (contact.last_seen ? 'last seen ' + formatTime(contact.last_seen) : 'offline')}
+                </div>
+            </div>
+            <span class="close-chat" id="chatUserClose">✕</span>
+        `;
+            $('#chatUserHeader').html(headerHtml);
+
+            $('#chatUserBody').empty();
+            loadedMessageIds.clear();
+            lastMessageDates.clear();
+
+            contact.unread_count = 0;
+            renderContacts();
+            updateUnreadBadge();
+
+            fetchMessages();
+            if (pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(fetchMessages, 3000);
+
+            $('#chatUserClose').off('click').on('click', () => $('#chatUserWidget').hide());
+        }
+
+        function fetchMessages() {
+            if (!selectedContact) return;
+            $.post('/new_project_bk/helper/send_message.php', {
+                action: 'fetch_messages',
+                receiver_id: selectedContact.contact_id,
+                receiver_type: selectedContact.contact_type
+            }, function(resp) {
+                if (!resp.success) return;
+                resp.messages.forEach(m => appendMessage(m, false));
+                $('#chatUserBody').scrollTop($('#chatUserBody')[0].scrollHeight);
+            }, 'json');
+        }
+
+        $('#chatUserForm').off('submit').on('submit', function(e) {
             e.preventDefault();
-            if ($(this).val().trim() !== '') $('#chatUserForm').submit();
-        }
-    });
+            if (!selectedContact) return alert('Zgjidhni një kontakt!');
 
-    $(document).ready(() => $('#chatUserWidget').hide());
+            const msg = $('#chatUserInput').val().trim();
+            const fileInput = $('#chatUserFile')[0];
+            if (!msg && (!fileInput || fileInput.files.length === 0)) return;
+
+            const fd = new FormData();
+            fd.append('action', 'send');
+            fd.append('receiver_id', selectedContact.contact_id);
+            fd.append('receiver_type', selectedContact.contact_type);
+            fd.append('message', msg);
+            if (fileInput && fileInput.files.length > 0) fd.append('file', fileInput.files[0]);
+
+            $('#chatUserInput').val('');
+            $('#chatUserFile').val('');
+
+            $.ajax({
+                url: '/new_project_bk/helper/send_message.php',
+                method: 'POST',
+                data: fd,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(resp) {
+                    if (resp.success) {
+                        appendMessage(resp.message_data);
+                        const contactKey = `${selectedContact.contact_type}-${selectedContact.contact_id}`;
+                        if (contactsData[contactKey]) {
+                            contactsData[contactKey].last_message = resp.message_data.message;
+                            contactsData[contactKey].last_message_time = resp.message_data.created_at;
+                            contactsData[contactKey].is_mine = true;
+                            renderContacts();
+                        }
+                    }
+                }
+            });
+        });
+
+        $('#chatFileIcon').on('click', () => $('#chatUserFile').click());
+
+        $('#chatUserIcon').on('click', () => {
+            $('#chatUserWidget').toggle();
+            if ($('#chatUserWidget').is(':visible')) {
+                fetchContacts();
+            }
+        });
+
+        $('#chatUserClose').on('click', () => $('#chatUserWidget').hide());
+
+        if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+            Notification.requestPermission();
+        }
+
+        $(document).ready(() => {
+            $('#chatUserWidget').hide();
+            fetchContacts();
+            updateUnreadBadge();
+        });
+    });
 </script>

@@ -19,6 +19,51 @@
 </div>
 
 <style>
+    #chatUserBody::-webkit-scrollbar {
+        display: none;
+    }
+
+
+    .msg-time {
+        font-size: 10px;
+        color: #666;
+        text-align: right;
+    }
+
+    .chat-img {
+        max-width: 150px;
+        border-radius: 6px;
+    }
+
+    #chatUserInput {
+        flex: 1;
+        border: none;
+        padding: 6px 10px;
+    }
+
+    #chatUserInput:focus {
+        outline: none;
+    }
+
+    #chatUserSend {
+        background: #007bff;
+        color: #fff;
+        border: none;
+        padding: 0 15px;
+        cursor: pointer;
+    }
+
+    #chatUserFile {
+        display: none;
+    }
+
+    #typingIndicator {
+        font-size: 12px;
+        color: #666;
+        margin: 2px 10px;
+        display: none;
+    }
+
     .chat-image-wrapper {
         margin: 8px 0;
         max-width: 100%;
@@ -158,7 +203,6 @@
         background-size: 20px 20px;
     }
 
-
     #chatUserWidget {
         display: none;
         position: fixed;
@@ -257,7 +301,6 @@
         background-position: center;
     }
 
-
     .chat-bubble {
         padding: 10px 14px;
         border-radius: 20px;
@@ -319,8 +362,6 @@
     #chatUserIcon .chat-icon:hover {
         transform: scale(1.2);
     }
-
-
 
     #chatInputWrapper button {
         padding: 10px 14px;
@@ -602,103 +643,253 @@
 
         let selectedContact = null;
         let loadedMessageIds = new Set();
+        let contactsData = {};
         let pollInterval = null;
-        let activeChannel = null;
+        let typingTimeout = null;
+        let lastMessageDates = new Map();
 
         Pusher.logToConsole = true;
         const pusher = new Pusher('d0652d5ed102a0e6056c', {
             cluster: 'eu',
             useTLS: true
         });
-
         const myChannelName = `chat-${CURRENT_USER_TYPE}-${CURRENT_USER_ID}`;
-        console.log('Subscribing to my channel:', myChannelName);
-
         const myChannel = pusher.subscribe(myChannelName);
 
-        myChannel.bind('pusher:subscription_succeeded', function() {
-            console.log('Successfully subscribed to:', myChannelName);
-        });
+        myChannel.bind('pusher:subscription_succeeded', () => console.log('Subscribed to:', myChannelName));
 
-        myChannel.bind('pusher:subscription_error', function(status) {
-            console.error('Subscription error:', status);
-        });
-
-        myChannel.bind('new-message', function(data) {
-            console.log('Received message on my channel:', data);
-
-            if (selectedContact) {
-                const isFromSelectedContact =
-                    (data.sender_type === selectedContact.contact_type &&
-                        String(data.sender_id) === String(selectedContact.contact_id)) ||
-                    (data.receiver_type === selectedContact.contact_type &&
-                        String(data.receiver_id) === String(selectedContact.contact_id));
-
-                if (isFromSelectedContact) {
-                    appendMessage(data);
+        myChannel.bind('new-message', function(msg) {
+            if (!loadedMessageIds.has(msg.id)) {
+                const contactKey = `${msg.sender_type}-${msg.sender_id===CURRENT_USER_ID?msg.receiver_id:msg.sender_id}`;
+                if (contactsData[contactKey]) {
+                    if (!selectedContact || selectedContact.contact_id != msg.sender_id) {
+                        contactsData[contactKey].unread_count++;
+                        updateUnreadBadge();
+                    }
+                    contactsData[contactKey].last_message = msg.message;
+                    contactsData[contactKey].last_message_time = msg.created_at;
+                    contactsData[contactKey].is_mine = msg.sender_id === CURRENT_USER_ID;
+                    renderContacts();
+                }
+                if (selectedContact && (msg.sender_id == selectedContact.contact_id || msg.receiver_id == selectedContact.contact_id)) {
+                    appendMessage(msg);
+                }
+                if (!selectedContact || msg.sender_id != selectedContact.contact_id) {
+                    if (Notification.permission === "granted") {
+                        new Notification("Mesazh i ri", {
+                            body: msg.message,
+                            icon: '/new_project_bk/uploads/chat.robot/chat-icon.png'
+                        });
+                    }
                 }
             }
         });
 
+        function formatTime(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            if (days === 0) {
+                return date.toLocaleTimeString('sq-AL', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+            if (days === 1) {
+                return 'Dje';
+            }
+            if (days < 7) {
+                return date.toLocaleDateString('sq-AL', {
+                    weekday: 'long'
+                });
+            }
+            return date.toLocaleDateString('sq-AL', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        function getDateSeparator(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const msgDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            const diff = today - msgDate;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            if (days === 0) return 'SOT';
+            if (days === 1) return 'DJE';
+            if (days < 7) return date.toLocaleDateString('sq-AL', {
+                weekday: 'long'
+            }).toUpperCase();
+            return date.toLocaleDateString('sq-AL', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        function needsDateSeparator(msgDate) {
+            const dateKey = new Date(msgDate).toDateString();
+            if (!lastMessageDates.has(dateKey)) {
+                lastMessageDates.set(dateKey, true);
+                return true;
+            }
+            return false;
+        }
+
         function appendMessage(msg, scroll = true) {
-            if (loadedMessageIds.has(msg.id)) {
-                console.log('Message already displayed:', msg.id);
-                return;
+            if (loadedMessageIds.has(msg.id)) return;
+            loadedMessageIds.add(msg.id);
+
+            const body = $('#chatUserBody');
+
+            if (needsDateSeparator(msg.created_at)) {
+                const separator = $('<div>').addClass('chat-date-separator').text(getDateSeparator(msg.created_at));
+                body.append(separator);
             }
 
-            loadedMessageIds.add(msg.id);
-            const body = $('#chatUserBody');
             const isMine = String(msg.sender_id) === String(CURRENT_USER_ID) && msg.sender_type === CURRENT_USER_TYPE;
-
             const bubble = $('<div>').addClass('chat-bubble').addClass(isMine ? 'my-message' : 'their-message');
-            let content = '';
-            if (msg.message) content += $('<div>').text(msg.message).html();
-            if (msg.file_path) content += '<br><a href="/new_project_bk/uploads/chat_files/' + msg.file_path + '" target="_blank">📎 File</a>';
 
-            bubble.html(content + '<div class="msg-time">' + new Date(msg.created_at).toLocaleTimeString() + '</div>');
+            let content = '';
+            if (msg.message) {
+                const emojiOnly = /^[\p{Emoji}\s]+$/u.test(msg.message) && msg.message.length <= 6;
+                if (emojiOnly) {
+                    content += `<div class="emoji-large">${$('<div>').text(msg.message).html()}</div>`;
+                } else {
+                    content += $('<div>').text(msg.message).html();
+                }
+            }
+
+            if (msg.file_path) {
+                if (msg.file_path.match(/\.(jpeg|jpg|png|gif|webp)$/i)) {
+                    content += `<div class="chat-image-wrapper"><img src="/new_project_bk/uploads/chat_files/${msg.file_path}" class="chat-image"/></div>`;
+                } else {
+                    content += `<br><a href="/new_project_bk/uploads/chat_files/${msg.file_path}" class="chat-file-link" target="_blank">📎 ${msg.file_path}</a>`;
+                }
+            }
+
+            const time = new Date(msg.created_at).toLocaleTimeString('sq-AL', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            let statusIcon = '';
+            if (isMine) {
+                if (msg.is_seen) {
+                    statusIcon = '<span class="msg-status seen">✓✓</span>';
+                } else if (msg.is_delivered) {
+                    statusIcon = '<span class="msg-status delivered">✓✓</span>';
+                } else {
+                    statusIcon = '<span class="msg-status sent">✓</span>';
+                }
+            }
+
+            content += `<div class="msg-time">${time} ${statusIcon}</div>`;
+            bubble.html(content);
             body.append(bubble);
 
             if (scroll) body.scrollTop(body[0].scrollHeight);
+        }
 
-            console.log('Message appended:', msg.id, 'isMine:', isMine);
+        function updateUnreadBadge() {
+            const totalUnread = Object.values(contactsData).reduce((sum, c) => sum + (c.unread_count || 0), 0);
+            let badge = $('#chatUserIcon .unread-badge');
+
+            if (totalUnread > 0) {
+                if (badge.length === 0) {
+                    badge = $('<span class="unread-badge"></span>');
+                    $('#chatUserIcon').append(badge);
+                }
+                badge.text(totalUnread > 99 ? '99+' : totalUnread);
+            } else {
+                badge.remove();
+            }
         }
 
         function fetchContacts() {
-            $.post('../../../helper/send_message.php', {
+            $.post('/new_project_bk/helper/send_message.php', {
                 action: 'fetch_contacts'
             }, function(resp) {
                 if (!resp.success) return;
-                const $list = $('#chatContacts').empty();
+                contactsData = {};
                 resp.contacts.forEach(c => {
+                    contactsData[`${c.contact_type}-${c.contact_id}`] = c;
+                });
+                renderContacts();
+                updateUnreadBadge();
+            }, 'json');
+        }
+
+        function renderContacts() {
+            const $list = $('#chatContacts').empty();
+            Object.values(contactsData)
+                .sort((a, b) => new Date(b.last_message_time) - new Date(a.last_message_time))
+                .forEach(c => {
                     const unread = c.unread_count > 0 ? `<span class="unread-count">${c.unread_count}</span>` : '';
-                    const $item = $(`<div class="contact-item" data-id="${c.contact_id}" data-type="${c.contact_type}">
-                    <div><strong>${c.contact_name}</strong><small>${c.last_message ?? ''}</small></div>${unread}</div>`);
+                    const time = c.last_message_time ? formatTime(c.last_message_time) : '';
+                    const lastMsg = c.last_message || 'Nuk ka mesazhe';
+
+                    let msgPreview = lastMsg;
+                    if (c.is_mine) {
+                        const statusIcon = c.is_seen ? '✓✓' : '✓';
+                        msgPreview = `<span class="msg-status ${c.is_seen ? 'seen' : 'delivered'}">${statusIcon}</span> ${lastMsg}`;
+                    }
+
+                    const $item = $(`
+                    <div class="contact-item ${selectedContact && selectedContact.contact_id === c.contact_id ? 'active' : ''}" data-id="${c.contact_id}" data-type="${c.contact_type}">
+                        <div class="contact-header">
+                            <span class="contact-name">${c.contact_name}</span>
+                            <span class="contact-time">${time}</span>
+                        </div>
+                        <div class="contact-preview">
+                            <div class="contact-last-message">${msgPreview}</div>
+                            ${unread}
+                        </div>
+                    </div>
+                `);
                     $item.off('click').on('click', () => selectContact(c));
                     $list.append($item);
                 });
-            }, 'json');
         }
 
         function selectContact(contact) {
             selectedContact = contact;
             $('#receiver_id').val(contact.contact_id);
             $('#receiver_type').val(contact.contact_type);
-            $('#chatUserTitle').text('Biseda me: ' + (contact.contact_type === 'guest' ? `Guest #${contact.contact_id}` : contact.contact_name));
+
+            const headerHtml = `
+            <div class="chat-header-info">
+                <div class="chat-header-name">${contact.contact_name}</div>
+                <div class="chat-header-status ${contact.is_online ? 'status-online' : ''}">
+                    ${contact.is_online ? 'online' : (contact.last_seen ? 'last seen ' + formatTime(contact.last_seen) : 'offline')}
+                </div>
+            </div>
+            <span class="close-chat" id="chatUserClose">✕</span>
+        `;
+            $('#chatUserHeader').html(headerHtml);
+
             $('#chatUserBody').empty();
             loadedMessageIds.clear();
-            $('.contact-item').removeClass('active');
-            $(`.contact-item[data-id="${contact.contact_id}"][data-type="${contact.contact_type}"]`).addClass('active');
+            lastMessageDates.clear();
 
-            console.log('Selected contact:', contact.contact_type, contact.contact_id);
+            contact.unread_count = 0;
+            renderContacts();
+            updateUnreadBadge();
 
             fetchMessages();
             if (pollInterval) clearInterval(pollInterval);
             pollInterval = setInterval(fetchMessages, 3000);
+
+            $('#chatUserClose').off('click').on('click', () => $('#chatUserWidget').hide());
         }
 
         function fetchMessages() {
             if (!selectedContact) return;
-            $.post('../../../helper/send_message.php', {
+            $.post('/new_project_bk/helper/send_message.php', {
                 action: 'fetch_messages',
                 receiver_id: selectedContact.contact_id,
                 receiver_type: selectedContact.contact_type
@@ -715,7 +906,6 @@
 
             const msg = $('#chatUserInput').val().trim();
             const fileInput = $('#chatUserFile')[0];
-
             if (!msg && (!fileInput || fileInput.files.length === 0)) return;
 
             const fd = new FormData();
@@ -725,41 +915,54 @@
             fd.append('message', msg);
             if (fileInput && fileInput.files.length > 0) fd.append('file', fileInput.files[0]);
 
-            console.log('Sending message to:', selectedContact.contact_type, selectedContact.contact_id);
-
             $('#chatUserInput').val('');
             $('#chatUserFile').val('');
 
             $.ajax({
-                url: '../../../helper/send_message.php',
+                url: '/new_project_bk/helper/send_message.php',
                 method: 'POST',
                 data: fd,
                 processData: false,
                 contentType: false,
                 dataType: 'json',
-                success: function(response) {
-                    console.log('Message sent successfully:', response);
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error sending message:', error);
+                success: function(resp) {
+                    if (resp.success) {
+                        appendMessage(resp.message_data);
+                        const contactKey = `${selectedContact.contact_type}-${selectedContact.contact_id}`;
+                        if (contactsData[contactKey]) {
+                            contactsData[contactKey].last_message = resp.message_data.message;
+                            contactsData[contactKey].last_message_time = resp.message_data.created_at;
+                            contactsData[contactKey].is_mine = true;
+                            renderContacts();
+                        }
+                    }
                 }
             });
         });
 
         $('#chatFileIcon').on('click', () => $('#chatUserFile').click());
+
         $('#chatUserIcon').on('click', () => {
             $('#chatUserWidget').toggle();
-            if ($('#chatUserWidget').is(':visible')) fetchContacts();
+            if ($('#chatUserWidget').is(':visible')) {
+                fetchContacts();
+            }
         });
+
         $('#chatUserClose').on('click', () => $('#chatUserWidget').hide());
+
+        if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+            Notification.requestPermission();
+        }
 
         $(document).ready(() => {
             $('#chatUserWidget').hide();
             fetchContacts();
-            console.log('Chat initialized - User Type:', CURRENT_USER_TYPE, 'User ID:', CURRENT_USER_ID);
+            updateUnreadBadge();
         });
     });
 </script>
+
 
 </body>
 
