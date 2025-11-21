@@ -1729,13 +1729,13 @@ if ($result) {
             <div class="company-block">
                 <h3>Kompania</h3>
                 <ul>
-                    <li><a href="#">Auto Future Block</a></li>
-                    <li><a href="#">Pikat tona</a></li>
-                    <li><a href="#">Karriera</a></li>
-                    <li><a href="#">Komunikata për shtyp</a></li>
-                    <li><a href="#">Qëndrueshmëria</a></li>
-                    <li><a href="#">Partnerë Globalë</a></li>
+                    <li><a href="<?= BASE_URL ?>views/general/main_page/location.php#auto-future">Auto Future Block</a></li>
+                    <li><a href="<?= BASE_URL ?>views/general/main_page/location.php#pikat-tona">Pikat tona</a></li>
+                    <li><a href="<?= BASE_URL ?>views/general/main_page/location.php#karriera">Karriera</a></li>
+                    <li><a href="<?= BASE_URL ?>views/general/main_page/location.php#qendrueshmeria">Qëndrueshmëria</a></li>
+                    <li><a href="<?= BASE_URL ?>views/general/main_page/location.php#partnere">Partnerë Globalë</a></li>
                 </ul>
+
             </div>
         </div>
 

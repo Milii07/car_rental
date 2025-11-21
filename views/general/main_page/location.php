@@ -1,489 +1,72 @@
 <?php
-include_once __DIR__ . '/../../../index.php';
-
-include DB_PATH . 'db.php';
-include_once HELPER_PATH . 'client_helper.php';
-
-
+include_once '../../../index.php';
 ?>
-
-<html lang="en">
+<!DOCTYPE html>
+<html lang="sq">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    <link rel="shortcut icon" href="<?= BASE_URL ?>public/assets/images/favicon.ico">
-    <link href="<?= BASE_URL ?>public/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-
-
-
-</head>
-
-<body>
-
+    <title>Auto Future Block - Luxury Car Rental</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #fb9b50;
+            --secondary: #5b84c4;
+            --dark: #1a1a1a;
+        }
 
         body {
             font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f5f5f5;
+            background: #f5f8ff;
+            overflow-x: hidden;
         }
 
-        .booking-section {
-            position: relative;
-            background-image: url("/new_project_bk/uploads/chat.robot/background.jpg");
-            height: 90vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            margin-bottom: 50px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-        }
-
-        .booking-overlay {
-            position: absolute;
-
-            inset: 0;
+        .navbar {
+            position: fixed;
+            top: 0;
             left: 0;
-            background: rgba(0, 0, 0, 0.55);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-        }
-
-        .booking-box {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px 40px;
-            width: 90%;
-            max-width: 900px;
-            color: #fff;
-            text-align: center;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-            animation: fadeInUp 0.8s ease;
-        }
-
-        .booking-title {
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 25px;
-            color: #fff;
-            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-        }
-
-        .booking-form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
             width: 100%;
+            z-index: 1000;
+            padding: 15px 30px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            transition: all 0.5s ease;
+            animation: slideDown 0.8s ease;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            text-align: left;
-        }
-
-        .form-group label {
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #e5e7eb;
-        }
-
-        .form-group select,
-        .form-group input {
-            padding: 8px 10px;
-            border-radius: 10px;
-            border: none;
-            outline: none;
-            background: rgba(255, 255, 255, 0.9);
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus {
-            box-shadow: 0 0 8px #1E40AF;
-        }
-
-        .checkbox-inline {
-            flex-direction: row;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 6px;
-        }
-
-        .search-btn {
-            margin-top: 25px;
-            background: #5b84c4;
-            color: #fff;
-            border: none;
-            padding: 12px 40px;
-            font-size: 1rem;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            letter-spacing: 0.5px;
-        }
-
-        .search-btn:hover {
-            background: #5b84c4;
-
-            box-shadow: 0 6px 15px #5b84c4;
-        }
-
-        @keyframes fadeInUp {
-            0% {
-                transform: translateY(30px);
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
                 opacity: 0;
             }
 
-            100% {
+            to {
                 transform: translateY(0);
                 opacity: 1;
             }
         }
 
-        .modal {
-            z-index: 2000 !important;
-            transition: transform 0.5s ease, opacity 0.5s ease;
-        }
-
-        .modal.fade .modal-dialog {
-            transform: translateY(-50px);
-            opacity: 0;
-        }
-
-        .modal.show .modal-dialog {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .modal-backdrop {
-            z-index: 1990 !important;
-            background: rgba(0, 0, 0, 0.45);
-        }
-
-        .modal-dialog {
-            margin-top: 50px;
-        }
-
-
-
-        .car-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 20px;
-        }
-
-        .car-card {
-            display: flex;
-            flex-direction: column;
-            background: #fff;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-            height: 100%;
-            position: relative;
-        }
-
-        .car-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .car-image {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            flex-shrink: 0;
-            transition: transform 0.3s ease;
-        }
-
-        .car-card:hover .car-image {
-            transform: scale(1.05);
-        }
-
-        .car-content-wrapper {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            justify-content: space-between;
-            padding: 15px;
-        }
-
-        .car-name {
-            font-weight: bold;
-            font-size: 1rem;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            color: #333;
-            text-align: center;
-        }
-
-        .car-specs {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 6px;
-            margin: 8px 0;
-            color: #6c757d;
-            font-size: 0.85rem;
-        }
-
-        .spec {
-            background: #f8f9fa;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
-
-        .car-footer {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            margin-top: 10px;
-        }
-
-        .car-price-clean {
-            color: #0d8d62ff;
-            font-weight: 700;
-            font-size: 1.6rem;
-            letter-spacing: 0.5px;
-        }
-
-        .car-price-clean .price-label {
-            font-size: 0.9rem;
-            color: #777;
-            font-weight: 400;
-        }
-
-        .car-rating {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: #f98125;
-            color: #000;
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 5px 8px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-
-
-        .car-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            flex-grow: 1;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .car-specs {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 6px;
-            margin: 8px 0;
-            color: #6c757d;
-            font-size: 0.85rem;
-        }
-
-        .spec {
-            background: #f8f9fa;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
-
-        .car-footer {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            margin-top: auto;
-        }
-
-        .car-price-clean {
-            color: #2c599d;
-            font-weight: 700;
-            font-size: 1.6rem;
-            letter-spacing: 0.5px;
-            margin-bottom: 5px;
-        }
-
-        .car-price-clean .price-label {
-            font-size: 0.9rem;
-            color: #777;
-            font-weight: 400;
-        }
-
-        .spinner-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-        }
-
-        .spinner-container .spinner-border {
-            width: 3rem;
-            height: 3rem;
-        }
-
-
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
-
-        body {
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-            background: #f5f8ffff;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .navbar {
-            width: 100%;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1000;
-            padding: 15px 30px;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            display: flex;
-            justify-content: center;
-            transition: all 0.3s ease;
+        .navbar.scrolled {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 10px 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .navbar .container {
-            width: 100%;
-            max-width: 1200px;
+            max-width: 1400px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .navbar .logo {
-            color: #fb9b50;
-            font-size: 1.8rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: transform 0.3s ease;
-        }
-
-        .navbar .logo:hover {
-            transform: scale(1.1);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 25px;
-            list-style: none;
-            align-items: center;
-            color: #fff
-        }
-
-        .nav-links li a {
-            text-decoration: none;
-            color: #fff;
-            font-weight: 500;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .nav-links li a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -4px;
-            left: 0;
-            background: #5b84c4;
-            transition: width 0.3s ease;
-        }
-
-        .nav-links li a:hover::after {
-            width: 100%;
-        }
-
-        .nav-links li a:hover {
-            color: #5b84c4;
-        }
-
-        .nav-links .phone a {
-            background: #fb9b50;
-            color: #f1f3f5ff;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            border: 2px solid #fb9b50;
-            transition: all 0.3s ease;
-        }
-
-        .nav-links .phone a:hover {
-            background: transparent;
-            color: #fb9b50;
-            transform: translateY(-2px);
-            box-shadow: 0 0 8px rgba(255, 213, 79, 0.4);
-        }
-
-
-
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-        }
-
-        .hamburger span {
-            width: 25px;
-            height: 3px;
-            background: #fff;
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                position: fixed;
-                top: 60px;
-                right: -100%;
-                width: 200px;
-                height: calc(100% - 60px);
-                background: rgba(0, 0, 0, 0.9);
-                flex-direction: column;
-                padding: 20px;
-                gap: 15px;
-                transition: right 0.3s ease;
-            }
-
-            .nav-links.active {
-                right: 0;
-            }
-
-            .hamburger {
-                display: flex;
-            }
         }
 
         .logo img {
@@ -505,17 +88,260 @@ include_once HELPER_PATH . 'client_helper.php';
             }
         }
 
-        .card.total-card.keep-color.show {
-            transition: transform 0.3s ease, box-shadow 0.3s ease !important;
-            cursor: pointer;
-            overflow: hidden;
-            border-radius: 15px;
+        .navbar.scrolled .logo img {
+            height: 60px;
         }
 
-        .card.total-card.keep-color.show:hover {
-            transform: scale(1.05) !important;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
-            z-index: 10;
+        .logo:hover img {
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 35px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links li a::before {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: all 0.4s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-links li a:hover::before {
+            width: 100%;
+        }
+
+        .nav-links li a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links .phone a {
+            background: linear-gradient(135deg, var(--primary), #ff7e3a);
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.4s ease;
+        }
+
+        .nav-links .phone a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(251, 155, 80, 0.4);
+        }
+
+        .hero-section {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .hero-section video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: 0;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .hero-content p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #fb9b50, #ff7e3a);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+        }
+
+        #video-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 3;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* SECTIONS */
+        .section-block {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            padding: 120px 80px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s ease;
+        }
+
+        .section-block.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-block.reverse {
+            flex-direction: row-reverse;
+        }
+
+        .text-block {
+            flex: 1;
+        }
+
+        .text-block h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 25px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .text-block h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        .text-block p {
+            font-size: 0.8rem;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .image-block {
+            flex: 1;
+        }
+
+        .image-block img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            transition: all 0.6s ease;
+        }
+
+        .image-block img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+        }
+
+        /* MAP */
+        .map-section {
+            padding: 80px 40px;
+            text-align: center;
+        }
+
+        .map-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            color: var(--dark);
+        }
+
+        .map-section iframe {
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        /* PARTNERS */
+        .partners-section {
+            padding: 100px 40px;
+            background: linear-gradient(135deg, var(--dark), #2a2a2a);
+            overflow: hidden;
+        }
+
+        .partners-section h2 {
+            text-align: center;
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 60px;
+        }
+
+        .partner-marquee {
+            overflow: hidden;
+            position: relative;
+            padding: 40px 0;
+        }
+
+        .partner-track {
+            display: flex;
+            gap: 80px;
+            animation: scroll 30s linear infinite;
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        .partner-track img {
+            height: 80px;
+            transition: all 0.4s ease;
+        }
+
+        .partner-track img:hover {
+            filter: brightness(1) invert(0);
+            opacity: 1;
+            transform: scale(1.3);
         }
 
         .footer-section {
@@ -779,897 +605,309 @@ include_once HELPER_PATH . 'client_helper.php';
             .footer-column.social-extra a {
                 margin-right: 15px;
             }
+        }
 
-            .region-block {
-                position: relative;
-                width: 220px;
-                font-family: 'Poppins', sans-serif;
-            }
-
-            #region-list {
-                display: none;
-                list-style: none;
-                margin: 0;
-                padding: 0;
-                position: absolute;
-                width: 100%;
-                background: #fff;
-                border-radius: 10px;
-                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
-                z-index: 1000;
-            }
-
-            #region-list li {
-                padding: 10px 15px;
-                cursor: pointer;
-                font-size: 14px;
-                transition: all 0.2s ease;
-            }
-
-            #region-list li:hover {
-                background: #FF7A00;
-                color: #fff;
-            }
-
-            #region-current-region {
-                cursor: pointer;
-                padding: 10px 15px;
-                border-radius: 10px;
-                border: 1px solid #ddd;
-                background: #fff;
-                width: 100%;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                font-size: 14px;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            }
-
-            .arrow {
-                transition: transform 0.3s ease;
-            }
-
-            .company-section {
-                padding: 60px 20px;
-                background: #f8f9fa;
-            }
-
+        @media (max-width: 992px) {
             .section-block {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 40px;
-                margin-bottom: 60px;
-                flex-wrap: wrap;
+                flex-direction: column !important;
             }
 
-            .section-block.reverse {
-                flex-direction: row-reverse;
-            }
-
-            .text-block {
-                flex: 1;
-            }
-
-            .image-block {
-                flex: 1;
-                text-align: center;
-            }
-
-            .image-block img {
-                max-width: 100%;
-                border-radius: 10px;
-                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-                transition: transform 0.3s ease;
-            }
-
-            .image-block img:hover {
-                transform: scale(1.05);
-            }
-
-            .text-block h2 {
-                font-size: 28px;
-                margin-bottom: 15px;
-                color: #FF6600;
-            }
-
-            .text-block p {
-                font-size: 16px;
-                line-height: 1.6;
-                color: #333;
-            }
-
-            .partners h2 {
-                text-align: center;
-                margin-bottom: 30px;
-                color: #FF6600;
-            }
-
-            .partner-marquee {
-                overflow: hidden;
-                position: relative;
-            }
-
-            .partner-track {
-                display: flex;
-                gap: 50px;
-                animation: marquee 20s linear infinite;
-            }
-
-            .partner-track img {
-                height: 60px;
-                object-fit: contain;
-                transition: transform 0.3s ease;
-            }
-
-            .partner-track img:hover {
-                transform: scale(1.2);
-            }
-
-            @keyframes marquee {
-                0% {
-                    transform: translateX(0);
-                }
-
-                100% {
-                    transform: translateX(-50%);
-                }
-            }
-
-            @media (max-width: 992px) {
-
-                .section-block,
-                .section-block.reverse {
-                    flex-direction: column;
-                }
-
-                .text-block,
-                .image-block {
-                    flex: 100%;
-                }
-
-                .partner-track {
-                    gap: 30px;
-                }
+            .hero-content h1 {
+                font-size: 2.5rem;
             }
 
         }
     </style>
-
-    <style>
-        .chat-image-wrapper {
-            margin: 8px 0;
-            max-width: 100%;
-        }
-
-        .chat-image {
-            max-width: 250px;
-            max-height: 300px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            display: block;
-        }
-
-        .chat-image:hover {
-            transform: scale(1.02);
-        }
-
-        .chat-file-link {
-            display: inline-block;
-            padding: 8px 12px;
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 6px;
-            text-decoration: none;
-            color: inherit;
-            margin: 4px 0;
-            transition: background 0.2s;
-        }
-
-        .chat-file-link:hover {
-            background: rgba(0, 0, 0, 0.15);
-        }
-
-        .my-message .chat-image-wrapper {
-            text-align: right;
-        }
-
-        .their-message .chat-image-wrapper {
-            text-align: left;
-        }
-
-        #chatRobot {
-            position: fixed;
-            bottom: 30px;
-            right: 16px;
-            z-index: 3002;
-            cursor: pointer;
-        }
-
-        #chatRobot img {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s;
-        }
-
-        #chatRobot img:hover {
-            transform: scale(1.2);
-        }
-
-        #chatWidget {
-            display: none;
-            flex-direction: column;
-            position: fixed;
-            bottom: 100px;
-            right: 90px;
-            width: 360px;
-            height: 520px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-            overflow: hidden;
-            z-index: 3001;
-        }
-
-        #chatHeader {
-            background: #075E54;
-            color: #fff;
-            padding: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        #chatHeader span.close-chat {
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        #chatBody {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            background: #e5ddd5;
-        }
-
-        .chat-message {
-            padding: 6px 10px;
-            border-radius: 12px;
-            max-width: 85%;
-            word-break: break-word;
-        }
-
-        .chat-user {
-            background: #34b7f1;
-            color: #fff;
-            align-self: flex-end;
-        }
-
-        .chat-bot {
-            background: #fff;
-            color: #000;
-            align-self: flex-start;
-        }
-
-        #chatInputWrapper {
-            display: flex;
-            align-items: center;
-            padding: 5px;
-            border-top: 1px solid #ddd;
-            background: #fff;
-        }
-
-        #chatInput {
-            flex: 1;
-            padding: 8px 40px 8px 35px;
-            border-radius: 18px;
-            border: 1px solid #ccc;
-            position: relative;
-            outline: none;
-            background-size: 20px 20px;
-        }
-
-
-        #chatUserWidget {
-            display: none;
-            position: fixed;
-            bottom: 120px;
-            right: 90px;
-            width: 550px;
-            height: 650px;
-            background: #f0f2f5;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-            display: flex;
-            flex-direction: row;
-            overflow: hidden;
-            z-index: 3002;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        #chatSidebar {
-            width: 150px;
-            background: #fff;
-            border-right: 1px solid #ccc;
-            overflow-y: auto;
-        }
-
-        #chatSidebarHeader {
-            padding: 16px;
-            font-weight: bold;
-            background: #075E54;
-            color: #fff;
-            text-align: center;
-            font-size: 18px;
-        }
-
-        .contact-item {
-            padding: 10px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #eee;
-            flex-direction: column;
-        }
-
-        .contact-item:hover {
-            background: #f0f0f0;
-        }
-
-        .contact-item.active {
-            background: #dcf8c6;
-        }
-
-        .unread-count {
-            background: red;
-            color: #fff;
-            padding: 2px 6px;
-            border-radius: 12px;
-            font-size: 12px;
-            align-self: flex-end;
-        }
-
-        #chatUserBody::-webkit-scrollbar {
-            display: none;
-        }
-
-        #chatArea {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        #chatUserHeader {
-            background: #075E54;
-            color: #fff;
-            padding: 16px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 18px;
-        }
-
-        #chatUserHeader .close-chat {
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        #chatUserBody,
-        #chatBody {
-            flex: 1;
-            padding: 10px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            background-color: #e5ddd5;
-            background-image: url("/new_project_bk/uploads/chat.robot/whatsapp.png");
-            background-repeat: repeat;
-            background-size: cover;
-            background-position: center;
-        }
-
-
-        .chat-bubble {
-            padding: 10px 14px;
-            border-radius: 20px;
-            max-width: 75%;
-            word-break: break-word;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .my-message {
-            background-color: #dcf8c6;
-            color: #000;
-            align-self: flex-end;
-        }
-
-        .their-message {
-            background-color: #fff;
-            color: #000;
-            align-self: flex-start;
-        }
-
-        .msg-time {
-            font-size: 10px;
-            color: #666;
-            text-align: right;
-        }
-
-        .chat-img {
-            max-width: 150px;
-            border-radius: 6px;
-        }
-
-        #chatUserForm {
-            display: flex;
-            border-top: 1px solid #ddd;
-        }
-
-        #chatUserInput {
-            flex: 1;
-            border: none;
-            padding: 6px 10px;
-        }
-
-        #chatUserInput:focus {
-            outline: none;
-        }
-
-        #chatUserSend {
-            background: #007bff;
-            color: #fff;
-            border: none;
-            padding: 0 15px;
-            cursor: pointer;
-        }
-
-        #chatUserFile {
-            display: none;
-        }
-
-        #typingIndicator {
-            font-size: 12px;
-            color: #666;
-            margin: 2px 10px;
-            display: none;
-        }
-
-        #chatInputWrapper {
-            display: flex;
-            gap: 8px;
-            padding: 10px;
-            border-top: 1px solid #ccc;
-            background: #fff;
-        }
-
-        #chatInputWrapper input[type="text"] {
-            flex: 1;
-            padding: 10px 14px 10px 18px;
-            border-radius: 25px;
-            border: 1px solid #ccc;
-            outline: none;
-            background-size: 20px 20px;
-        }
-
-        #chatInputWrapper input[type="file"] {
-            display: none;
-        }
-
-        #chatUserIcon {
-            position: fixed;
-            bottom: 100px;
-            right: 16px;
-            z-index: 3003;
-            cursor: pointer;
-        }
-
-        #chatUserIcon .chat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s;
-        }
-
-        #chatUserIcon .chat-icon:hover {
-            transform: scale(1.2);
-        }
-
-
-
-        #chatInputWrapper button {
-            padding: 10px 14px;
-            border-radius: 50%;
-            border: none;
-            background: #075E54;
-            color: #fff;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.2s ease, transform 0.2s ease;
-        }
-
-        #chatInputWrapper button:hover {
-            background: #064d46;
-            transform: scale(1.05);
-        }
-
-        #chatUserBody::-webkit-scrollbar,
-        #chatContacts::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        #chatUserBody::-webkit-scrollbar-thumb,
-        #chatContacts::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 3px;
-        }
-
-        .chat-date-separator {
-            text-align: center;
-            background: rgba(0, 0, 0, 0.1);
-            color: #555;
-            font-size: 12px;
-            font-weight: bold;
-            padding: 4px 10px;
-            border-radius: 12px;
-            margin: 10px auto;
-            max-width: 60%;
-        }
-
-        .chat-calendar {
-            background: #f4f6f8;
-            border-radius: 10px;
-            padding: 10px;
-            margin: 10px 0;
-        }
-
-        .chat-calendar input {
-            display: block;
-            width: 100%;
-            margin: 6px 0;
-            padding: 5px;
-        }
-
-        .chat-calendar button {
-            margin-top: 8px;
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .chat-calendar button:hover {
-            background: #0056b3;
-        }
-
-        #chatBody::-webkit-scrollbar,
-        #chatUserBody::-webkit-scrollbar,
-        #chatContacts::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        #chatBody::-webkit-scrollbar-thumb,
-        #chatUserBody::-webkit-scrollbar-thumb,
-        #chatContacts::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 3px;
-        }
-    </style>
-
-    <div id="chatRobot">
-        <img src="/new_project_bk/uploads/chat.robot/Chat.jpg" alt="Chat Robot" style="width:60px; height:60px; border-radius:50%; box-shadow:0 4px 15px rgba(0,0,0,0.3);">
-    </div>
-    <div id="chatWidget">
-        <div id="chatHeader">
-            Chat Auto Future Block
-            <span id="chatClose" style="float:right; cursor:pointer;">✖</span>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="<?= BASE_URL ?>views/general/home/list.php" class="logo collapsed-sidebar-logo" id="navbar-brand-box img">
+                <img src="<?= UPLOADS_URL ?>cars/LOGO.png" alt="Logo">
+            </a>
+            <ul class="nav-links">
+                <li><a href="<?= GENERAL_URL ?>main_page/list.php">Home</a></li>
+                <li><a href="<?= GENERAL_URL ?>main_page/list.php">Book Now</a></li>
+                <li><a href="<?= GENERAL_URL ?>main_page/our_fleet.php">Our Fleet</a></li>
+                <li class="phone"><a href="https://wa.me/355695555556" target="_blank">+355 69 555 5556</a></li>
+                <li class="nav-item dropdown ms-3">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="page-header-user-dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="<?= BASE_URL ?>public/assets/images/users/avatar-1.jpg" alt="Header Avatar" class="rounded-circle me-2" width="35" height="35">
+                        <span>
+                            <span class="fw-semibold user-name-text">Emiljano Perhati</span><br>
+                            <span class="text-muted fs-12 user-name-sub-text">Founder</span>
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="page-header-user-dropdown" style="min-width: 200px;">
+                        <li>
+                            <h6 class="dropdown-header text-center mb-1 text-dark">Welcome Emiljano!</h6>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center text-muted" href="<?= BASE_URL ?>views/general/home/list.php">
+                                <i class="mdi mdi-account-circle text-primary fs-16 me-2"></i> Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center text-muted" href="<?= BASE_URL ?>views/general/home/list.php">
+                                <i class="mdi mdi-lock text-primary fs-16 me-2"></i> Lock screen
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center text-muted" href="<?= BASE_URL ?>controllers/logout.php">
+                                <i class="mdi mdi-logout text-danger fs-16 me-2"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
-        <div id="chatBody"></div>
-        <div style="padding:10px; border-top:1px solid #ddd; display:flex; gap:10px; align-items:center;">
-            <input id="chatInput" type="text" placeholder="Shkruaj mesazhin..."
-                style="flex:1; padding:10px 13px; font-size:14px; border-radius:23px; border:1px solid #ccc; outline:none;">
+    </nav>
+
+    <section class="hero-section">
+
+        <video id="hero-video" autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800">
+            <source src="https://v.ftcdn.net/04/89/28/91/700_F_489289172_T37vHr3L2NjedSpGRXwvs33EWHvyac2f_ST.mp4" type="video/mp4">
+            Your browser does not support HTML5 video.
+        </video>
+
+
+        <div class="hero-content">
+            <h1>Drive Your Dreams</h1>
+            <p>Experience luxury and performance</p>
+            <a href="#fleet" class="cta-button">Explore Cars</a>
         </div>
 
+
+        <button id="video-toggle" title="Pause Video">⏸️</button>
+    </section>
+
+    <div class="content-section" id="auto-future">
+        <div class="section-block">
+            <div class="text-block">
+                <h2>Auto Future Block</h2>
+                <p>
+                    Auto Future Block është udhëheqës në industrinë e qirasë së makinave në Shqipëri, duke ofruar një gamë të gjerë automjetesh luksoze dhe premium për çdo nevojë. Ne sigurojmë një eksperiencë të qetë dhe të personalizuar për klientët tanë, duke përfshirë shërbime të shpejta rezervimi, asistencë 24/7, dhe mundësi fleksibile të qiradhënies për periudha të shkurtra apo të gjata. Çdo automjet është i mirëmbajtur me standarde të larta sigurie dhe pastërtie, duke garantuar rehati dhe performancë maksimale gjatë çdo udhëtimi. Ne synojmë të krijojmë eksperiencën perfekte të vozitjes, qoftë për klientë lokalë apo vizitorë ndërkombëtarë, duke e kombinuar luksin me besueshmërinë dhe shërbimin e shkëlqyer.
+                </p>
+
+            </div>
+            <div class="image-block">
+                <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800" alt="Cars">
+            </div>
+        </div>
     </div>
 
-    <div id="chatUserIcon">
-        <img src="/new_project_bk/uploads/chat.robot/mm.jpg" class="chat-icon" alt="Chat">
-    </div>
 
-    <div id="chatUserWidget">
-        <div id="chatSidebar">
-            <div id="chatSidebarHeader">Kontakti</div>
-            <div id="chatContacts"></div>
+    <div class="content-section" id="karriera"></div>
+    <div class="section-block reverse">
+        <div class="text-block">
+            <h2>Karriera</h2>
+            <p>
+                Bashkohu me ekipin tonë të talentuar dhe inovativ në Auto Future Block! Ne ofrojmë një ambient pune dinamik, ku kreativiteti dhe profesionalizmi vlerësohen çdo ditë. Punonjësit tanë kanë mundësi të zhvillohen profesionalisht përmes trajnimeve të avancuara, mentorimit dhe projekteve sfiduese që forcojnë aftësitë e tyre. Ne besojmë në promovimin e talenteve të brendshme, ofrojmë rritje karriere të qëndrueshme dhe një paketë përfitimesh konkurruese që përfshin fleksibilitet, shëndetësi dhe stimuj motivues. Nëse dëshiron të rritesh profesionalisht dhe të kontribuosh në suksesin e një kompanie lider në industrinë e qiradhënies së makinave luksoze, kjo është mundësia jote ideale!
+            </p>
         </div>
 
-        <div id="chatArea">
-            <div id="chatUserHeader">
-                <span id="chatUserTitle">Biseda</span>
-                <span id="chatUserClose" class="close-chat">✖</span>
+        <div class="image-block">
+            <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800" alt="Career">
+        </div>
+    </div>
+    </div>
+
+    <div class="content-section" id="qendrueshmeria">
+        <div class="section-block">
+            <div class="text-block">
+                <h2>Qëndrueshmëria</h2>
+                <p>
+                    Angazhimi ynë për mjedisin është prioritet kryesor në Auto Future Block. Ne zbatojmë praktika të qëndrueshme në çdo aspekt të biznesit tonë, nga menaxhimi i flotës së makinave me teknologji energjie të pastër, përdorimi i materialeve të riciklueshme dhe reduktimi i mbeturinave deri tek optimizimi i konsumit të energjisë në zyrat dhe pikat tona. Përveç kësaj, ne promovojmë ngasjen e përgjegjshme dhe edukimin e klientëve tanë mbi përdorimin e efikas të burimeve. Synimi ynë është të krijojmë një industri të qiradhënies së makinave që jo vetëm ofron eksperiencë luksoze, por gjithashtu ruan dhe mbështet mjedisin për brezat e ardhshëm.
+                </p>
+            </div>
+            <div class="image-block">
+                <img src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800" alt="Sustainability">
+            </div>
+        </div>
+    </div>
+
+
+    <div class="content-section" id="pikat-tona"></div>
+    <div class="map-section">
+        <h1>Our location</h1>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2996.852531726948!2d19.805350276461905!3d41.31207160066284!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x135031293aa19c85%3A0xbd392fe96905553a!2sFuture%20Block%20Group!5e0!3m2!1sen!2s!4v1763128719276!5m2!1sen!2s" width="100%" height="600" style="border:0;" allowfullscreen=""></iframe>
+    </div>
+    </div>
+
+    <div class="content-section" id="partnere">
+        <div class="partners-section">
+            <h2>Partnerët Tanë Globalë</h2>
+            <div class="partner-marquee">
+                <div class="partner-track">
+                    <img src="/new_project_bk/uploads/chat.robot/partner2.png" alt="Mercedes-Benz">
+                    <img src="/new_project_bk/uploads/chat.robot/partner3.png" alt="BMW">
+                    <img src="/new_project_bk/uploads/chat.robot/partner4.png" alt="Ferrari">
+                    <img src="/new_project_bk/uploads/chat.robot/partner8.png" alt="Jaguar">
+                    <img src="/new_project_bk/uploads/chat.robot/partner9.png" alt="Rolls-Royce">
+                    <img src="/new_project_bk/uploads/chat.robot/partner10.png" alt="Bentley">
+                    <img src="/new_project_bk/uploads/chat.robot/partner12.png" alt="McLaren">
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="footer-section">
+
+        <div class="footer-top">
+            <div class="region-block">
+                <h3>Rajoni / Gjuha</h3>
+                <div class="region-select">
+                    <button id="current-region">🇦🇱 Shqipëri / Shqip ▼</button>
+                    <ul id="region-list">
+                        <li data-flag="🇦🇱" data-country="Shqipëri" data-lang="Shqip">🇦🇱 Shqipëri / Shqip</li>
+                        <li data-flag="🇺🇸" data-country="USA" data-lang="English">🇺🇸 USA / English</li>
+                        <li data-flag="🇬🇧" data-country="UK" data-lang="English">🇬🇧 UK / English</li>
+                        <li data-flag="🇩🇪" data-country="Germany" data-lang="Deutsch">🇩🇪 Gjermani / Deutsch</li>
+                        <li data-flag="🇫🇷" data-country="France" data-lang="Français">🇫🇷 Francë / Français</li>
+                        <li data-flag="🇪🇬" data-country="Egypt" data-lang="English">🇪🇬 Egypt / English</li>
+                    </ul>
+                </div>
             </div>
 
-            <div id="chatUserBody"></div>
+            <div class="newsletter-block">
+                <h3>Newsletter</h3>
+                <p>Lajmet më të fundit direkt në email-in tuaj</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Vendos email-in tuaj">
+                    <button type="submit">Abonohu</button>
+                </form>
+            </div>
 
-            <form id="chatUserForm">
-                <input type="hidden" id="receiver_id" name="receiver_id">
-                <input type="hidden" id="receiver_type" name="receiver_type">
+            <div class="social-block">
+                <h3>Rrjetet Sociale</h3>
+                <p>Na ndiqni në rrjetet sociale.</p>
 
-                <div id="chatInputWrapper">
-                    <span id="chatFileIcon" style="cursor:pointer; font-size:24px; margin-right:8px;">📷</span>
-                    <input type="file" id="chatUserFile" name="file" style="display:none;">
-                    <input type="text" id="chatUserInput" name="message" placeholder="Shkruaj mesazhin...">
-                    <button type="submit">➤</button>
+                <div class="social-icons">
+                    <a href="https://www.facebook.com/faverent" target="_blank">Facebook</a>
+                    <a href="https://www.instagram.com/emiljano_perhati" target="_blank">Instagram</a>
+                    <a href="https://www.pinterest.com/faverent" target="_blank">Pinterest</a>
+                    <a href="https://www.youtube.com/@faverent" target="_blank">YouTube</a>
+                    <a href="https://twitter.com/faverent" target="_blank">Twitter</a>
+                    <a href="https://www.linkedin.com/company/faverent" target="_blank">LinkedIn</a>
                 </div>
-            </form>
-        </div>
-    </div>
+            </div>
 
-    <div class="main-content">
-        <nav class="navbar">
-            <div class="container">
-                <a href="<?= BASE_URL ?>views/general/home/list.php" class="logo collapsed-sidebar-logo" id="navbar-brand-box img">
-                    <img src="<?= UPLOADS_URL ?>cars/LOGO.png" alt="Logo">
-                </a>
-                <ul class="nav-links">
-                    <li><a href="<?= GENERAL_URL ?>main_page/list.php">Home</a></li>
-                    <li><a href="<?= GENERAL_URL ?>main_page/list.php">Book Now</a></li>
-                    <li><a href="<?= GENERAL_URL ?>main_page/our_fleet.php">Our Fleet</a></li>
-                    <li class="phone"><a href="https://wa.me/355695555556" target="_blank">+355 69 555 5556</a></li>
-                    <li class="nav-item dropdown ms-3">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="page-header-user-dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="<?= BASE_URL ?>public/assets/images/users/avatar-1.jpg" alt="Header Avatar" class="rounded-circle me-2" width="35" height="35">
-                            <span>
-                                <span class="fw-semibold user-name-text">Emiljano Perhati</span><br>
-                                <span class="text-muted fs-12 user-name-sub-text">Founder</span>
-                            </span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="page-header-user-dropdown" style="min-width: 200px;">
-                            <li>
-                                <h6 class="dropdown-header text-center mb-1 text-dark">Welcome Emiljano!</h6>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center text-muted" href="<?= BASE_URL ?>views/general/home/list.php">
-                                    <i class="mdi mdi-account-circle text-primary fs-16 me-2"></i> Profile
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center text-muted" href="<?= BASE_URL ?>views/general/home/list.php">
-                                    <i class="mdi mdi-lock text-primary fs-16 me-2"></i> Lock screen
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center text-muted" href="<?= BASE_URL ?>controllers/logout.php">
-                                    <i class="mdi mdi-logout text-danger fs-16 me-2"></i> Logout
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-
+            <div class="company-block">
+                <h3>Kompania</h3>
+                <ul>
+                    <li><a href="#auto-future">Auto Future Block</a></li>
+                    <li><a href="#pikat-tona">Pikat tona</a></li>
+                    <li><a href="#karriera">Karriera</a></li>
+                    <li><a href="#komunikata">Komunikata për shtyp</a></li>
+                    <li><a href="#qendrueshmeria">Qëndrueshmëria</a></li>
+                    <li><a href="#partnere">Partnerë Globalë</a></li>
                 </ul>
-                <div class="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
             </div>
-        </nav>
+        </div>
 
+        <div class="footer-container">
 
-
-        <div class="page-content">
-
-            <div class="section-block">
-                <div class="text-block left">
-                    <h2>Auto Future Block</h2>
-                    <p>Auto Future Block është lider në ofrimin e shërbimeve të qirasë së makinave në Shqipëri, duke ofruar eksperiencë të sigurt dhe luksoze për çdo klient.</p>
-                </div>
-                <div class="image-block right">
-                    <img src="/new_project_bk/uploads/chat.robot/auto_future_intro.jpg" alt="Auto Future Block">
-                </div>
+            <div class="footer-column contact-info">
+                <h3>Kontakt</h3>
+                <p>Tirana International Airport, Uzina, Tirana 1504, Albania</p>
+                <p><a href="mailto:info@faverent.al">info@faverent.al</a></p>
+                <p class="phone-number">+355 69 55 55 556</p>
             </div>
 
-            <h1 style=" padding: 5px 10px; 
-             border-radius: 5px; text-align: center; margin-top: 130px;">
-                Book with us for a seamless journey, where convenience <br>meets reliability in every rental.
-            </h1>
-            <div style="width: 100%; display: flex; justify-content: center; margin-top: 30px; margin-bottom: 30px;">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2996.852531726948!2d19.805350276461905!3d41.31207160066284!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x135031293aa19c85%3A0xbd392fe96905553a!2sFuture%20Block%20Group!5e0!3m2!1sen!2s!4v1763128719276!5m2!1sen!2s" width="100%" height="650" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <div class="footer-column services">
+                <h3>Shërbime</h3>
+                <ul class="services">
+                    <li><a href="#nightparties">Rent For Night Parties</a></li>
+                    <li><a href="#weddings">Rent For Weddings</a></li>
+                    <li><a href="#airport">Rent For Airport Transfers</a></li>
+                    <li><a href="#casinos">Rent For Casinos</a></li>
+                    <li><a href="#birthdays">Rent For Birthdays</a></li>
+                </ul>
             </div>
 
-            <div class="section-block">
-                <div class="text-block left">
-                    <h2>Karriera</h2>
-                    <p>Ne ofrojmë mundësi të shkëlqyera për zhvillim profesional dhe bashkëpunim me një ekip të dedikuar dhe inovativ.</p>
-                </div>
-                <div class="image-block right">
-                    <img src="/new_project_bk/uploads/chat.robot/career.jpg" alt="Career">
-                </div>
+            <div class="footer-column cta">
+                <h3>Rezervo makinën tënde!</h3>
+                <a href="<?= GENERAL_URL ?>main_page/list.php" target="_blank">Rezervo Tani</a>
             </div>
 
-            <div class="section-block reverse">
-                <div class="image-block left">
-                    <img src="/new_project_bk/uploads/chat.robot/press.jpg" alt="Press">
-                </div>
-                <div class="text-block right">
-                    <h2>Komunikata për shtyp</h2>
-                    <p>Lexoni lajmet dhe njoftimet tona zyrtare për të qenë të informuar mbi çdo zhvillim të rëndësishëm.</p>
-                </div>
+            <div class="footer-column social-extra">
+                <h3>Na kontakto</h3>
+                <a href="https://www.instagram.com/emiljano_perhati/" target="_blank">
+                    <img src="/new_project_bk/uploads/chat.robot/instagram.png"
+                        style="width:40px; height:40px; object-fit:contain;">
+                </a>
+
+                <a href="https://wa.me/355695555556" target="_blank">
+                    <img src="/new_project_bk/uploads/chat.robot/social.png"
+                        style="width:40px; height:40px; object-fit:contain;">
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+
+            <p class="copyright">
+                © 2025 Të gjitha të drejtat e rezervuara për Auto Future Block dhe licencuesit e saj.
+            </p>
+
+            <div class="legal-links">
+                <a href="#">Kushtet e përdorimit</a> |
+                <a href="#">Politika e Privatësisë</a> |
+                <a href="#">Cookies</a> |
+                <a href="#">Rregulloret</a> |
+                <a href="#">Markat tregtare</a> |
+                <a href="#">Deklarata kundër skllavërisë</a> |
+                <a href="#">Kushtet e UGC</a> |
+                <a href="#">Strategjia e taksave</a> |
+                <a href="#">Skema e pensioneve</a> |
+                <a href="#">Deklarata S172</a> |
+                <a href="#">Open Source Software Notice</a> |
+                <a href="#">Sistemi i sinjalizimit</a> |
+                <a href="#">Kodi i Sjelljes Porsche</a> |
+                <a href="#">EU Data Act</a>
             </div>
 
-            <div class="section-block">
-                <div class="text-block left">
-                    <h2>Qëndrueshmëria</h2>
-                    <p>Ne përpiqemi të zbatojmë praktika të qëndrueshme dhe të mbrojmë mjedisin në çdo hap të shërbimit tonë.</p>
-                </div>
-                <div class="image-block right">
-                    <img src="/new_project_bk/uploads/chat.robot/sustainability.jpg" alt="Sustainability">
-                </div>
+            <div class="legal-text">
+                <p>
+                    * Të dhënat e performancës janë bazuar në standardin WLTP. Për automjetet hibride,
+                    distanca elektrike varet nga ngarkesa e baterisë dhe kushtet e ngasjes.
+                </p>
+                <p>
+                    ** Informacion i rëndësishëm rreth modeleve elektrike mund të gjendet këtu.
+                </p>
             </div>
-
-
-            <div class="section-block partners">
-                <h2>Partnerë Globalë</h2>
-                <div class="partner-marquee">
-                    <div class="partner-track">
-                        <img src="/new_project_bk/uploads/partners/partner1.png" alt="Partner 1">
-                        <img src="/new_project_bk/uploads/partners/partner2.png" alt="Partner 2">
-                        <img src="/new_project_bk/uploads/partners/partner3.png" alt="Partner 3">
-                        <img src="/new_project_bk/uploads/partners/partner4.png" alt="Partner 4">
-                        <img src="/new_project_bk/uploads/partners/partner5.png" alt="Partner 5">
-                        <img src="/new_project_bk/uploads/partners/partner6.png" alt="Partner 6">
-                    </div>
-                </div>
-            </div>
-
-            <footer class="footer-section">
-
-                <div class="footer-top">
-                    <div class="region-block">
-                        <h3>Rajoni / Gjuha</h3>
-                        <div class="region-select">
-                            <button id="current-region">🇦🇱 Shqipëri / Shqip ▼</button>
-                            <ul id="region-list">
-                                <li data-flag="🇦🇱" data-country="Shqipëri" data-lang="Shqip">🇦🇱 Shqipëri / Shqip</li>
-                                <li data-flag="🇺🇸" data-country="USA" data-lang="English">🇺🇸 USA / English</li>
-                                <li data-flag="🇬🇧" data-country="UK" data-lang="English">🇬🇧 UK / English</li>
-                                <li data-flag="🇩🇪" data-country="Germany" data-lang="Deutsch">🇩🇪 Gjermani / Deutsch</li>
-                                <li data-flag="🇫🇷" data-country="France" data-lang="Français">🇫🇷 Francë / Français</li>
-                                <li data-flag="🇪🇬" data-country="Egypt" data-lang="English">🇪🇬 Egypt / English</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="newsletter-block">
-                        <h3>Newsletter</h3>
-                        <p>Lajmet më të fundit direkt në email-in tuaj</p>
-                        <form class="newsletter-form">
-                            <input type="email" placeholder="Vendos email-in tuaj">
-                            <button type="submit">Abonohu</button>
-                        </form>
-                    </div>
-
-                    <div class="social-block">
-                        <h3>Rrjetet Sociale</h3>
-                        <p>Na ndiqni në rrjetet sociale.</p>
-
-                        <div class="social-icons">
-                            <a href="https://www.facebook.com/faverent" target="_blank">Facebook</a>
-                            <a href="https://www.instagram.com/emiljano_perhati" target="_blank">Instagram</a>
-                            <a href="https://www.pinterest.com/faverent" target="_blank">Pinterest</a>
-                            <a href="https://www.youtube.com/@faverent" target="_blank">YouTube</a>
-                            <a href="https://twitter.com/faverent" target="_blank">Twitter</a>
-                            <a href="https://www.linkedin.com/company/faverent" target="_blank">LinkedIn</a>
-                        </div>
-                    </div>
-
-                    <div class="company-block">
-                        <h3>Kompania</h3>
-                        <ul>
-                            <li><a href="#">Auto Future Block</a></li>
-                            <li><a href="#">Pikat tona</a></li>
-                            <li><a href="#">Karriera</a></li>
-                            <li><a href="#">Komunikata për shtyp</a></li>
-                            <li><a href="#">Qëndrueshmëria</a></li>
-                            <li><a href="#">Partnerë Globalë</a></li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="footer-container">
-
-                    <div class="footer-column contact-info">
-                        <h3>Kontakt</h3>
-                        <p>Tirana International Airport, Uzina, Tirana 1504, Albania</p>
-                        <p><a href="mailto:info@faverent.al">info@faverent.al</a></p>
-                        <p class="phone-number">+355 69 55 55 556</p>
-                    </div>
-
-                    <div class="footer-column services">
-                        <h3>Shërbime</h3>
-                        <ul class="services">
-                            <li><a href="#nightparties">Rent For Night Parties</a></li>
-                            <li><a href="#weddings">Rent For Weddings</a></li>
-                            <li><a href="#airport">Rent For Airport Transfers</a></li>
-                            <li><a href="#casinos">Rent For Casinos</a></li>
-                            <li><a href="#birthdays">Rent For Birthdays</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-column cta">
-                        <h3>Rezervo makinën tënde!</h3>
-                        <a href="<?= GENERAL_URL ?>main_page/list.php" target="_blank">Rezervo Tani</a>
-                    </div>
-
-                    <div class="footer-column social-extra">
-                        <h3>Na kontakto</h3>
-                        <a href="https://www.instagram.com/emiljano_perhati/" target="_blank">
-                            <img src="/new_project_bk/uploads/chat.robot/instagram.png"
-                                style="width:40px; height:40px; object-fit:contain;">
-                        </a>
-
-                        <a href="https://wa.me/355695555556" target="_blank">
-                            <img src="/new_project_bk/uploads/chat.robot/social.png"
-                                style="width:40px; height:40px; object-fit:contain;">
-                        </a>
-                    </div>
-                </div>
-
-                <div class="footer-bottom">
-
-                    <p class="copyright">
-                        © 2025 Të gjitha të drejtat e rezervuara për Auto Future Block dhe licencuesit e saj.
-                    </p>
-
-                    <div class="legal-links">
-                        <a href="#">Kushtet e përdorimit</a> |
-                        <a href="#">Politika e Privatësisë</a> |
-                        <a href="#">Cookies</a> |
-                        <a href="#">Rregulloret</a> |
-                        <a href="#">Markat tregtare</a> |
-                        <a href="#">Deklarata kundër skllavërisë</a> |
-                        <a href="#">Kushtet e UGC</a> |
-                        <a href="#">Strategjia e taksave</a> |
-                        <a href="#">Skema e pensioneve</a> |
-                        <a href="#">Deklarata S172</a> |
-                        <a href="#">Open Source Software Notice</a> |
-                        <a href="#">Sistemi i sinjalizimit</a> |
-                        <a href="#">Kodi i Sjelljes Porsche</a> |
-                        <a href="#">EU Data Act</a>
-                    </div>
-
-                    <div class="legal-text">
-                        <p>
-                            * Të dhënat e performancës janë bazuar në standardin WLTP. Për automjetet hibride,
-                            distanca elektrike varet nga ngarkesa e baterisë dhe kushtet e ngasjes.
-                        </p>
-                        <p>
-                            ** Informacion i rëndësishëm rreth modeleve elektrike mund të gjendet këtu.
-                        </p>
-                    </div>
-
-                </div>
-
-            </footer>
 
         </div>
-    </div>
-    </div>
+
+    </footer>
+
+    <script>
+        window.addEventListener('scroll', () => {
+            document.querySelector('.navbar').classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        });
+
+        document.querySelectorAll('.section-block').forEach(el => observer.observe(el));
+    </script>
 </body>
 
 </html>
@@ -1889,11 +1127,6 @@ include_once HELPER_PATH . 'client_helper.php';
         }
 
     });
-</script>
-
-<script>
-    const BASE_URL = "<?php echo BASE_URL; ?>";
-    const UPLOADS_URL = "<?php echo UPLOADS_URL; ?>";
 </script>
 
 <script>
@@ -2354,5 +1587,20 @@ include_once HELPER_PATH . 'client_helper.php';
             fetchContacts();
             updateUnreadBadge();
         });
+    });
+</script>
+
+<script>
+    const video = document.getElementById('heroVideo');
+    const btn = document.getElementById('pauseBtn');
+
+    btn.addEventListener('click', () => {
+        if (video.paused) {
+            video.play();
+            btn.textContent = 'Pause';
+        } else {
+            video.pause();
+            btn.textContent = 'Play';
+        }
     });
 </script>
